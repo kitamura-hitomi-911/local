@@ -1,6 +1,7 @@
 <?php
 
 $file_name = $_POST['file_name'];
+
 $action = $_POST['action'];
 $model = $_POST['model'];
 $model_obj = json_decode($model);
@@ -11,7 +12,7 @@ $current_json_obj = json_decode($current_json);
 $resp = array('list'=>array());
 
 foreach ($current_json_obj->list as &$item) {
-	if(!empty($item -> player_id) && $item -> player_id === $model_obj -> player_id || !empty($item -> game_id) && $item -> game_id === $model_obj -> game_id){
+	if($item -> id === $model_obj -> id){
 		$resp['list'][] = $model_obj;
 	}else{
 		$resp['list'][] = $item;
