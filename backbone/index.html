@@ -1,0 +1,380 @@
+<!doctype html>
+<html lang="ja">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="x-ua-compatible" content="ie=edge">
+	<meta http-equiv="content-language" content="ja-JP">
+	<title>backbone.jsのテスト</title>
+</head>
+<body>
+<div id="wrapper">
+	<section id="index" class="page">
+		<ul class="menu">
+			<li><a href="#players">プレイヤーリスト</a></li>
+			<li><a href="#games">試合リスト</a></li>
+		</ul>
+	</section>
+	<section id="players" class="page">
+		<ul class="player-list"></ul>
+	</section>
+	<section id="games" class="page">
+		<ul class="game-list"></ul>
+	</section>
+</div>
+
+<script type="text/template" id="tmpl-player-list">
+	<dl>
+		<dt><%= name %></dt>
+		<dd><%= country %></dd>
+		<dd><%= prefecture %></dd>
+		<% if(game){ %>
+			<dd><%= game %></dd>
+		<% }else{ %>
+			<dd>試合選択
+				<div class="select"></div>
+			</dd>
+		<% } %>
+		<dd>
+			<p class="btn"><a href="#">更新</a></p>
+		</dd>
+	</dl>
+</script>
+<script type="text/template" id="tmpl-game-list">
+	<dl>
+		<dt><%= game_id %></dt>
+		<dd><%= group %></dd>
+		<dd><%= name %></dd>
+	</dl>
+</script>
+<script type="text/template" id="tmpl-select-game-list">
+	グループ<%= group %>:<%= name %>
+</script>
+
+<script src="./js/underscore-min.js"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<script src="./js/backbone.js"></script>
+<script>
+	Backbone.emulateHTTP = true;
+	Backbone.emulateJSON = true;
+	var infoMap = {
+		'create': {type: 'POST', action: "create"},
+		'update': {type: 'POST', action: "update"},
+		'delete': {type: 'POST', action: "delete"},
+		'read': {type: 'GET' , action: "get"}
+	};
+	Backbone.sync = function(info, model, options) {
+//		console.log(info);
+//		console.log(model);
+//		console.log(options);
+		var info = infoMap[info];
+		var type = info.type; // method_type
+		var action = info.action // action
+
+		// Default JSON-request options.
+		var params = {type: type, dataType: 'json'};
+
+		// Ensure that we have a URL.
+		if (!options.url) {
+			params.url = getValue(model, 'url') || urlError();
+		}
+
+		// Ensure that we have the appropriate request data.
+		if(type == "POST"){
+			params.contentType = 'application/json';
+			params.data = JSON.stringify(model.toJSON());
+		} else {
+			console.log(model);
+			// params.data = $.param(model.toJSON());
+		}
+
+		// For older servers, emulate JSON by encoding the request into an HTML-form.
+		if (Backbone.emulateJSON) {
+			params.contentType = 'application/x-www-form-urlencoded';
+			params.data = params.data ? {model: params.data} : {};
+		}
+		// Don't process data on a non-GET request.
+		if (params.type !== 'GET' && !Backbone.emulateJSON) {
+			params.processData = false;
+		}
+		// 対象ファイル
+		if(model.file_name){
+			params.data.file_name = model.file_name;
+		}
+		// アクション
+		params.data.action = action;
+
+		// console.dir(params);
+		// Make the request, allowing the user to override any Ajax options.
+		return $.ajax(_.extend(params, options));
+	};
+	// Helper function to get a value from a Backbone object as a property
+	// or as a function.
+	var getValue = function(object, prop) {
+		if (!(object && object[prop])) return null;
+		return _.isFunction(object[prop]) ? object[prop]() : object[prop];
+	};
+
+	// Throw an error when a URL is needed, and none is supplied.
+	var urlError = function() {
+		throw new Error('A "url" property or function must be specified');
+	};
+
+	/* model */
+	var Player = Backbone.Model.extend({
+		urlRoot: './api/updateData.php',
+		file_name:'players',
+		defaults:{
+			id:null,
+			player_id:null,
+			name:null,
+			country:null,
+			prefecture:null,
+			game_id:null,
+			game:null
+		},
+		initialize: function (){
+			this.set({
+				id: this.cid
+			});
+			this.on('change',this.onChange,this);
+		},
+		url:function(){
+			return this.urlRoot;
+		},
+		validate:function(attrs){
+			if(!attrs.name){
+				return 'nameは必須です'
+			}
+			if(!attrs.country){
+				return 'countryは必須です'
+			}
+		},
+		onChange:function(model){
+			model.save();
+		}
+	});
+
+	var Game = Backbone.Model.extend({
+		urlRoot: './api/updateData.php',
+		file_name:'games',
+		defaults:{
+			id:null,
+			game_id:null,
+			name:null,
+			group:null,
+			prefecture:null,
+			is_empty:true
+		},
+		initialize: function (){
+			this.set({
+				id: this.cid
+			});
+			this.on('change',this.onChange,this);
+		},
+		url:function(){
+			return this.urlRoot;
+		},
+		validate:function(attrs){
+			if(!attrs.name){
+				return 'nameは必須です'
+			}
+			if(!attrs.group){
+				return 'groupは必須です'
+			}
+		},
+		onChange:function(model){
+			model.save();
+		}
+	});
+
+	/* Collection */
+	var Players = Backbone.Collection.extend({
+		model:Player,
+		url:'./api/getData.php',
+		file_name:'players_init',
+		parse:function(resp){
+			return resp.list;
+		}
+	});
+	var players = new Players();
+
+	var Games = Backbone.Collection.extend({
+		model:Game,
+		url:'./api/getData.php',
+		file_name:'games_init',
+		initialize:function(){
+			this.listenTo(players, 'change', this.playerChange);
+		},
+		parse:function(resp){
+			return resp.list;
+		},
+		playerChange:function(player_model){
+			var model = this.where({game_id:player_model.attributes.game_id});
+			model[0].set({is_empty:false});
+		}
+	});
+	var games = new Games();
+
+	/* View Constructor */
+	var PlayerList = Backbone.View.extend({
+		initialize: function() {
+			this.listenTo(this.collection, 'add', this.add);
+		},
+		add:function(model){
+			var item = new PlayerListItem({ model: model });
+			item.render();
+			this.$el.append(item.el);
+		}
+	});
+	var PlayerListItem = Backbone.View.extend({
+		tagName:'li',
+		selectGameListView:null,
+		initialize:function(){
+			_.bindAll(this,"render");
+			this.listenTo(this.model, 'change', this.render);
+			this.selectGameListView = new SelectGameList({collection: games});
+		},
+		template:_.template($('#tmpl-player-list').text()),
+		render:function(){
+			var html = this.template(this.model.attributes);
+			this.$el.html(html);
+			this.$el.find('.select').append(this.selectGameListView.$el);
+			return this;
+		},
+		events:{
+			"click .btn a":"updateItem"
+		},
+		updateItem:function(e){
+			var game_val= this.$el.find('select option:selected').text()||'';
+			var game_id = this.$el.find('select option:selected').val()||'';
+			if(game_val){
+				this.model.set({'game':game_val,'game_id':game_id});
+			}else{
+				console.log('指定してね');
+			}
+			return false;
+		}
+	});
+	var GameList = Backbone.View.extend({
+		initialize: function() {
+			this.listenTo(this.collection, 'add', this.add);
+		},
+		add:function(model){
+			var item = new GameListItem({ model: model });
+			item.render();
+			this.$el.append(item.el);
+		}
+	});
+	var GameListItem = Backbone.View.extend({
+		tagName:'li',
+		initialize:function(){
+			_.bindAll(this,"render");
+		},
+		template:_.template($('#tmpl-game-list').text()),
+		render:function(){
+			var html = this.template(this.model.attributes);
+			this.$el.html(html);
+			return this;
+		}
+	});
+	var SelectGameList = Backbone.View.extend({
+		tagName:'select',
+		initialize: function() {
+			var that = this;
+			_.bindAll(this,"renderAll");
+			this.listenTo(this.collection, 'add', this.add);
+			this.listenTo(this.collection, 'change', this.renderAll);
+		},
+		add:function(model){
+			if(!this.$el.text()){
+				this.$el.append('<option value="">↓選択する</option>');
+			}
+			if(model.attributes.is_empty){
+				var item = new SelectGameListItem({model: model});
+				item.render();
+				this.$el.append(item.el);
+			}
+		},
+		renderAll:function(collection){
+			var that = this;
+			this.$el.html('');
+			_(this.collection.where({is_empty: true})).each(function(model){
+				that.add(model);
+			})
+		}
+	});
+	var SelectGameListItem = Backbone.View.extend({
+		tagName:'option',
+		initialize:function(){
+			_.bindAll(this,"render");
+		},
+		template:_.template($('#tmpl-select-game-list').text()),
+		render:function(){
+			var html = this.template(this.model.attributes);
+			this.$el.attr({value:this.model.attributes.game_id}).html(html);
+			return this;
+		}
+	});
+
+	/* View Instance */
+	var playerList = new PlayerList({
+		el:'ul.player-list',
+		collection: players
+	});
+	var playerListItem = new PlayerListItem();
+
+	var gameList = new GameList({
+		el:'ul.game-list',
+		collection: games
+	});
+	var gameListItem = new GameListItem();
+
+
+	var selectGameListItem = new SelectGameListItem();
+
+	var Router = Backbone.Router.extend({
+		initialize: function() {
+			players.fetch({
+				success:function success(collection, res, options){
+					collection.file_name = "players";
+					players.add({"player_id":"p4","name":"名前です","country":"国です"});
+				}
+			});
+			games.fetch({
+				success: function success(collection, res, options){
+					collection.file_name = "games";
+				},
+			});
+		},
+		routes: {
+			'':'index',
+			'players': 'players',
+			'games': 'games'
+		},
+		index:function(){
+			this.show('index');
+		},
+		players:function(){
+			this.show('players');
+		},
+		games:function(){
+			this.show('games');
+		},
+		show:function(id){
+			$('section.page').hide();
+			$('#'+id).show();
+		}
+	});
+
+	var router = new Router();
+
+	Backbone.history.start();
+</script>
+
+</body>
+</html>
+
+
+
+
+
