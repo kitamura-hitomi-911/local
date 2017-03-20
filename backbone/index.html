@@ -125,7 +125,6 @@
 		file_name:'players',
 		defaults:{
 			id:null,
-			player_id:null,
 			name:null,
 			country:null,
 			prefecture:null,
@@ -191,9 +190,32 @@
 	var Players = Backbone.Collection.extend({
 		model:Player,
 		url:'./api/getData.php',
-		file_name:'players_init',
+		file_name:'players',
 		parse:function(resp){
 			return resp.list;
+		},
+		create_file:function(){
+			var that = this;
+			this.file_name = 'players_init';
+			this.fetch({
+				success:function success(collection, res, options){
+					console.log('初回失敗後のfetch成功');
+					collection.file_name = 'players';
+					var obj={list:[]};
+					_(collection.models).each(function(model){
+						obj.list.push(model.attributes);
+					});
+					$.ajax({
+						type: "POST",
+						url: "./api/createFile.php",
+						data: {
+							file_name : that.file_name,
+							text: JSON.stringify(obj)
+						}
+					})
+				}
+			});
+
 		}
 	});
 	var players = new Players();
@@ -201,7 +223,7 @@
 	var Games = Backbone.Collection.extend({
 		model:Game,
 		url:'./api/getData.php',
-		file_name:'games_init',
+		file_name:'games',
 		initialize:function(){
 			this.listenTo(players, 'change', this.playerChange);
 		},
@@ -211,6 +233,29 @@
 		playerChange:function(player_model){
 			var model = this.where({game_id:player_model.attributes.game_id});
 			model[0].set({is_empty:false});
+		},
+		create_file:function(){
+			var that = this;
+			this.file_name = 'games_init';
+			this.fetch({
+				success:function success(collection, res, options){
+					console.log('初回失敗後のfetch成功');
+					collection.file_name = 'games';
+					var obj={list:[]};
+					_(collection.models).each(function(model){
+						obj.list.push(model.attributes);
+					});
+					$.ajax({
+						type: "POST",
+						url: "./api/createFile.php",
+						data: {
+							file_name : that.file_name,
+							text: JSON.stringify(obj)
+						}
+					})
+				}
+			});
+
 		}
 	});
 	var games = new Games();
@@ -336,14 +381,20 @@
 		initialize: function() {
 			players.fetch({
 				success:function success(collection, res, options){
-					collection.file_name = "players";
-					players.add({"player_id":"p4","name":"名前です","country":"国です"});
+					console.log('初回fetch成功');
+					players.add({"name":"名前です","country":"国です"});
+				},
+				error:function error(collection, res, options){
+					collection.create_file();
 				}
 			});
 			games.fetch({
 				success: function success(collection, res, options){
-					collection.file_name = "games";
+					console.log('初回fetch成功');
 				},
+				error:function error(collection, res, options){
+					collection.create_file();
+				}
 			});
 		},
 		routes: {

@@ -3,6 +3,8 @@
 $file_name = $_POST['file_name'];
 $text = $_POST['text'];
 
+
+
 $fp = fopen($file_name.'.json', 'wb');
 
 if ($fp){
