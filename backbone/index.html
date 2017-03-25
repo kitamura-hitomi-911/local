@@ -83,7 +83,7 @@
 			params.contentType = 'application/json';
 			params.data = JSON.stringify(model.toJSON());
 		} else {
-			console.log(model);
+			//console.log(model);
 			// params.data = $.param(model.toJSON());
 		}
 
@@ -136,6 +136,7 @@
 				id: this.cid
 			});
 			this.on('change',this.onChange,this);
+			//this.on('add',this.onAdd,this);
 		},
 		url:function(){
 			return this.urlRoot;
@@ -149,6 +150,10 @@
 			}
 		},
 		onChange:function(model){
+			console.log('player change');
+			model.save();
+		},
+		onAdd:function(model){
 			model.save();
 		}
 	});
@@ -232,7 +237,9 @@
 		},
 		playerChange:function(player_model){
 			var model = this.where({game_id:player_model.attributes.game_id});
-			model[0].set({is_empty:false});
+			if(model.length){
+				model[0].set({is_empty: false});
+			}
 		},
 		create_file:function(){
 			var that = this;
@@ -341,6 +348,7 @@
 			}
 		},
 		renderAll:function(collection){
+			console.log('ここきてる？');
 			var that = this;
 			this.$el.html('');
 			_(this.collection.where({is_empty: true})).each(function(model){
@@ -382,7 +390,17 @@
 			players.fetch({
 				success:function success(collection, res, options){
 					console.log('初回fetch成功');
-					players.add({"name":"名前です","country":"国です"});
+					var worker = new Worker('js/playerfetch.js');
+					worker.addEventListener('message',function(e) {
+						collection.set(e.data.list);
+						//console.log('Worker said: ', e.data);
+					}, false);
+					worker.postMessage('players');
+
+//					setInterval(function(){
+//						players.fetch();
+//
+//					},1000);
 				},
 				error:function error(collection, res, options){
 					collection.create_file();

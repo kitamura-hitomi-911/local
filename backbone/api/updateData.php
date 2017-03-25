@@ -11,12 +11,18 @@ $current_json_obj = json_decode($current_json);
 
 $resp = array('list'=>array());
 
+$is_exist = false;
+
 foreach ($current_json_obj->list as &$item) {
 	if($item -> id === $model_obj -> id){
 		$resp['list'][] = $model_obj;
+		$is_exist = true;
 	}else{
 		$resp['list'][] = $item;
 	}
+}
+if(!$is_exist){
+	$resp['list'][] = $model_obj;
 }
 
 $text = json_encode($resp);
