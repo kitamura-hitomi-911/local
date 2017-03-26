@@ -289,7 +289,7 @@
 		template:_.template($('#tmpl-player-list').text()),
 		render:function(){
 			var html = this.template(this.model.attributes);
-			this.$el.html(html);
+			this.$el.empty().html(html);
 			this.$el.find('.select').append(this.selectGameListView.$el);
 			return this;
 		},
@@ -325,7 +325,7 @@
 		template:_.template($('#tmpl-game-list').text()),
 		render:function(){
 			var html = this.template(this.model.attributes);
-			this.$el.html(html);
+			this.$el.empty().html(html);
 			return this;
 		}
 	});
@@ -348,9 +348,8 @@
 			}
 		},
 		renderAll:function(collection){
-			console.log('ここきてる？');
 			var that = this;
-			this.$el.html('');
+			this.$el.empty();
 			_(this.collection.where({is_empty: true})).each(function(model){
 				that.add(model);
 			})
@@ -364,7 +363,7 @@
 		template:_.template($('#tmpl-select-game-list').text()),
 		render:function(){
 			var html = this.template(this.model.attributes);
-			this.$el.attr({value:this.model.attributes.game_id}).html(html);
+			this.$el.attr({value:this.model.attributes.game_id}).empty().html(html);
 			return this;
 		}
 	});
@@ -389,11 +388,10 @@
 		initialize: function() {
 			players.fetch({
 				success:function success(collection, res, options){
-					console.log('初回fetch成功');
+					//console.log('初回fetch成功');
 					var worker = new Worker('js/playerfetch.js');
 					worker.addEventListener('message',function(e) {
 						collection.set(e.data.list);
-						//console.log('Worker said: ', e.data);
 					}, false);
 					worker.postMessage('players');
 
@@ -408,7 +406,12 @@
 			});
 			games.fetch({
 				success: function success(collection, res, options){
-					console.log('初回fetch成功');
+					// console.log('初回fetch成功');
+					var worker = new Worker('js/gamefetch.js');
+					worker.addEventListener('message',function(e) {
+						collection.set(e.data.list);
+					}, false);
+					worker.postMessage('games');
 				},
 				error:function error(collection, res, options){
 					collection.create_file();

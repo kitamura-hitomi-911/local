@@ -2,13 +2,13 @@ self.addEventListener('message', onMessage, false);
 var previous_obj ={list:[]};
 
 function onMessage(e){
-	setInterval(fetchPlayers,1000);
+	setInterval(fetchGames,1000);
 }
 
-function fetchPlayers(){
+function fetchGames(){
 	var xhr = new XMLHttpRequest();
 	// 同期モードで送信
-	xhr.open('GET', '../api/players.json', false);
+	xhr.open('GET', '../api/games.json', false);
 	xhr.responseType = 'json';
 	xhr.onreadystatechange = function() {
 		if(xhr.readyState === 4 && xhr.status == 200) {
