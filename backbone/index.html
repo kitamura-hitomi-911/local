@@ -290,7 +290,7 @@
 		render:function(){
 			var html = this.template(this.model.attributes);
 			this.$el.empty().html(html);
-			this.$el.find('.select').append(this.selectGameListView.$el);
+			this.$('.select').append(this.selectGameListView.$el);
 			return this;
 		},
 		events:{
@@ -333,9 +333,11 @@
 		tagName:'select',
 		initialize: function() {
 			var that = this;
-			_.bindAll(this,"renderAll");
 			this.listenTo(this.collection, 'add', this.add);
-			this.listenTo(this.collection, 'change', this.renderAll);
+			_.each(this.collection.models,function(model){
+				console.log(model);
+				that.add(model);
+			});
 		},
 		add:function(model){
 			if(!this.$el.text()){
@@ -346,24 +348,22 @@
 				item.render();
 				this.$el.append(item.el);
 			}
-		},
-		renderAll:function(collection){
-			var that = this;
-			this.$el.empty();
-			_(this.collection.where({is_empty: true})).each(function(model){
-				that.add(model);
-			})
 		}
 	});
 	var SelectGameListItem = Backbone.View.extend({
 		tagName:'option',
 		initialize:function(){
 			_.bindAll(this,"render");
+			this.listenTo(this.model, 'change', this.render);
 		},
 		template:_.template($('#tmpl-select-game-list').text()),
 		render:function(){
-			var html = this.template(this.model.attributes);
-			this.$el.attr({value:this.model.attributes.game_id}).empty().html(html);
+			if(this.model.get('is_empty')){
+				var html = this.template(this.model.attributes);
+				this.$el.attr({value:this.model.attributes.game_id}).empty().html(html);
+			}else{
+				this.$el.remove();
+			}
 			return this;
 		}
 	});
