@@ -161,6 +161,7 @@
 	var Game = Backbone.Model.extend({
 		urlRoot: './api/updateData.php',
 		file_name:'games',
+		selectGameListItemView:null,
 		defaults:{
 			id:null,
 			game_id:null,
@@ -188,6 +189,9 @@
 		},
 		onChange:function(model){
 			model.save();
+		},
+		setSelectGameListItemView:function(view){
+			this.selectGameListView = view;
 		}
 	});
 
@@ -331,41 +335,53 @@
 	});
 	var SelectGameList = Backbone.View.extend({
 		tagName:'select',
+		child_view:[],
 		initialize: function() {
 			var that = this;
 			this.listenTo(this.collection, 'add', this.add);
-			_.each(this.collection.models,function(model){
-				console.log(model);
-				that.add(model);
-			});
+			this.listenTo(this.collection, 'change', this.change);
 		},
 		add:function(model){
 			if(!this.$el.text()){
 				this.$el.append('<option value="">↓選択する</option>');
 			}
+			var item = new SelectGameListItem({model: model});
+			this.child_view.push(item);
+			item.render();
 			if(model.attributes.is_empty){
-				var item = new SelectGameListItem({model: model});
-				item.render();
 				this.$el.append(item.el);
 			}
+		},
+		change:function(model){
+			var that = this;
+			var $el = this.$el;
+			console.log(this.$el);
+			this.$el.empty().append('<option value="">↓選択する</option>');
+			_.each(this.child_view,function(option_view){
+				if(option_view.model.get('is_empty')){
+					console.log($el);
+					$el.append(option_view.el);
+				}
+			});
+		},
+		reRender:function(){
+			var that = this;
+			this.$el.empty();
+			_.each(this.collection.models,function(model){
+				//that.add(model);
+			});
 		}
 	});
 	var SelectGameListItem = Backbone.View.extend({
 		tagName:'option',
+		parent_view:null,
 		initialize:function(){
 			_.bindAll(this,"render");
-			this.listenTo(this.model, 'change', this.render);
+			//console.log(this);
+			//this.model.setSelectGameListItemView(this);
 		},
 		template:_.template($('#tmpl-select-game-list').text()),
-		render:function(){
-			if(this.model.get('is_empty')){
-				var html = this.template(this.model.attributes);
-				this.$el.attr({value:this.model.attributes.game_id}).empty().html(html);
-			}else{
-				this.$el.remove();
-			}
-			return this;
-		}
+
 	});
 
 	/* View Instance */
@@ -373,16 +389,16 @@
 		el:'ul.player-list',
 		collection: players
 	});
-	var playerListItem = new PlayerListItem();
+	//var playerListItem = new PlayerListItem();
 
 	var gameList = new GameList({
 		el:'ul.game-list',
 		collection: games
 	});
-	var gameListItem = new GameListItem();
+	//var gameListItem = new GameListItem();
 
 
-	var selectGameListItem = new SelectGameListItem();
+	//var selectGameListItem = new SelectGameListItem();
 
 	var Router = Backbone.Router.extend({
 		initialize: function() {
