@@ -22,22 +22,74 @@
 <script type="text/template" id="tmpl-select-page">
 	<ul>
 		<li>
-			<a href="#" class="select-page" data-page="reset">初期状態<% if(page=='reset'){ %>選択<% } %></a>
+			初期状態（これは設定する項目がない）
 		</li>
 		<li>
-			<a href="#" class="select-page" data-page="league">ページ１<% if(page=='league'){ %>選択<% } %></a>
+			<a href="#" class="select-page" data-page="league">
+				<dl>
+					<dt>ページ１</dt>
+					<dd>
+						選択：<% if(params.league.id){ %><%= params.league.id %><% }else{ %>未設定<% } %><br>
+						フリー：<% if(params.league.is_disp_free){ %>表示<% }else{ %>非表示<% } %>
+					</dd>
+				</dl>
+
+			</a>
 		</li>
 		<li>
-			<a href="#" class="select-page" data-page="match">ページ２<% if(page=='match'){ %>選択<% } %></a>
+			<a href="#" class="select-page" data-page="match">
+				<dl>
+					<dt>ページ２</dt>
+					<dd>
+						選択：<% if(params.match.id){ %><%= params.match.id %><% }else{ %>未設定<% } %><br>
+						フリー：<% if(params.match.is_disp_free){ %>表示<% }else{ %>非表示<% } %>
+					</dd>
+				</dl>
+			</a>
 		</li>
-		<li><a href="#" class="select-page" data-page="vs">ページ３<% if(page=='vs'){ %>選択<% } %></a></li>
-		<li><a href="#" class="select-page" data-page="player">ページ４<% if(page=='player'){ %>選択<% } %></a></li>
+		<li>
+			<a href="#" class="select-page" data-page="vs">
+				<dl>
+					<dt>ページ３</dt>
+					<dd>
+						選択：<% if(params.vs.match_id){ %><%= params.vs.match_id %><% }else{ %>未設定<% } %><br>
+						1人め:<% if(params.vs.player1_id){ %><%= params.vs.player1_id %><% }else{ %>未設定<% } %><br>
+						2人め:<% if(params.vs.player2_id){ %><%= params.vs.player2_id %><% }else{ %>未設定<% } %><br>
+					</dd>
+				</dl>
+			</a>
+		</li>
+		<li>
+			<a href="#" class="select-page" data-page="player">
+				<dl>
+					<dt>ページ４</dt>
+					<dd>
+						選択：<% if(params.player.match_id){ %><%= params.player.match_id %><% }else{ %>未設定<% } %><br>
+						1人め:<% if(params.player.player_id){ %><%= params.player.player_id %><% }else{ %>未設定<% } %><br>
+					</dd>
+				</dl>
+			</a>
+		</li>
 	</ul>
 </script>
 
 <script type="text/template" id="tmpl-edit">
 	<%= selected_page %>
-	<p class="btn"><a href="#" class="update">登録</a></p>
+	<div class="tgt-form">
+		<% if(selected_page == 'league'){ %>
+			<select data-params="id">
+				<option value="">未選択</option>
+				<option value="A"<% if(model.params.league.id && model.params.league.id=='A'){ %> selected="selected"<% } %>>A</option>
+				<option value="B"<% if(model.params.league.id && model.params.league.id=='B'){ %> selected="selected"<% } %>>B</option>
+				<option value="C"<% if(model.params.league.id && model.params.league.id=='C'){ %> selected="selected"<% } %>>C</option>
+				<option value="D"<% if(model.params.league.id && model.params.league.id=='D'){ %> selected="selected"<% } %>>D</option>
+			</select>
+			<label><input type="checkbox" data-params="is_disp_free"<% if(model.params.league.is_disp_free){ %> checked="checked"<% } %>>フリーテキストを表示する</label>
+		<% }else if(selected_page == 'match'){ %>
+			<label><input type="checkbox" data-params="is_disp_free"<% if(model.params.match.is_disp_free){ %> checked="checked"<% } %>>フリーテキストを表示する</label>
+		<% } %>
+		<p class="btn"><a href="#" class="update">登録</a></p>
+	</div>
 </script>
 
 <script src="./js/underscore-min.js"></script>
@@ -118,13 +170,32 @@
 			id:'',
 			taikai:'',
 			page:'',
-			params:{}
+			params:{
+				league:{
+					id:'',
+					is_disp_free:true
+				},
+				match:{
+					id:'',
+					is_disp_free:true,
+					is_disp_hoge:true
+				},
+				vs:{
+					match_id:'',
+					player1_id:'',
+					player2_id:''
+				},
+				player:{
+					match_id:'',
+					player_id:'',
+					is_disp_free:true,
+				}
+			}
 		},
 		initialize: function (){
 			this.file_name = this.file_name+this.id;
 			this.fetch({
 				success:function(model, res, options){
-					console.log(model);
 					if(!model.get('taikai')){
 						router.navigate('select',{trigger:true});
 					}else{
@@ -188,7 +259,6 @@
 		},
 		selectPage:function(e){
 			var selected_page = $(e.currentTarget).data('page');
-			console.log(selected_page);
 			router.navigate('setting/'+selected_page,{trigger:true});
 			return false;
 		}
@@ -205,7 +275,7 @@
 		},
 		template:_.template($('#tmpl-edit').text()),
 		render:function(){
-			var html = this.template({model:this.model.attribute,selected_page:this.selected_page});
+			var html = this.template({model:this.model.attributes,selected_page:this.selected_page});
 			this.$el.empty().html(html);
 			return this;
 		},
@@ -214,8 +284,33 @@
 			this.render();
 		},
 		update:function(e){
-			this.model.set({page:this.selected_page});
-			this.model.save();
+			var $btn = $(e.currentTarget);
+			var obj = {};
+			this.$('select').each(function(){
+				var param_key = $(this).data('params')||'';
+				if(param_key){
+					obj[param_key] = $(this).val()||'';
+				}
+			});
+			this.$('input:checkbox').each(function(){
+				var param_key = $(this).data('params')||'';
+				if(param_key){
+					obj[param_key] = $(this).prop("checked")?1:0;
+				}
+			});
+
+			if(!_(obj).isEmpty()){
+				var params = {};
+				for(var i in this.model.attributes.params){
+					if(i == this.selected_page){
+						params[this.selected_page] = obj;
+					}else{
+						params[i] = this.model.attributes.params[i];
+					}
+				}
+				this.model.set({params:params});
+				this.model.save();
+			}
 			router.navigate('setting',{trigger:true});
 			return false;
 		}
@@ -236,7 +331,6 @@
 			'setting/:page':'edit'
 		},
 		index:function(){
-			console.log('a');
 			this.show('index');
 		},
 		select:function(){
