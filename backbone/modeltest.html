@@ -86,6 +86,21 @@
 			</select>
 			<label><input type="checkbox" data-params="is_disp_free"<% if(model.params.league.is_disp_free){ %> checked="checked"<% } %>>フリーテキストを表示する</label>
 		<% }else if(selected_page == 'match'){ %>
+			<ul>
+				<li>
+					<dl>
+						<dt>これこれ</dt>
+						<dd><p class="btn"><a href="#" data-param_obj='{"id":1}' class="select">選択<% if(model.params.match.id && model.params.match.id==1){ %>中<% }%></a></p></dd>
+					</dl>
+				</li>
+				<li>
+					<dl>
+						<dt>あれあれ</dt>
+						<dd><p class="btn"><a href="#" data-param_obj='{"id":2}' class="select">選択<% if(model.params.match.id && model.params.match.id==2){ %>中<% }%></a></p></dd>
+					</dl>
+				</li>
+			</ul>
+			<input type="hidden" id="id" data-params="id" value="<% if(model.params.match.id){ %><%= model.params.match.id %><% } %>">
 			<label><input type="checkbox" data-params="is_disp_free"<% if(model.params.match.is_disp_free){ %> checked="checked"<% } %>>フリーテキストを表示する</label>
 		<% } %>
 		<p class="btn"><a href="#" class="update">登録</a></p>
@@ -271,6 +286,7 @@
 			this.render();
 		},
 		events: {
+			"click a.select": "select",
 			"click a.update": "update"
 		},
 		template:_.template($('#tmpl-edit').text()),
@@ -282,6 +298,15 @@
 		setSelectedPage:function(page){
 			this.selected_page = page;
 			this.render();
+		},
+		select:function(e){
+			var $btn = $(e.currentTarget);
+			var param_obj = $btn.data('param_obj')||{};
+			console.log(param_obj);
+			for(var i in param_obj){
+				$('input#'+i).val(param_obj[i]);
+			}
+			return false;
 		},
 		update:function(e){
 			var $btn = $(e.currentTarget);
@@ -296,6 +321,12 @@
 				var param_key = $(this).data('params')||'';
 				if(param_key){
 					obj[param_key] = $(this).prop("checked")?1:0;
+				}
+			});
+			this.$('input:hidden').each(function(){
+				var param_key = $(this).data('params')||'';
+				if(param_key){
+					obj[param_key] = $(this).val()||'';
 				}
 			});
 
