@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="x-ua-compatible" content="ie=edge">
+	<title>checkForm</title>
+	<meta name="description" content="">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="format-detection" content="telephone=no">
+	<link rel="stylesheet" href="./style.css">
+</head>
+<body>
+<div id="wrapper">
+	<div class="form-area">
+		<form action="">
+			<dl>
+				<dt>テキスト</dt>
+				<dd><input type="text" name="item1" value=""></dd>
+			</dl>
+			<dl>
+				<dt>ラジオボタン</dt>
+				<dd>
+					<input type="radio" name="radio" value="1" id="radio1"><label for="radio1"><span></span>ラジオ１</label>
+					<input type="radio" name="radio" value="2" id="radio2"><label for="radio2"><span></span>ラジオ２</label>
+					<input type="radio" name="radio" value="3" id="radio3"><label for="radio3"><span></span>ラジオ３</label>
+					<input type="radio" name="radio" value="4" id="radio4"><label for="radio4"><span></span>ラジオ４</label>
+				</dd>
+			</dl>
+			<dl>
+				<dt>チェックボックス</dt>
+				<dd>
+					<input type="checkbox" name="checkbox" value="1" id="check1"><label for="check1"><span></span>チェック１</label>
+					<input type="checkbox" name="checkbox" value="2" id="check2"><label for="check2"><span></span>チェック２</label>
+					<input type="checkbox" name="checkbox" value="3" id="check3"><label for="check3"><span></span>チェック３</label>
+					<input type="checkbox" name="checkbox" value="4" id="check4"><label for="check4"><span></span>チェック４</label>
+				</dd>
+			</dl>
+			<dl>
+				<dt>セレクトボックス</dt>
+				<dd>
+					<select name="select" id="">
+						<option value="">未選択</option>
+						<option value="a">選択A</option>
+						<option value="b">選択B</option>
+						<option value="c">選択C</option>
+						<option value="d">選択D</option>
+					</select>
+				</dd>
+			</dl>
+			<dl>
+				<dt>テキストエリア</dt>
+				<dd>
+					<textarea name="textarea" id=""></textarea>
+				</dd>
+			</dl>
+			<p class="btn"><a href="#">送信</a></p>
+		</form>
+	</div>
+</div>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<script src="./underscore-min.js"></script>
+<script src="./checkForm.js"></script>
+<script type="text/javascript">
+	(function(){
+
+	})();
+</script>
+</body>
+</html>

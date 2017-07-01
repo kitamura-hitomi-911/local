@@ -1,0 +1,161 @@
+@charset "UTF-8";
+
+/* reset */
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed,
+figure, figcaption, footer, header,
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	font: inherit;
+	font-size: 100%;
+	vertical-align: baseline;
+	box-sizing: border-box;
+}
+html {
+	overflow-y: scroll;
+	line-height: 1;
+}
+ol, ul {
+	list-style: none;
+}
+table {
+	border-collapse: collapse;
+	border-spacing: 0;
+}
+caption, th, td {
+	text-align: left;
+	font-weight: normal;
+	vertical-align: middle;
+}
+q, blockquote {
+	quotes: none;
+}
+q:before, q:after, blockquote:before, blockquote:after {
+	content: "";
+	content: none;
+}
+a img {
+	border: none;
+}
+a {
+	text-decoration: none;
+}
+article, aside, details, figcaption, figure, footer, header, menu, nav, section, summary {
+	display: block;
+}
+/* style */
+html {
+	height: 100%;
+}
+body {
+	position: relative;
+	height: 100%;
+	font-family: arial, "游ゴシック", YuGothic, "メイリオ", Meiryo, "ヒラギノ角ゴ ProN W3", "Hiragino Kaku Gothic ProN", sans-serif;
+	font-size: 16px;
+	line-height: 20px;
+	color: #666;
+	-webkit-text-size-adjust: 100%;
+	word-wrap: break-word;
+	overflow-wrap: break-word;
+	background: #fff;
+}
+.form-area{
+	width:600px;
+	margin:20px auto;
+}
+.form-area dl{
+	display:flex;
+	padding:10px;
+}
+.form-area dl>dt{
+	width:12em;
+}
+.form-area dl label{
+	display:block;
+}
+.form-area dl>dd input[type=checkbox],
+.form-area dl>dd input[type=radio]{
+	display:none;
+}
+.form-area dl>dd input[type=checkbox]+label,
+.form-area dl>dd input[type=radio]+label{
+	position:relative;
+	padding-left:1.2em;
+}
+.form-area dl>dd input[type=checkbox]+label>span,
+.form-area dl>dd input[type=radio]+label>span{
+	position: absolute;
+	display: block;
+	width:1em;
+	height:1em;
+	border:1px solid #666;
+	top:0;
+	left:0;
+}
+.form-area dl>dd input[type=radio]+label>span{
+	border-radius: 0.5em;
+}
+.form-area dl>dd input[type=checkbox]+label>span:after{
+	position: absolute;
+	content:"";
+	display: block;
+	-webkit-transition: opacity 0.2s linear;
+	transition: opacity 0.2s linear;
+	width: 0.4em;
+	height: 0.8em;
+	top: 50%;
+	left: 0.30em;
+	margin-top:-0.6em;
+	border-right: 2px solid #666;
+	border-bottom: 2px solid #666;
+	-webkit-transform: rotate(45deg);
+	-moz-transform: rotate(45deg);
+	transform: rotate(45deg);
+	opacity: 0;
+}
+.form-area dl>dd input[type=radio]+label>span:after {
+	position: absolute;
+	content:"";
+	display: block;
+	-webkit-transition: opacity 0.2s linear;
+	transition: opacity 0.2s linear;
+	width: 0.4em;
+	height: 0.4em;
+	top:50%;
+	left:50%;
+	margin-top:-0.2em;
+	margin-left:-0.2em;
+	background-color:#666;
+	border-radius:0.2em;
+	opacity: 0;
+}
+.form-area dl>dd input[type=checkbox]:checked+label>span:after,
+.form-area dl>dd input[type=radio]:checked+label>span:after {
+	opacity:1;
+}
+.form-area p.btn{
+	width:200px;
+	margin:20px auto;
+}
+.form-area p.btn a{
+	display:block;
+	width:100%;
+	padding:10px 0;
+	text-align:center;
+	background-color:#000;
+	color:#fff;
+}
+.form-area p.btn a:hover{
+	background-color:#900;
+}
