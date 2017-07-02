@@ -84,6 +84,14 @@ body {
 .form-area dl label{
 	display:block;
 }
+.form-area dl>dd input[type=text] {
+	padding:5px;
+	border:1px solid #666;
+}
+.form-area dl.error>dd input[type=text]{
+	border-color:#f00;
+	background-color: #fee;
+}
 .form-area dl>dd input[type=checkbox],
 .form-area dl>dd input[type=radio]{
 	display:none;
@@ -143,6 +151,17 @@ body {
 .form-area dl>dd input[type=checkbox]:checked+label>span:after,
 .form-area dl>dd input[type=radio]:checked+label>span:after {
 	opacity:1;
+}
+.form-area dl>dd textarea{
+	width:200px;
+	height:60px;
+	padding:10px;
+	border:1px solid #999;
+}
+.form-area dl>dd p.error{
+	padding:3px;
+	background-color:#ff0000;
+	color:#fff;
 }
 .form-area p.btn{
 	width:200px;

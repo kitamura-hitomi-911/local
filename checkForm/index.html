@@ -12,12 +12,12 @@
 <body>
 <div id="wrapper">
 	<div class="form-area">
-		<form action="">
-			<dl>
+		<form action="" id="testform">
+			<dl class="edit text required">
 				<dt>テキスト</dt>
 				<dd><input type="text" name="item1" value=""></dd>
 			</dl>
-			<dl>
+			<dl class="edit radio required">
 				<dt>ラジオボタン</dt>
 				<dd>
 					<input type="radio" name="radio" value="1" id="radio1"><label for="radio1"><span></span>ラジオ１</label>
@@ -26,7 +26,7 @@
 					<input type="radio" name="radio" value="4" id="radio4"><label for="radio4"><span></span>ラジオ４</label>
 				</dd>
 			</dl>
-			<dl>
+			<dl class="edit checkbox required">
 				<dt>チェックボックス</dt>
 				<dd>
 					<input type="checkbox" name="checkbox" value="1" id="check1"><label for="check1"><span></span>チェック１</label>
@@ -35,7 +35,7 @@
 					<input type="checkbox" name="checkbox" value="4" id="check4"><label for="check4"><span></span>チェック４</label>
 				</dd>
 			</dl>
-			<dl>
+			<dl class="edit selectbox required">
 				<dt>セレクトボックス</dt>
 				<dd>
 					<select name="select" id="">
@@ -47,13 +47,13 @@
 					</select>
 				</dd>
 			</dl>
-			<dl>
+			<dl class="edit textarea required">
 				<dt>テキストエリア</dt>
 				<dd>
 					<textarea name="textarea" id=""></textarea>
 				</dd>
 			</dl>
-			<p class="btn"><a href="#">送信</a></p>
+			<p class="btn"><a href="#" onclick="checkForm.submit();return false;">送信</a></p>
 		</form>
 	</div>
 </div>
@@ -62,7 +62,9 @@
 <script src="./checkForm.js"></script>
 <script type="text/javascript">
 	(function(){
-
+		checkForm.init({
+			tgt_form_id:'testform',
+		});
 	})();
 </script>
 </body>
