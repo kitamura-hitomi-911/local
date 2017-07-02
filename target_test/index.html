@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="x-ua-compatible" content="ie=edge">
+	<title>Title</title>
+	<meta name="description" content="">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="format-detection" content="telephone=no">
+	<link rel="stylesheet" href="./style.css">
+</head>
+<body>
+<div id="current-info" style="display:none;">
+	現在の情報を表示<br>
+	<a href="#" onclick="$('#current-info').slideUp('normal');$('#change').slideDown('normal');return false;">変更</a>
+</div>
+<div id="change" style="display:none;">
+	変更処理画面
+</div>
+
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<script type="text/javascript">
+	(function(){
+		var hash = location.hash||'';
+		if(hash=='#change'){
+			$('#change').show();
+		}else{
+			$('#current-info').show();
+		}
+		// comment
+	})();
+</script>
+</body>
+</html>
