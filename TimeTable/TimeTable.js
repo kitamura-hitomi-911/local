@@ -6,7 +6,7 @@ window.jQuery && (function($, _){
 	"use strict";
 	var TimeTable = function(op){
 		if(!op){op = {};}
-		if(!op.programs || !op.column_tgt_ids || !op.column_key || !op.column_values){
+		if(!op.programs || !op.column_tgt_ids || !op.column_key || !op.column_values || !op.tmpl_ids){
 			return;
 		}
 		// プログラムデータ
@@ -14,7 +14,7 @@ window.jQuery && (function($, _){
 		this.dataIndexById = {};
 		// 列情報
 		this.column = {
-			$elm:[],
+			$elm:{},
 			key:'',
 			values:[]
 		};
@@ -27,28 +27,33 @@ window.jQuery && (function($, _){
 		// レイアウト情報
 		this.height_of_hour = 200;
 		// ステータス
-		this.is_disp = false;
+		this.is_open = false;
+		// ハッシュのプレフィックス
+		this.hash_prefix = 'program-';
 		// テンプレート情報
 		this.tmpl = {};
 		this.init(op);
 	};
 	TimeTable.prototype.init = function(op){
-		this.column.$elm = _.map(op.column_tgt_ids,function(element, index, list){
-			var $tgt = $('#'+element);
-			return $tgt.length?$tgt:null;
-		});
+		var that = this;
 		this.column.key = op.column_key;
 		this.column.values = op.column_values;
+		_.each(this.column.values,function(element, index, list){
+			var $tgt = $('#'+op.column_tgt_ids[index]);
+			that.column.$elm[element] = $tgt.length?$tgt:null;
+		});
+
 		this.timetable.start_num = op.time_table_start_num||this.timetable.start_num;
 		this.timetable.end_num = op.time_table_end_num||this.timetable.end_num;
 		this.def_length_of_time = op.time_table_def_length_of_time || this.timetable.def_length_of_time;
 		this.height_of_hour = op.height_of_hour || this.height_of_hour;
-		this.tmpl = _.map(op.tmpl_ids,function(element, index, list){
-			return _.template($('#'+element).text());
+		this.hash_prefix = op.hash_prefix || this.hash_prefix;
+		_.each(op.tmpl_ids,function(element, index, list){
+			that.tmpl[element.replace('tmpl-','')] = _.template($('#'+element).text());
 		});
 		this.setFormatData(op.programs);
 		this.embedPrograms();
-		this.setPosition();
+		this.setHashEvent();
 		return;
 	};
 	TimeTable.prototype.setFormatData = function(programs){
@@ -56,7 +61,7 @@ window.jQuery && (function($, _){
 		// IDでのインデックスを作っておく
 		this.dataIndexById = _.indexBy(programs,'ID');
 
-		// 時間を数値化をいれる
+		// 時間を数値化
 		_.each(programs,function(program){
 			program.start_num = that._timeToDecimal(program.start_time);
 			program.end_num = program.end_time?that._timeToDecimal(program.end_time):program.start_num*1+that.timetable.def_length_of_time*1;
@@ -79,28 +84,66 @@ window.jQuery && (function($, _){
 			});
 		});
 
-		// 時間の重なりを調整する
+		// 終了が次のプログラムの開始にかぶっていたら調整
 		_.each(this.column.values,function(val){
-			for(var i=0;i<that.data[val].length;i++){
-
+			for(var i=0;i<that.data[val].length-1;i++){
+				if(that.data[val][i].end_num > that.data[val][i+1*1].start_num){
+					that.data[val][i].end_num = that.data[val][i+1*1].start_num;
+				}
 			}
+		});
+
+		// 縦位置情報を付与
+		_.each(this.column.values,function(val){
+			_.each(that.data[val],function(program){
+				program.pos_top = (program.start_num - that.timetable.start_num)*that.height_of_hour;
+				program.height = (program.end_num - program.start_num)*that.height_of_hour;
+				console.log(program);
+			});
 		});
 
 		return;
 	};
 	// HTMLを埋め込む
 	TimeTable.prototype.embedPrograms = function(){
-		// HTMLを埋め込む
-
-	};
-	TimeTable.prototype.setPosition = function(){
-		// 縦位置を調整
+		var that = this;
+		_.each(this.column.values,function(val, index, list){
+			var $elm = that.column.$elm[val];
+			_.each(that.data[val],function(program, index, list){
+				$elm.append(that.tmpl.program(program));
+			});
+		});
 	};
 	TimeTable.prototype.getProgramData = function(id){
 		return this.dataIndexById[id]||null;
 	};
+	TimeTable.prototype.openDetail = function(id){
+		if(!id){return;}
+		var program = this.getProgramData(id.replace(this.hash_prefix,''));
+		if(progmram){
+			// open処理
+			this.is_open = true;
+		}
+		return;
+	};
+	TimeTable.prototype.closeDetail = function(){
+		this.is_open = false;
+		return;
+	}
 	TimeTable.prototype.setHashEvent = function(){
 		// hashコントローラーに対しての処理
+		var that = this;
+		_.each(this.column.values,function(val){
+			_.each(that.data[val],function(program){
+				var setEventObj = {
+					hash:that.hash_prefix+program.ID,
+					fn:that.openDetail,
+					parent:that
+				};
+				console.log(setEventObj);
+			});
+		});
+		// close 処理するハッシュ #timetableなども設定
 	};
 	// HH:MM表記を十進法の数値化
 	TimeTable.prototype._timeToDecimal = function(time){

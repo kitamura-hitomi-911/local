@@ -12,6 +12,9 @@
 <body>
 <div id="aa">a</div>
 <div id="bb">b</div>
+<script type="text/template" id="tmpl-program">
+	<li><%= ID %><%= title %></li>
+</script>
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
 <script src="./underscore-min.js"></script>
 <script src="./Timetable.js"></script>
@@ -22,7 +25,9 @@
 			programs:[{ID:1,title:"a",stage:"main",start_time:"11:00",end_time:"12:00"},{ID:2,title:"b",stage:"main",start_time:"10:00",end_time:"11:00"},{ID:3,title:"c",stage:"sub",start_time:"14:00",end_time:"15:00"},{ID:4,title:"a",stage:"main",start_time:"11:30",end_time:""}],
 			column_tgt_ids:['aa','bb'],
 			column_key:'stage',
-			column_values:['main','sub']
+			column_values:['main','sub'],
+			hash_prefix:'tab_1-program_',
+			tmpl_ids:['tmpl-program']
 		});
 		console.log(test);
 	})();
