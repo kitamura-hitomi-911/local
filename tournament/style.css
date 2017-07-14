@@ -1,0 +1,268 @@
+@charset "UTF-8";
+
+/* reset */
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed,
+figure, figcaption, footer, header,
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	font: inherit;
+	font-size: 100%;
+	vertical-align: baseline;
+	box-sizing: border-box;
+}
+html {
+	overflow-y: scroll;
+	line-height: 1;
+}
+ol, ul {
+	list-style: none;
+}
+table {
+	border-collapse: collapse;
+	border-spacing: 0;
+}
+caption, th, td {
+	text-align: left;
+	font-weight: normal;
+	vertical-align: middle;
+}
+q, blockquote {
+	quotes: none;
+}
+q:before, q:after, blockquote:before, blockquote:after {
+	content: "";
+	content: none;
+}
+a img {
+	border: none;
+}
+a {
+	text-decoration: none;
+}
+article, aside, details, figcaption, figure, footer, header, menu, nav, section, summary {
+	display: block;
+}
+/* style */
+html {
+	height: 100%;
+}
+body {
+	position: relative;
+	height: 100%;
+	font-family: arial, "游ゴシック", YuGothic, "メイリオ", Meiryo, "ヒラギノ角ゴ ProN W3", "Hiragino Kaku Gothic ProN", sans-serif;
+	font-size: 16px;
+	line-height: 20px;
+	color: #001e49;
+	-webkit-text-size-adjust: 100%;
+	word-wrap: break-word;
+	overflow-wrap: break-word;
+	background: #fff;
+}
+.tournament-set{
+	width:280px;
+	padding-top:20px;
+}
+.tournament-set.player-5{
+	width:350px;
+}
+.tournament-set ul.match-1{
+	width:100%;
+}
+.tournament-set.player-5 ul.match-1{
+	padding-right:70px;
+}
+.tournament-set ul.match-1 li{
+	text-align:center;
+}
+.tournament-set ul.match-2{
+	overflow:hidden;
+	width:100%;
+}
+.tournament-set.player-5 ul.match-2{
+	padding-right:70px;
+}
+.tournament-set ul.match-2 li {
+	float:left;
+	position: relative;
+	width:50%;
+	height:24px;
+}
+.tournament-set ul.match-2 li:before{
+	content:"";
+	position:absolute;
+	display:block;
+	width:70px;
+	height:24px;
+	bottom:0;
+	border-bottom:4px solid #666;
+}
+.tournament-set ul.match-2 li.left-pos:before{
+	right:-2px;
+	border-right:4px solid #666;
+}
+.tournament-set ul.match-2 li.win.left-pos:before{
+	border-right:4px solid #f00;
+	border-bottom:4px solid #f00;
+	z-index:1;
+}
+.tournament-set ul.match-2 li.right-pos:before{
+	left:-2px;
+	border-left:4px solid #666;
+}
+.tournament-set ul.match-2 li.win.right-pos:before{
+	border-left:4px solid #f00;
+	border-bottom:4px solid #f00;
+	z-index:1;
+}
+.tournament-set ul.match-2 li p.point,
+.tournament-set ul.match-3 li p.point,
+.tournament-set ul.match-4 li p.point{
+	position: absolute;
+	top: 20px;
+	padding: 0 5px;
+	font-size: 75%;
+	line-height: 1.1666;
+}
+.tournament-set ul.match-2 li.left-pos p.point,
+.tournament-set ul.match-3 li.left-pos p.point,
+.tournament-set ul.match-4 li.left-pos p.point{
+	right:0;
+	transform:translate(0, -100%);
+}
+.tournament-set ul.match-2 li.right-pos p.point,
+.tournament-set ul.match-3 li.right-pos p.point,
+.tournament-set ul.match-4 li.right-pos p.point{
+	left:0;
+	transform:translate(0, -100%);
+}
+.tournament-set ul.match-3{
+	overflow:hidden;
+	margin-top:-4px;/* border */
+}
+.tournament-set ul.match-3 li{
+	position:relative;
+	float:left;
+	width:70px;
+	padding:40px 10px 0;
+}
+.tournament-set ul.match-3 li:before{
+	content:"";
+	position:absolute;
+	display:block;
+	width:33px;/* liのwidth の半分 - borderの半分 */
+	height:16px;/* li の padding-top の半分 - border */
+	bottom:10em;/* dl の高さ */
+	border-top:4px solid #666;
+}
+.tournament-set.player-5 ul.match-3 li:before{
+	bottom:0;
+}
+.tournament-set ul.match-3 li.left-pos:before{
+	border-left:4px solid #666;
+	left:33px;
+}
+.tournament-set ul.match-3 li.win.left-pos:before{
+	border-top:4px solid #f00;
+	border-left:4px solid #f00;
+}
+.tournament-set ul.match-3 li.right-pos:before{
+	border-right:4px solid #666;
+	right:33px
+}
+.tournament-set ul.match-3 li.win.right-pos:before{
+	border-top:4px solid #f00;
+	border-right:4px solid #f00;
+}
+.tournament-set ul.match-3 li:after {
+	content:"";
+	position:absolute;
+	display:block;
+	top:0;
+	width:100%;
+	height:24px;/* li の padding-top の半分 + border */
+}
+.tournament-set ul.match-3 li.left-pos:after {
+	right:-2px;/* border 1/2 */
+	border-right:4px solid #666;
+}
+.tournament-set ul.match-3 li.win.left-pos:after {
+	border-right:4px solid #f00;
+	z-index:1;
+}
+.tournament-set ul.match-3 li.right-pos:after {
+	left:-2px;/* li の border 1/2 */
+	border-left:4px solid #666;
+}
+.tournament-set ul.match-3 li.win.right-pos:after{
+	border-left:4px solid #f00;
+	z-index:1;
+}
+.tournament-set ul.match-4{
+	overflow:hidden;
+	margin-top:-4px;/* border */
+}
+.tournament-set ul.match-4 li{
+	position:relative;
+	float:left;
+	width:70px;
+	padding:40px 10px 0;
+}
+.tournament-set.player-5 ul.match-4 li{
+	padding-top:20px;
+}
+.tournament-set.player-5 ul.match-4 li.skip-pos:before{
+	content:"";
+	position:absolute;
+	display:block;
+	width:33px;/* liのwidth の半分 - borderの半分 */
+	height:16px;/* li の padding-top の半分 - border */
+	left:0;
+	bottom:10em;/* dl の高さ */
+	border-right:4px solid #666;
+}
+.tournament-set.player-5 ul.match-4 li.win.skip-pos:before{
+	border-right:4px solid #f00;
+}
+.tournament-set ul.players li dl{
+	position:relative;
+	width:100%;
+	height:10em;
+	border:4px solid #666;
+	border-radius:5px;
+}
+.tournament-set ul.players li.win dl {
+	border-color:#f00;
+}
+.tournament-set ul.players li.lose dl {
+	background-color:#eee;
+}
+.tournament-set ul.players li dl dt{
+	position: absolute;
+	top:10px;
+	left:50%;
+	transform:translate(-50%, 0);
+	-webkit-writing-mode: vertical-rl;
+	-ms-writing-mode: tb-rl;
+	writing-mode: vertical-rl;
+}
+.tournament-set ul.players li dl dd{
+	position: absolute;
+	bottom:0;
+	left:0;
+	width:100%;
+	text-align:center;
+	font-size:10px;
+	line-height:12px;
+}
