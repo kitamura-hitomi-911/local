@@ -93,7 +93,7 @@ body {
 	width:50%;
 	height:24px;
 }
-.tournament-set ul.match-2 li:before{
+.tournament-set ul.match-2 li:after{
 	content:"";
 	position:absolute;
 	display:block;
@@ -102,23 +102,23 @@ body {
 	bottom:0;
 	border-bottom:4px solid #666;
 }
-.tournament-set.player-5 ul.match-2 li.left-pos:before{
+.tournament-set.player-5 ul.match-2 li.left-pos:after{
 	width:105px;/* li の 1.5 倍 */
 }
-.tournament-set ul.match-2 li.left-pos:before{
+.tournament-set ul.match-2 li.left-pos:after{
 	right:-2px;
 	border-right:4px solid #666;
 }
-.tournament-set ul.match-2 li.win.left-pos:before{
+.tournament-set ul.match-2 li.win.left-pos:after{
 	border-right:4px solid #f00;
 	border-bottom:4px solid #f00;
 	z-index:1;
 }
-.tournament-set ul.match-2 li.right-pos:before{
+.tournament-set ul.match-2 li.right-pos:after{
 	left:-2px;
 	border-left:4px solid #666;
 }
-.tournament-set ul.match-2 li.win.right-pos:before{
+.tournament-set ul.match-2 li.win.right-pos:after{
 	border-left:4px solid #f00;
 	border-bottom:4px solid #f00;
 	z-index:1;
@@ -164,7 +164,6 @@ body {
 	width:33px;/* liのwidth の半分 - borderの半分 */
 	height:16px;/* li の padding-top の半分 - border */
 	bottom:10em;/* dl の高さ */
-	border-top:4px solid #666;
 }
 .tournament-set.player-5 ul.match-3 li:before{
 	bottom:0;
@@ -177,8 +176,11 @@ body {
 	left:33px;
 }
 .tournament-set ul.match-3 li.win.left-pos:before{
-	border-top:4px solid #f00;
 	border-left:4px solid #f00;
+}
+.tournament-set.player-5 ul.match-3 li.left-pos:before,
+.tournament-set.player-5 ul.match-3 li.win.left-pos:before{
+	border-left:4px solid transparent;
 }
 .tournament-set ul.match-3 li.right-pos:before{
 	border-right:4px solid #666;
@@ -188,8 +190,11 @@ body {
 	border-right:4px solid transparent;
 }
 .tournament-set ul.match-3 li.win.right-pos:before{
-	border-top:4px solid #f00;
 	border-right:4px solid #f00;
+}
+.tournament-set.player-5 ul.match-3 li.right-pos:before,
+.tournament-set.player-5 ul.match-3 li.win.right-pos:before{
+	border-right:4px solid transparent;
 }
 .tournament-set.player-5 ul.match-3 li.win.right-pos:nth-child(4):before{
 	border-right:4px solid transparent;
@@ -199,15 +204,20 @@ body {
 	position:absolute;
 	display:block;
 	top:0;
-	width:100%;
-	height:24px;/* li の padding-top の半分 + border */
+	width:50%;
+	height:20px;/* li の padding-top の半分 */
+	border-bottom:4px solid #666;
 }
 .tournament-set ul.match-3 li.left-pos:after {
 	right:-2px;/* border 1/2 */
 	border-right:4px solid #666;
 }
+.tournament-set.player-5 ul.match-3 li.left-pos:nth-child(3):after{
+	width:70px;
+}
 .tournament-set ul.match-3 li.win.left-pos:after {
 	border-right:4px solid #f00;
+	border-bottom:4px solid #f00;
 	z-index:1;
 }
 .tournament-set ul.match-3 li.right-pos:after {
@@ -216,10 +226,11 @@ body {
 }
 .tournament-set ul.match-3 li.win.right-pos:after{
 	border-left:4px solid #f00;
+	border-bottom:4px solid #f00;
 	z-index:1;
 }
 .tournament-set ul.match-4{
-	overflow: :hidden;
+	overflow: hidden;
 	margin-top:-4px;/* border */
 }
 .tournament-set ul.match-4 li{
@@ -234,7 +245,7 @@ body {
 }
 .tournament-set.player-5 ul.match-4 li.skip-pos:before{
 	width:33px;/* liのwidth の半分 - borderの半分 */
-	height:36px;/* li の padding-top の半分 - border */
+	height:40px;/* li の padding-top */
 	left:0;
 	bottom:10em;/* dl の高さ */
 	border-right:4px solid #666;
@@ -244,7 +255,7 @@ body {
 }
 .tournament-set.player-5 ul.match-4 li.left-pos:before,
 .tournament-set.player-5 ul.match-4 li.right-pos:before{
-	width:33px;/* liのwidth の半分 - borderの半分 */
+	width:35px;/* liのwidth の半分 */
 	height:16px;/* li の padding-top の半分 - border */
 	bottom:10em;/* dl の高さ */
 	border-top:4px solid #666;
@@ -270,7 +281,7 @@ body {
 	content:"";
 	position:absolute;
 	display:block;
-	top:4px;/* border */
+	top:0;/* border */
 	width:100%;
 	height:20px;/* li の padding-top の半分 */
 }
