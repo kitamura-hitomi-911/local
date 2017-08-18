@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="x-ua-compatible" content="ie=edge">
+	<title>SlideController</title>
+	<meta name="description" content="">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="format-detection" content="telephone=no">
+	<link rel="stylesheet" href="./style.css">
+</head>
+<body>
+<div id="wrapper">
+
+</div>
+<script type="text/template" id="tmpl-slide">
+	<ul id="page-<%= page %>">
+		<% for(var i=0;i < list.length;i++){ %>
+			<li data-disp_time="<%= (list[i].disp_time||"") %>" style="background-image:url(img/<%= list[i].img %>);<% if(list[i].img_size){ %>background-size:<%= list[i].img_size %>;<% } %><% if(list[i].bg_color){ %>background-color:<%= list[i].bg_color %>;<% } %>"></li>
+		<% } %>
+	</ul>
+</script>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<script src="./underscore-min.js"></script>
+<script type="text/javascript">
+	(function(){
+		var slideController = {
+			animation_time:1500/2,
+			page:'',
+			def_page:'a',
+			data:{
+				a:{
+					key:65,
+					disp_time:5000,
+					list: [
+						{img: 'test1.jpg'},
+						{img: 'test2.jpg'},
+						{img: 'test3.jpg'}
+					]
+				},
+				b:{
+					key:66,
+					disp_time:7000,
+					list: [
+						{img: 'test4.jpg'},
+						{img: 'test5.jpg',img_size:"auto auto",bg_color:"#fff",disp_time:1000},
+						{img: 'test6.jpg',img_size:"auto auto",bg_color:"#000",disp_time:1000}
+					]
+				},
+				c:{
+					key:67,
+					disp_time:7000,
+					list: [
+						{img: 'test7.jpg'}
+					]
+				}
+			},
+			tmpl:null,
+			timer_id:null,
+			init:function(){
+				var that = this;
+
+				// ソース埋め込み
+				this.tmpl = _.template($('#tmpl-slide').text());
+				for(var i in this.data){
+					$('#wrapper').append(this.tmpl({page:i,list:this.data[i].list}));
+				}
+
+				// hash から page を判断する
+				this.setPageFromHash();
+				$(window).bind("hashchange",function(){that.setPageFromHash();});
+
+				// key イベントセット
+				this.setKeyEvent();
+
+				return;
+			},
+			setPageFromHash:function(){
+				var hash = location.hash?(location.hash).replace('#',''):'';
+				if(hash && this.data[hash]){
+					this.page = hash;
+				}else{
+					this.page = this.def_page;
+				}
+				// 表示
+				this.showCurrentPage();
+			},
+			showCurrentPage:function(){
+				var that = this;
+				//アニメーションストップ
+				clearTimeout(this.timer_id);
+				this.timer_id = null;
+
+				// 前のページを非表示にして、現在のページにcurrent
+				$('#wrapper>ul').removeClass('current').find('>li').removeClass('current');
+				setTimeout(function(){
+					$('#page-'+that.page).addClass('current').find('>li:first-child').addClass('current');
+				},1200);
+				if(this.data[this.page].list.length > 1){
+					this.changeSlide();
+				}
+			},
+			changeSlide:function(){
+				var that = this;
+				var page_tmp = this.page;
+				var $current_ul = $('#page-'+page_tmp);
+				var $current_li = $current_ul.find('>li.current');
+				var $next_li = $current_li.next();
+				if(!$next_li.length){
+					$next_li = $current_ul.find('>li:first-child')
+				}
+				var disp_time = $current_li.data('disp_time')||this.data[page_tmp].disp_time||5000;
+				this.timer_id = setTimeout(function(){
+					clearTimeout(that.timer_id);
+					that.timer_id = null;
+					$current_li.removeClass('current');
+					$next_li.addClass('current');
+					if(that.page == page_tmp){
+						that.changeSlide();
+					}
+				},disp_time*1+this.animation_time*1);
+			},
+			setKeyEvent:function(){
+				var that = this;
+				$(window).on('keydown', function(e) {
+					var key_code = e.keyCode;
+					for(var i in that.data){
+						if(that.data[i].key == key_code){
+							location.hash = '#'+i;
+						}
+					}
+				});
+			}
+		};
+		slideController.init();
+	})();
+</script>
+</body>
+</html>
