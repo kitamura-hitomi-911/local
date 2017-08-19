@@ -17,15 +17,29 @@
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
 <script src="./underscore-min.js"></script>
 <script type="text/javascript">
-	function CountDown(current_date,target_date){
+	function CountDown(op){
+		if(!op || !op.current_date || !op.target_date){
+			return;
+		}
+		this.now = null;
 		this.current_date = null;
-		this.target_date=null;
-		this.init(current_date,target_date);
+		this.target_date = null;
+		this.passed_time = 0;
+		this.countDownEvents = {
+			day:[],
+			hour:[],
+			minute:[],
+			second:[],
+			minute_lt_day:[],
+			second_lt_day:[]
+		};
+		this.init(op);
 		return;
 	}
-	CountDown.prototype.init = function(current_date,target_date){
-		this.current_date = typeof current_date == 'string'?new Date(current_date):current_date;
-		this.target_date = typeof target_date == 'string'?new Date(target_date):target_date;
+	CountDown.prototype.init = function(op){
+		this.now = new Date();
+		this.current_date = typeof op.current_date == 'string'?new Date(op.current_date):op.current_date;
+		this.target_date = typeof op.target_date == 'string'?new Date(op.target_date):op.target_date;
 
 		if(!isValidDate(this.current_date)){
 			console.error('current_dateの指定がおかしい');
@@ -34,47 +48,104 @@
 			console.error('target_dateの指定がおかしい');
 		}
 
+		// カウントダウンイベントをセット
+		if(op.countDownEvents){
+			this.setCountDownEvents(op.countDownEvents);
+		}
+
 		function isValidDate(date) {
 			if (Object.prototype.toString.call(date) !== "[object Date]"){return false;}
 			return !isNaN(date.getTime());
 		}
 	};
 	CountDown.prototype.getLeftTime = function(){
-		var left_time = this.target_date.getTime() - this.current_date.getTime();
+		var left_time = this.target_date.getTime() - this.current_date.getTime() - this.passed_time;
 		return left_time;
 	};
 	CountDown.prototype.getLeftTimeObj = function(){
 		var left_time_obj = {
+			already_past:false,
 			ceil_day:0,
 			day:0,
 			hour:0,
 			minute:0,
 			second:0
 		};
-		var left_second = this.getLeftTime() / 1000;
-		var left_day = Math.floor(left_second / 86400);
-		if(left_day){
-			left_time_obj.day = left_day;
-			left_second -= 86400 * left_day;
-			left_time_obj.ceil_day = left_second?++left_day:left_day;
+		var left_second = Math.round(this.getLeftTime() / 1000);
+		if(left_second < 0){
+			left_time_obj.already_past = true;
+		}else{
+			var left_day = Math.floor(left_second / 86400);
+			if(left_day){
+				left_time_obj.day = left_day;
+				left_second -= 86400 * left_day;
+				left_time_obj.ceil_day = left_second?++left_day:left_day;
+			}
+			var left_hour = Math.floor(left_second / 3600);
+			if(left_hour){
+				left_time_obj.hour = left_hour;
+				left_second -= 3600 * left_hour;
+			}
+			var left_minute = Math.floor(left_second / 60);
+			if(left_minute){
+				left_time_obj.minute = left_minute;
+				left_second -= 60 * left_minute;
+			}
+			left_time_obj.second = left_second;
 		}
-		var left_hour = Math.floor(left_second / 3600);
-		if(left_hour){
-			left_time_obj.hour = left_hour;
-			left_second -= 3600 * left_hour;
-		}
-		var left_minute = Math.floor(left_second / 60);
-		if(left_minute){
-			left_time_obj.minute = left_minute;
-			left_second -= 60 * left_minute;
-		}
-		left_time_obj.second = left_second;
-
 		return left_time_obj;
-	}
-	var test = new CountDown('2017/08/01','2017/08/03');
+	};
+	CountDown.prototype.isAlreadyPast = function(){
+		var left_second = this.getLeftTime();
+		return left_second < 0 ? true : false;
+	};
+	CountDown.prototype.setCountDownEvents = function(events){
+		var that = this;
+		if(!isArray(events)){
+			events = [events];
+		}
+		for(var i=0;i<events.length;i++){
+			events[i].parent = events[i].parent || window;
+			if(events[i].init){
+				events[i].fn.call(events[i].parent,this.getLeftTime(),this.getLeftTimeObj());
+			}
+			if(this.countDownEvents[events[i].type]){
+				this.countDownEvents[events[i].type].push(events[i]);
+			}
+
+		}
+		// すでにすぎてたらカウントダウンイベントは発生しない
+		if(this.isAlreadyPast()){
+			return;
+		}
+		var timer_time = 1000 * 60;
+		if(this.countDownEvents.second.length || this.countDownEvents.second_lt_day.length && this.getLeftTime() < 86400*1000){
+			timer_time = 1000;
+		}
+		setInterval(function(){
+			that.passed_time = (new Date()).getTime() - that.now.getTime();
+			for(var i in that.countDownEvents){
+				for(var j=0;j<that.countDownEvents[i].length;j++){
+					var parent = that.countDownEvents[i][j].parent;
+					var fn = that.countDownEvents[i][j].fn;
+					fn.call(parent,that.getLeftTime(),that.getLeftTimeObj());
+				}
+			}
+		},timer_time)
+		function isArray(obj) {
+			return Object.prototype.toString.call(obj) === '[object Array]';
+		}
+	};
+	var test = new CountDown(
+		{
+			current_date: '2017/08/01 10:05:30',
+			target_date: '2017/08/03 10:00:00',
+			countDownEvents:{fn:function(left_time,left_time_obj){console.log(left_time_obj);},type:'second'}
+		}
+	);
 	console.log(test.getLeftTime());
 	console.log(test.getLeftTimeObj());
+	console.log(test.isAlreadyPast());
 	(function(){
 		// comment
 
