@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="x-ua-compatible" content="ie=edge">
+	<title>カウントダウン</title>
+	<meta name="description" content="">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="format-detection" content="telephone=no">
+	<link rel="stylesheet" href="./style.css">
+</head>
+<body>
+<div id="wrapper">
+
+</div>
+
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<script src="./underscore-min.js"></script>
+<script type="text/javascript">
+	function CountDown(current_date,target_date){
+		this.current_date = null;
+		this.target_date=null;
+		this.init(current_date,target_date);
+		return;
+	}
+	CountDown.prototype.init = function(current_date,target_date){
+		this.current_date = typeof current_date == 'string'?new Date(current_date):current_date;
+		this.target_date = typeof target_date == 'string'?new Date(target_date):target_date;
+
+		if(!isValidDate(this.current_date)){
+			console.error('current_dateの指定がおかしい');
+		}
+		if(!isValidDate(this.target_date)){
+			console.error('target_dateの指定がおかしい');
+		}
+
+		function isValidDate(date) {
+			if (Object.prototype.toString.call(date) !== "[object Date]"){return false;}
+			return !isNaN(date.getTime());
+		}
+	};
+	CountDown.prototype.getLeftTime = function(){
+		var left_time = this.target_date.getTime() - this.current_date.getTime();
+		return left_time;
+	};
+	CountDown.prototype.getLeftTimeObj = function(){
+		var left_time_obj = {
+			ceil_day:0,
+			day:0,
+			hour:0,
+			minute:0,
+			second:0
+		};
+		var left_second = this.getLeftTime() / 1000;
+		var left_day = Math.floor(left_second / 86400);
+		if(left_day){
+			left_time_obj.day = left_day;
+			left_second -= 86400 * left_day;
+			left_time_obj.ceil_day = left_second?++left_day:left_day;
+		}
+		var left_hour = Math.floor(left_second / 3600);
+		if(left_hour){
+			left_time_obj.hour = left_hour;
+			left_second -= 3600 * left_hour;
+		}
+		var left_minute = Math.floor(left_second / 60);
+		if(left_minute){
+			left_time_obj.minute = left_minute;
+			left_second -= 60 * left_minute;
+		}
+		left_time_obj.second = left_second;
+
+		return left_time_obj;
+	}
+	var test = new CountDown('2017/08/01','2017/08/03');
+	console.log(test.getLeftTime());
+	console.log(test.getLeftTimeObj());
+	(function(){
+		// comment
+
+	})();
+</script>
+</body>
+</html>
