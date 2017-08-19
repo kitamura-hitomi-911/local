@@ -32,6 +32,7 @@
 				a:{
 					key:65,
 					disp_time:5000,
+					no_loop:true,
 					list: [
 						{img: 'test1.jpg'},
 						{img: 'test2.jpg'},
@@ -95,10 +96,11 @@
 				$('#wrapper>ul').removeClass('current').find('>li').removeClass('current');
 				setTimeout(function(){
 					$('#page-'+that.page).addClass('current').find('>li:first-child').addClass('current');
+					if(that.data[that.page].list.length > 1){
+						that.changeSlide();
+					}
 				},1200);
-				if(this.data[this.page].list.length > 1){
-					this.changeSlide();
-				}
+
 			},
 			changeSlide:function(){
 				var that = this;
@@ -107,12 +109,19 @@
 				var $current_li = $current_ul.find('>li.current');
 				var $next_li = $current_li.next();
 				if(!$next_li.length){
-					$next_li = $current_ul.find('>li:first-child')
+					if(this.data[page_tmp].no_loop){
+						// 最後のスライドかつループしないの場合はなにもせずに終わる
+						return;
+					}else{
+						$next_li = $current_ul.find('>li:first-child')
+					}
 				}
 				var disp_time = $current_li.data('disp_time')||this.data[page_tmp].disp_time||5000;
 				this.timer_id = setTimeout(function(){
-					clearTimeout(that.timer_id);
-					that.timer_id = null;
+					if(that.timer_id){
+						clearTimeout(that.timer_id);
+						that.timer_id = null;
+					}
 					$current_li.removeClass('current');
 					$next_li.addClass('current');
 					if(that.page == page_tmp){
