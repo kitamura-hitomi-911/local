@@ -11,7 +11,8 @@
 </head>
 <body>
 <div id="wrapper">
-
+	<div id="timer_disp"></div>
+	<div id="timer_disp2"></div>
 </div>
 
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
@@ -26,13 +27,13 @@
 		this.target_date = null;
 		this.passed_time = 0;
 		this.countDownEvents = {
-			day:[],
-			hour:[],
 			minute:[],
 			second:[],
 			minute_lt_day:[],
 			second_lt_day:[]
 		};
+		this.current_left_time_obj = null;
+		this.prev_left_time_obj = null;
 		this.init(op);
 		return;
 	}
@@ -59,6 +60,7 @@
 		}
 	};
 	CountDown.prototype.getLeftTime = function(){
+		this.passed_time = (new Date()).getTime() - this.now.getTime();
 		var left_time = this.target_date.getTime() - this.current_date.getTime() - this.passed_time;
 		return left_time;
 	};
@@ -67,9 +69,9 @@
 			already_past:false,
 			ceil_day:0,
 			day:0,
-			hour:0,
-			minute:0,
-			second:0
+			hour:"00",
+			minute:"00",
+			second:"00"
 		};
 		var left_second = Math.round(this.getLeftTime() / 1000);
 		if(left_second < 0){
@@ -83,16 +85,18 @@
 			}
 			var left_hour = Math.floor(left_second / 3600);
 			if(left_hour){
-				left_time_obj.hour = left_hour;
+				left_time_obj.hour = left_hour<10?'0'+left_hour+'':left_hour;
 				left_second -= 3600 * left_hour;
 			}
 			var left_minute = Math.floor(left_second / 60);
 			if(left_minute){
-				left_time_obj.minute = left_minute;
+				left_time_obj.minute = left_minute<10?'0'+left_minute+'':left_minute;
 				left_second -= 60 * left_minute;
 			}
-			left_time_obj.second = left_second;
+			left_time_obj.second = left_second<10?'0'+left_second+'':left_second;
 		}
+		this.prev_left_time_obj = this.current_left_time_obj;
+		this.current_left_time_obj = left_time_obj;
 		return left_time_obj;
 	};
 	CountDown.prototype.isAlreadyPast = function(){
@@ -123,29 +127,48 @@
 			timer_time = 1000;
 		}
 		setInterval(function(){
-			that.passed_time = (new Date()).getTime() - that.now.getTime();
+			var left_time = that.getLeftTime();
+			var left_time_obj = that.getLeftTimeObj();
 			for(var i in that.countDownEvents){
+				if(!that.countDownEvents[i].length){
+					continue;
+				}
+				// type が 分のものはminuteに変化がなければなにもしない
+				if(i=='minute' || i=='minute_lt_day'){
+					if(that.prev_left_time_obj.minute == that.current_left_time_obj.minute){
+						continue;
+					}
+				}
 				for(var j=0;j<that.countDownEvents[i].length;j++){
 					var parent = that.countDownEvents[i][j].parent;
 					var fn = that.countDownEvents[i][j].fn;
-					fn.call(parent,that.getLeftTime(),that.getLeftTimeObj());
+					fn.call(parent,left_time,left_time_obj);
 				}
 			}
-		},timer_time)
+		},timer_time);
 		function isArray(obj) {
 			return Object.prototype.toString.call(obj) === '[object Array]';
 		}
 	};
 	var test = new CountDown(
 		{
-			current_date: '2017/08/01 10:05:30',
+			current_date: '2017/08/01 10:05:40',
 			target_date: '2017/08/03 10:00:00',
-			countDownEvents:{fn:function(left_time,left_time_obj){console.log(left_time_obj);},type:'second'}
+			countDownEvents:[
+				{
+					fn: function(left_time, left_time_obj){
+						$('#timer_disp').html((left_time_obj.day ? (left_time_obj.day + '日 ') : '') + left_time_obj.hour + ':' + left_time_obj.minute + ':' + left_time_obj.second);
+					}, type: 'second', init: true
+				},
+				{
+					fn: function(left_time, left_time_obj){
+						console.log('minute');
+						$('#timer_disp2').html((left_time_obj.day ? (left_time_obj.day + '日 ') : '') + left_time_obj.hour + ':' + left_time_obj.minute);
+					}, type: 'minute', init: true
+				}
+			]
 		}
 	);
-	console.log(test.getLeftTime());
-	console.log(test.getLeftTimeObj());
-	console.log(test.isAlreadyPast());
 	(function(){
 		// comment
 
