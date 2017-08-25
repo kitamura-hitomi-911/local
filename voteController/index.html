@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="x-ua-compatible" content="ie=edge">
+	<title>VOTEテスト</title>
+	<meta name="description" content="">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="format-detection" content="telephone=no">
+	<link rel="stylesheet" href="./style.css">
+</head>
+<body>
+
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<script src="./underscore-min.js"></script>
+<script type="text/javascript">
+	(function(){
+		var Votes = function(op){
+			if(!op || !op.id || !op.tgt_id || !op.btn_class || !op.due_date){
+				return;
+			}
+			this.api_get_path = '';
+			this.api_set_path = '';
+			this.id = '';
+			this.due_date = '';
+			this.$tgt = null;
+			this.$vote_tgt_info = {};
+			this.btn_class = 'btn_area';
+			this.answers = [];
+			this.avail_override = false;
+			this.tmpl = {};
+			this.err_msg = {};
+			this.init(op);
+		};
+		Vote.prototype.init = function(op){
+			var that = this;
+			this.id = op.id;
+			this.due_date = op.dute_date;
+			this.$tgt = $('#'+'op.tgt_id');
+			this.$tgt.find('.'+op.btn_class).each(function(){
+				var key = $(this).data('key');
+				var vote_tgt_info = {
+					$btn_elm : $(this),
+					key:key,
+					value:$(this).data('value')
+
+				};
+				that.$vote_tgt_info[key] = $vote_tgt_info;
+			});
+			this.tmpl.btn = _.template($('#'+op.tmpl_btn).text());
+			this.avail_override = op.avail_override || this.avail_override;
+			this.getStatus({
+				callback:that.initView
+			});
+			return;
+		};
+		Vote.prototype.getStatus = function(obj){
+			if(!obj){
+				obj = {};
+			}
+			var params = {
+				id:this.id
+			};
+			var ajax_obj = {
+				type: 'GET',
+				dataType: 'json',
+				url : this.api_get_path,
+				data: params,
+				success : function(data){
+					console.log(data);
+					that.setStatus(data);
+					obj.callback && obj.callback();
+					return;
+				},
+				error : function(){
+					obj.callback && obj.callback();
+					return;
+				}
+			};
+		};
+		Vote.prototype.setStatus = function(key_values){
+
+		};
+		Vote.prototype.initView = function(){
+			var that = this;
+
+		};
+		Vote.prototype.setAnswer = function(key.value){
+
+		};
+	})();
+</script>
+</body>
+</html>
