@@ -16,44 +16,50 @@
 <script type="text/javascript">
 	(function(){
 		var Votes = function(op){
-			if(!op || !op.id || !op.tgt_id || !op.btn_class || !op.due_date){
+			if(!op || !op.id || !op.tgt_id || !op.vote_area || !op.vote_btn || !op.due_date){
 				return;
 			}
 			this.api_get_path = '';
 			this.api_set_path = '';
-			this.id = '';
-			this.due_date = '';
-			this.$tgt = null;
-			this.$vote_tgt_info = {};
-			this.btn_class = 'btn_area';
-			this.answers = [];
-			this.avail_override = false;
-			this.tmpl = {};
-			this.err_msg = {};
-			this.init(op);
-		};
-		Vote.prototype.init = function(op){
-			var that = this;
 			this.id = op.id;
 			this.due_date = op.dute_date;
 			this.$tgt = $('#'+'op.tgt_id');
-			this.$tgt.find('.'+op.btn_class).each(function(){
-				var key = $(this).data('key');
-				var vote_tgt_info = {
-					$btn_elm : $(this),
-					key:key,
-					value:$(this).data('value')
-
+			this.vote_info = {};
+			this.class_name = {
+				vote_area:op.vote_area||'vote_area',
+				vote_btn:op.vote_btn||'vote_btn'
+			};
+			this.avail_override = op.avail_override || false;
+			this.tmpl = {
+				vote_area:_.template($('#'+op.tmpl_vote_area).text())
+			};
+			this.err_msg = {};
+			this.init();
+		};
+		// 初期処理
+		Vote.prototype.init = function(){
+			var that = this;
+			if(!this.$tgt.length || !this.$tgt.find('.'+this.class_name.vote_area).length){
+				console.log('対象エリアがありません');
+				return;
+			}
+			this.$tgt.find('.'+this.class_name.vote_area).each(function(){
+				var $this = $(this);
+				var op = $this.data('op');
+				var info = {
+					$area_elm : $this,
+					$btn_elm:$this.find('.'+that.class_name.btn),
+					op:op,
+					value:$this.data('value')
 				};
-				that.$vote_tgt_info[key] = $vote_tgt_info;
+				that.vote_info[op] = info;
 			});
-			this.tmpl.btn = _.template($('#'+op.tmpl_btn).text());
-			this.avail_override = op.avail_override || this.avail_override;
 			this.getStatus({
-				callback:that.initView
+				callback:that.initViews
 			});
 			return;
 		};
+		// 現在のステータスを取得
 		Vote.prototype.getStatus = function(obj){
 			if(!obj){
 				obj = {};
@@ -79,14 +85,45 @@
 			};
 		};
 		Vote.prototype.setStatus = function(key_values){
-
+			for(var op in key_values){
+				if(this.vote_info[op]){
+					this.vote_info[op] = key_values[op];
+				}
+			}
+			return;
 		};
-		Vote.prototype.initView = function(){
+		Vote.prototype.initViews = function(){
 			var that = this;
+			_.each(this.vote_info,function(info){
+				info.$btn_elm.html(that.tmpl.btn({op:info.op,value:info.value}))
+					.find('.'+that.class_name.vote_btn).click(function(){that.setAnswer(info);});
+			});
+		};
+		Vote.prototpye.updateViews=function(){
 
 		};
-		Vote.prototype.setAnswer = function(key.value){
-
+		Vote.prototype.sendAnswer = function(obj){
+			var that = this;
+			console.log(obj);
+			var params = {
+				id:this.id
+			};
+			var ajax_obj = {
+				type: 'GET',
+				dataType: 'json',
+				url : this.api_set_path,
+				data: params,
+				success : function(data){
+					console.log(data);
+					that.setStatus(data);
+					that.updateViews();
+					return;
+				},
+				error : function(){
+					obj.callback && obj.callback();
+					return;
+				}
+			};
 		};
 	})();
 </script>
