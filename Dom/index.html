@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="x-ua-compatible" content="ie=edge">
+	<title>DOM</title>
+	<meta name="description" content="">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="format-detection" content="telephone=no">
+	<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="wrapper">
+	<header>
+		ヘッダー
+	</header>
+	<div id="content">
+		<p class="aaa">あああ</p>
+		<p class="bbb">いいい<span>いいい</span><i>いいい</i><b>ボールド</b><a href="#">リンク</a><br><em>強調</em></p>
+		<form>
+			<select name="" id="">
+				<option value=""></option>
+				<option value="ccc" class="ccc">ううう</option>
+			</select>
+		</form>
+		<p><a href="#" onclick="slideuptest();slidedowntest();return false;">スライドアップテスト</a></p>
+		<!-- コメントノード -->
+		<dl class="ddd">
+			<dt>見出し</dt>
+			<dd>説明</dd>
+		</dl>
+		<dl class="eee">
+			<dt>見出し2</dt>
+			<dd>説明2<br>説明2</dd>
+		</dl>
+		<script class="aaa">var abc;</script>
+		<div id="kore">aaa</div>
+	</div>
+	<footer>
+		フッター
+	</footer>
+</div>
+<script src="dom.js"></script>
+<script type="text/javascript">
+	function slideuptest(){
+		var ddd_elm = document.getElementsByClassName('ddd');
+		Dom.slideUp(ddd_elm);
+	}
+	function slidedowntest(){
+		var eee_elm = document.getElementsByClassName('eee');
+		Dom.slideDown(eee_elm);
+	}
+	(function(){
+		// comment
+		var content_elm = document.getElementById("content");
+//		var aaa_elm = document.getElementsByClassName('aaa');
+//		var bbb_elm = document.getElementsByClassName('bbb');
+//		var ccc_elm = document.getElementsByClassName('ccc');
+//		var ddd_elm = document.getElementsByClassName('ddd');
+
+		var kore = document.getElementById("kore");
+		console.log(kore);
+		var test = content_elm.querySelectorAll('.aaa');
+		console.log(test);
+		console.log(Object.prototype.toString.call(test));
+
+		console.log(document);
+		for(var i in document){
+			console.log(i,document[i]);
+		}
+//		console.log(document.forms);
+//		console.log(document.images);
+//		console.log(document.links);
+		console.log(Object.prototype.toString.call(document.embeds));
+//		console.log(Object.prototype.toString.call(document.forms));
+//		console.log(Object.prototype.toString.call(document.images));
+//		console.log(Object.prototype.toString.call(document.links[0]));
+
+//		Dom.slideUp(content_elm);
+//		Dom.slideUp(aaa_elm);
+//		Dom.slideUp(content_elm.childNodes);
+//
+//		console.log('content_elm.children');
+//		Dom.slideUp(content_elm.children);
+//		console.log('content_elm.childNodes.length');
+//		for(var i=0;i<content_elm.childNodes.length;i++){
+//			Dom.slideUp(content_elm.childNodes[i]);
+//		}
+//		for(var i=0;i<bbb_elm[0].childNodes.length;i++){
+//			Dom.slideUp(bbb_elm[0].childNodes[i]);
+//		}
+//		Dom.slideUp(ccc_elm);
+//		Dom.slideUp(ddd_elm);
+//		for(var i=0;i<ddd_elm[0].childNodes.length;i++){
+//			Dom.slideUp(ddd_elm[0].childNodes[i]);
+//		}
+//		Dom.expandAllNode(document);
+
+
+	})();
+</script>
+</body>
+</html>
