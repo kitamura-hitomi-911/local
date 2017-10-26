@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="x-ua-compatible" content="ie=edge">
+	<title>Prototype</title>
+	<meta name="description" content="">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="format-detection" content="telephone=no">
+	<link rel="stylesheet" href="">
+</head>
+<body>
+<div id="tgt"></div>
+<script type="text/template" id="tmpl-base">
+	base
+</script>
+<script type="text/template" id="tmpl-loading">
+	<div id="loading">loading...</div>
+</script>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<script src="underscore-min.js"></script>
+<script type="text/javascript">
+	(function(){
+		// comment
+		var Base = function(obj){
+			this.$tgt = null;
+			this.$loading = null;
+			this.ranking_selected = {};
+			this.filter_selected = {};
+			this.api = {};
+			this.tmpl = {};
+			this.filter_params = [];
+			this.ranking_items = [];
+			this.lang = {};
+			this.ranking_list = [];
+		};
+		Base.prototype.checkAndSetArgs = function(obj){
+			var that = this;
+			if(!obj || !obj.tgt_id || !obj.tmpl || !obj.lang || !obj.api){
+				return false;
+			}
+
+			// 基本情報格納
+			this.$tgt = $('#'+obj.tgt_id);
+			this.lang = obj.lang;
+			this.api = obj.api;
+
+			// テンプレート保持
+			_.each(obj.tmpl,function(tmpl){
+				that.tmpl[tmpl.name] = _.template($('#tmpl-'+tmpl.id).html());
+			});
+			if(!this.tmpl.loading){
+				console.log('Loading Parts Missing');
+				return false;
+			}
+
+			// ローディングを先にjQueryオブジェクト化
+			this.$loading = $(this.tmpl.loading());
+
+
+			return true;
+		};
+		Base.prototype.showLoading = function(){
+			if(!this.$loading || !this.$loading.length){
+				return;
+			}
+		};
+		Base.prototype.hideLoading = function(callback){
+			if(!this.$loading || !this.$loading.length){
+				return;
+			}
+		};
+		var Child = function(obj){
+			Base.call(this,obj);
+			this.round_data = {};
+			this.init(obj);
+		}
+		Child.prototype = new Base('b');
+		Child.prototype.init = function(obj){
+			if(!this.checkAndSetArgs(obj)){
+				return;
+			}
+			$('body').append(this.$loading);
+
+
+
+		};
+		var test = new Child({
+			tgt_id:'tgt',
+			filter_params:[{name:'aa',val:'bbb'}],
+			tmpl:[
+				{name:'base',id:'base'},
+				{name:'loading',id:'loading'}
+				],
+			lang:{
+				aa:'bb',
+				cc:'dd'
+			},
+			api:{
+				api_name:'url'
+			}
+		});
+		window.test = test;
+	})();
+</script>
+</body>
+</html>
