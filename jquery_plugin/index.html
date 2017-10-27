@@ -16,7 +16,7 @@
 <div class="tgt">ddd</div>
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
 <script type="text/javascript">
-window.jQuery && (function($){
+/* window.jQuery && (function($){
 	var PluginName = function(self, op){
 		console.log('new!');
 		this.self = self;
@@ -29,7 +29,6 @@ window.jQuery && (function($){
 	$.fn.pluginName = function(op) {
 		return this.each(function(){
 			var $this = $(this);
-			if(!$this.length){return;}
 			if($(this).data('pluginName')){
 				var method = op && typeof op == 'string' ? op : '';
 				var method_arg = method && arguments.length > 1 ? arguments[1] : undefined;
@@ -41,6 +40,47 @@ window.jQuery && (function($){
 			}
 		});
 
+	};
+}).call(this,jQuery); */
+
+window.jQuery && (function($){
+	var PluginName = function(self, op){
+		console.log('new!');
+		this.self = self;
+	};
+	PluginName.prototype.method = function(op){
+		console.log('method');
+		console.log('op',op);
+		console.log(this);
+	};
+	PluginName.prototype.method2 = function(op){
+		console.log('method2');
+		console.log('op',op);
+		console.log(this);
+	};
+	$.fn.pluginName = function(op) {
+		var that = this;
+
+		var methods = ['method','method2'];
+		methods.forEach(function(method){
+			$.fn.pluginName[method] = function(op){
+				return that.each(function(){
+					var $this = $(this);
+					var self = $this;
+					op = op || undefined;
+					if($this.data('pluginName')){
+						$this.data('pluginName')[method] && $this.data('pluginName')[method](op);
+					}
+				});
+			};
+		});
+
+		return this.each(function(){
+			var $this = $(this);
+			var self = $this;
+			op = op || undefined;
+			$(this).data('pluginName',new PluginName(self, op));
+		});
 	};
 }).call(this,jQuery);
 </script>
