@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="x-ua-compatible" content="ie=edge">
+	<title>Title</title>
+	<meta name="description" content="">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="format-detection" content="telephone=no">
+	<link rel="stylesheet" href="">
+</head>
+<body>
+<div class="tgt">aaa</div>
+<div class="tgt">bbb</div>
+<div class="tgt">ccc</div>
+<div class="tgt">ddd</div>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<script type="text/javascript">
+window.jQuery && (function($){
+	var PluginName = function(self, op){
+		console.log('new!');
+		this.self = self;
+	};
+	PluginName.prototype.method = function(op){
+		console.log('method');
+		console.log('op',op);
+		console.log(this);
+	};
+	$.fn.pluginName = function(op) {
+		return this.each(function(){
+			var $this = $(this);
+			if(!$this.length){return;}
+			if($(this).data('pluginName')){
+				var method = op && typeof op == 'string' ? op : '';
+				var method_arg = method && arguments.length > 1 ? arguments[1] : undefined;
+				method && $(this).data('pluginName')[method] && $(this).data('pluginName')[method](method_arg);
+			}else{
+				var self = $this;
+				op = op || undefined;
+				$(this).data('pluginName',new PluginName(self, op));
+			}
+		});
+
+	};
+}).call(this,jQuery);
+</script>
+</body>
+</html>
