@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="x-ua-compatible" content="ie=edge">
+	<title>クロージャーサンプル</title>
+	<meta name="description" content="">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="format-detection" content="telephone=no">
+	<link rel="stylesheet" href="">
+</head>
+<body>
+
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<script type="text/javascript">
+(function(){
+// comment
+var closure = (function(){
+	var prop = 0;
+	return function(){
+		prop++;
+		console.log(prop);
+	};
+})();
+window.closure = closure;
+
+var closure2 = (function(){
+	var is_init = false;
+	var prop;
+
+	function init(tgt){
+		is_init = true;
+		prop = 4;
+	}
+	function method(tgt){
+		prop++;
+		console.log(prop);
+	}
+	return {
+		method:function(){
+			if(!is_init){
+				init();
+			}
+			method();
+		}
+	};
+})();
+	window.closure2 = closure2;
+})();
+</script>
+</body>
+</html>
