@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="x-ua-compatible" content="ie=edge">
+	<title>VueJSテスト</title>
+	<meta name="description" content="">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="format-detection" content="telephone=no">
+	<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<a href="#" onclick="vm_modal.open(this);return false;" data-tmpl="tmpl-modal-1" data-args="title==タイトル1&&lead==リード文1">開く</a><br>
+<a href="#" onclick="vm_modal.open(this);return false;" data-tmpl="tmpl-modal-2" data-args="title==タイトル2&&lead==リード文2&&param==パラメータ">開く2</a>
+
+	<div id="modal"></div>
+	<script type="text/x-template" id="tmpl-modal">
+		<div v-if="is_active" :class="type">
+			<component :is="tmpl" :type="type" :args="args" @close="close"></component>
+		</div>
+	</script>
+	<script type="text/x-template" id="tmpl-modal-1">
+		<div :class="type+'-inner'">
+			<p>{{args.title}}</p>
+			<p>{{args.lead}}</p>
+			<a href="#" @click.prevent="close">閉じる</a>
+		</div>
+	</script>
+	<script type="text/x-template" id="tmpl-modal-2">
+		<div :class="type+'-inner'">
+			<p>{{args.title}}</p>
+			<p>{{args.lead}}<br>{{args.param}}</p>
+			<a href="#" @click.prevent="close">閉じる</a>
+		</div>
+	</script>
+	<script type="text/x-template" id="tmpl-modal-3">
+		<div :class="type+'-inner'">
+			<p>{{args.title}}</p>
+			<p>{{args.lead}}</p>
+			<a href="#" @click.prevent="close">閉じる</a>
+		</div>
+	</script>
+<script src="https://unpkg.com/vue/dist/vue.js"></script>
+<script type="text/javascript">
+	var responsiveController = (function(){
+		var that = this;
+		var mql = window.matchMedia('screen and (min-width: 768px)');
+		var events = [];
+		function checkBreakPoint(mql){
+			events.forEach(function(event){
+				var devide = getCurrentDevice();
+				event.fn.call(event.parent,devide,event.params);
+			});
+		}
+		function getCurrentDevice(){
+			return mql.matches?'pc':'sp';
+		}
+
+		mql.addListener(checkBreakPoint);
+
+		return {
+			setEvents:function(event){
+				if(typeof event === 'function' ){
+					events.push({
+						parent:window,
+						fn:event,
+						params:{}
+					});
+				}else if(typeof event.fn === 'function'){
+					events.push({
+						parent:event.parent||window,
+						fn:event.fn,
+						params:event.params||{}
+					});
+					if(event.first){
+						var devide = getCurrentDevice();
+						var delay = isFinite(event.first)?event.first:0;
+						setTimeout(function(){
+							event.fn.call(event.parent,devide,event.params);
+						},delay);
+					}
+				}
+				return;
+			},
+			getCurrentDevice:getCurrentDevice
+		};
+	})();
+
+	var my_child = {
+		props:{
+			type:String,
+			args:Object
+		},
+		template:"#tmpl-modal-3",
+		methods: {
+			close:function(){
+				this.$emit('close')
+			}
+		}
+	};
+
+	var vm_modal = new Vue({
+		el: '#modal',
+		data:{
+			tmpl:null,
+			is_active:false,
+			type:'',
+			is_fixid_type:false,
+			args:{}
+		},
+		template: "#tmpl-modal",
+		mounted: function () {
+			responsiveController.setEvents({
+				fn:this.onChangeDevice,
+				parent:this
+			});
+		},
+		methods: {
+			/* デバイス変更時のtype切り替え処理 */
+			onChangeDevice:function(device){
+				if(!this.is_fixid_type){
+					this.is_active = false;
+					this.type = this._getTypeFromDevice();
+					this.is_active = true;
+				}
+				return;
+			},
+			/* 現在のデバイスのおけるデフォルトtype */
+			_getTypeFromDevice:function(){
+				return responsiveController.getCurrentDevice() === 'sp'?'fullpanel':'popup';
+			},
+			open:function(obj){
+				var component = {
+					props:{
+						type:String,
+						args:Object
+					},
+					methods: {
+						close:function(){
+							this.$emit('close');
+							return false;
+						}
+					}
+				};
+				var args;
+				var type;
+				if(obj && obj.nodeName ){
+					/* onclickによる呼び出し、objはHTML要素 */
+					component.template = obj.dataset.tmpl ? '#'+ obj.dataset.tmpl:'';
+					args = function(args_text){
+						return (args_text||'').split('&&').reduce(function(obj,v){
+							var pair = v.split('==');
+							obj[pair[0]] = pair[1]||'';
+							return obj;
+						},{});
+					}(obj.dataset.args);
+					type = obj.dataset.type || '';
+				}else{
+					/* JS内からの呼び出し */
+					if(obj.tmpl){
+						component.template = '#'+ obj.tmpl;
+					}else if(obj.component){
+						component = obj.component;
+					}
+					args = obj.args || {};
+					type = obj.type || '';
+				}
+				if(component.template){
+					this.args = args;
+					this.tmpl = component;
+					this.is_fixid_type = type?true:false;
+					this.type = type?type:this._getTypeFromDevice();
+					this.is_active = true;
+				}
+				return;
+			},
+			close:function(){
+				this.reset();
+			},
+			reset:function(){
+				this.tmpl = '';
+				this.is_active = false;
+				this.type = '';
+				this.is_fixid_type = false;
+				this.args = {};
+			}
+		},
+	});
+
+</script>
+</body>
+</html>
