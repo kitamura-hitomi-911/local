@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="x-ua-compatible" content="ie=edge">
+	<title>Title</title>
+	<meta name="description" content="">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="format-detection" content="telephone=no">
+	<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="l-wrapper">
+	内容入る<br>
+	内容入る<br>
+	内容入る<br>
+	内容入る<br>
+	内容入る<br>
+	内容入る<br>
+	内容入る<br>
+	内容入る<br>
+	内容入る<br>
+	内容入る<br>
+	内容入る<br>
+	内容入る<br>
+	内容入る<br>
+	内容入る<br>
+	内容入る<br>
+	<a href="#" onclick="vm_modal.open(this);return false;" data-tmpl="tmpl-dialog" data-args="title==見出し&&lead==内容入ります">クリック</a><br>
+	内容入る<br>
+	内容入る<br>
+	内容入る<br>
+	内容入る<br>
+	内容入る<br>
+	内容入る<br>
+	内容入る<br>
+	内容入る<br>
+	内容入る<br>
+	内容入る<br>
+	内容入る<br>
+	内容入る<br>
+	内容入る<br>
+	内容入る<br>
+	内容入る<br>
+</div>
+<div id="page-cover"></div>
+<div id="modal"></div>
+<script type="text/x-template" id="tmpl-modal">
+	<div v-if="is_active" :class="type" :style="styleObj">
+		<component :is="tmpl" :type="type" :args="args" @close="close"></component>
+	</div>
+</script>
+<script type="text/x-template" id="tmpl-dialog">
+	<div :class="type+'-inner'">
+		<div v-if="args.title" :class="type+'-title'">
+			<h1>{{args.title}}</h1>
+			<p v-if="type==='fullpanel'" class="fullpanel-title-close">
+				<a href="#" @click.prevent="close"></a>
+			</p>
+		</div>
+		<div :class="type+'-main'">
+			{{args.lead}}
+		</div>
+		<div :class="type+'-btns'">
+			<p class="btn">
+				<a href="#" @click.prevent="close">CLOSE</a>
+			</p>
+		</div>
+		<a href="#" @click.prevent="close">閉じる</a>
+	</div>
+</script>
+<script src="https://unpkg.com/vue/dist/vue.js"></script>
+<script src="common.js"></script>
+<script type="text/javascript">
+	(function(){
+		// comment
+	})();
+</script>
+</body>
+</html>
