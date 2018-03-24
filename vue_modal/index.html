@@ -47,7 +47,7 @@
 <div id="modal"></div>
 <script type="text/x-template" id="tmpl-modal">
 	<transition @after-enter="showAnime">
-		<div v-if="is_active" :class="class_obj" :style="style_obj">
+		<div v-if="is_active" :class="class_obj" :style="style_obj" @click.prevent="close">
 			<component :is="component" :type="type" :args="args" @close="close"></component>
 		</div>
 	</transition>
@@ -69,30 +69,37 @@
 	</div>
 </script>
 <script type="text/x-template" id="tmpl-dialog">
-	<div :class="type+'-inner'">
-		<div v-if="args.title" :class="type+'-title'">
-			<h1>{{args.title}}</h1>
-			<p v-if="type==='fullpanel'" class="fullpanel-title-close">
-				<a href="#" @click.prevent="close"></a>
-			</p>
-		</div>
-		<div :class="type+'-main'">
-			{{args.lead}}<br>{{args.lead}}<br>{{args.lead}}<br>{{args.lead}}<br>{{args.lead}}<br>{{args.lead}}<br>{{args.lead}}<br>{{args.lead}}<br>
-		</div>
-		<div :class="type+'-btns'">
+	<popup-base :type="type" :args="args" @close="close">
+		<h1 slot="title">{{args.title}}</h1>
+		<div slot="main" :class="type+'-main-inner'">{{args.lead}}</div>
+		<div slot="btns" :class="type+'-btns-inner'">
 			<p class="btn">
 				<a href="#" @click.prevent="close">CLOSE</a>
 			</p>
 		</div>
-	</div>
+	</popup-base>
+</script>
+<script type="text/x-template" id="tmpl-dialog2">
+	<popup-base :type="type" :args="args" @close="close">
+		<h1 slot="title">{{args.title}}</h1>
+		<div slot="main" :class="type+'-main-inner'"><span v-html="args.lead"></span></div>
+		<div slot="btns" :class="type+'-btns-inner'">
+			<p class="btn">
+				<a href="#" @click.prevent="close">CLOSE</a>
+			</p>
+		</div>
+	</popup-base>
 </script>
 <script src="https://unpkg.com/vue/dist/vue.js"></script>
 <script src="common.js"></script>
 <script type="text/javascript">
 	function openDialog(){
 		vm_modal.open({
-			tmpl:'tmpl-dialog',
-			args:{lead:'内容いれておきますよいいですよね<br>これってどうなるかな？'}
+			tmpl:'tmpl-dialog2',
+			args:{
+				title:'hoge',
+				lead:'内容いれておきますよいいですよね<br>これってどうなるかな？'
+			}
 		});
 	}
 	(function(){

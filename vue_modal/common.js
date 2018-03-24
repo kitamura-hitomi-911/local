@@ -84,7 +84,6 @@
 				return obj;
 			},
 			tmpl_name:function(){
-				console.log(this.component);
 				return this.component && this.component.template && typeof this.component.template === 'string'?this.component.template.replace(/^#(tmpl-)?/,''):'';
 			}
 		},
@@ -120,7 +119,21 @@
 							this.$emit('close');
 							return false;
 						}
-					}
+					},
+					components:{
+						'popup-base': {
+							props: {
+								type: String,
+								args: Object
+							},
+							template: '#tmpl-modal-base',
+							methods: {
+								close: function(){
+									this.$emit('close');
+								}
+							}
+						}
+					},
 				};
 				var args;
 				var type;
