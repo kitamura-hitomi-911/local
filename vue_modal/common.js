@@ -133,21 +133,21 @@
 								}
 							}
 						}
-					},
+					}
 				};
-				var args;
-				var type;
+				var _args;
+				var _type;
 				if(obj && obj.nodeName ){
 					/* onclickによる呼び出し、objはHTML要素 */
 					_component.template = obj.dataset.tmpl ? '#'+ obj.dataset.tmpl:'';
-					args = function(args_text){
+					_args = function(args_text){
 						return (args_text||'').split('&&').reduce(function(obj,v){
 							var pair = v.split('==');
 							obj[pair[0]] = pair[1]||'';
 							return obj;
 						},{});
 					}(obj.dataset.args);
-					type = obj.dataset.type || '';
+					_type = obj.dataset.type || '';
 				}else{
 					/* JS内からの呼び出し */
 					if(obj.tmpl){
@@ -155,14 +155,14 @@
 					}else if(obj.component){
 						_component = obj.component;
 					}
-					args = obj.args || {};
-					type = obj.type || '';
+					_args = obj.args || {};
+					_type = obj.type || '';
 				}
 				if(_component.template){
-					this.args = args;
+					this.args = _args;
 					this.component = _component;
-					this.is_fixid_type = type?true:false;
-					this.type = type?type:this._getTypeFromDevice();
+					this.is_fixid_type = _type?true:false;
+					this.type = _type?_type:this._getTypeFromDevice();
 					this.is_active = true;
 					// fullpanelの場合の初期位置
 					if(this.type === 'fullpanel'){

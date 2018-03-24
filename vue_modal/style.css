@@ -78,7 +78,22 @@ body {
 	position:relative;
 }
 
-
+/* モジュール ボタン */
+.btn{
+	display:inline-block;
+	min-width:100px;
+}
+.btn a{
+	display:block;
+	padding:10px;
+	border:1px solid #000;
+	text-align: center;
+}
+@media only screen and (min-width: 768px){
+	.btn {
+		min-width:200px;
+	}
+}
 
 /* モジュール poopup */
 .popup{
@@ -103,18 +118,23 @@ body {
 	background-color:#fff;
 }
 .popup .popup-title{
+	padding:15px 20px;
 	background-color:#000;
 	color:#fff;
 }
 .popup .popup-main{
+	padding:15px 20px 0;
+}
+.popup .popup-main-inner{
 	min-height:200px;
 }
 .popup .popup-btns{
-	padding:10px;
+	padding:15px 20px;
 	text-align:center;
 }
 .popup .popup-btns .btn{
 	display:inline-block;
+	margin:0 10px;
 }
 @media only screen and (min-width: 768px){
 	.popup .popup-inner{

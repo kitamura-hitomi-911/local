@@ -47,7 +47,7 @@
 <div id="modal"></div>
 <script type="text/x-template" id="tmpl-modal">
 	<transition @after-enter="showAnime">
-		<div v-if="is_active" :class="class_obj" :style="style_obj" @click.prevent="close">
+		<div v-if="is_active" :class="class_obj" :style="style_obj" @click.prevent.self="close">
 			<component :is="component" :type="type" :args="args" @close="close"></component>
 		</div>
 	</transition>
@@ -61,18 +61,22 @@
 			</p>
 		</div>
 		<div :class="type+'-main'">
-			<slot name="main"></slot>
-		</div>
-		<div :class="type+'-btns'">
+			<div :class="type+'-main-inner'">
+				<slot name="main"></slot>
+			</div>
 			<slot name="btns"></slot>
 		</div>
 	</div>
 </script>
 <script type="text/x-template" id="tmpl-dialog">
 	<popup-base :type="type" :args="args" @close="close">
-		<h1 slot="title">{{args.title}}</h1>
-		<div slot="main" :class="type+'-main-inner'">{{args.lead}}</div>
-		<div slot="btns" :class="type+'-btns-inner'">
+		<h1 slot="title">
+			{{args.title}}
+		</h1>
+		<p slot="main">
+			{{args.lead}}
+		</p>
+		<div slot="btns" :class="type+'-btns'">
 			<p class="btn">
 				<a href="#" @click.prevent="close">CLOSE</a>
 			</p>
@@ -81,11 +85,18 @@
 </script>
 <script type="text/x-template" id="tmpl-dialog2">
 	<popup-base :type="type" :args="args" @close="close">
-		<h1 slot="title">{{args.title}}</h1>
-		<div slot="main" :class="type+'-main-inner'"><span v-html="args.lead"></span></div>
-		<div slot="btns" :class="type+'-btns-inner'">
-			<p class="btn">
-				<a href="#" @click.prevent="close">CLOSE</a>
+		<h1 slot="title">
+			{{args.title}}
+		</h1>
+		<p slot="main">
+			<span v-html="args.lead"></span><span v-html="args.lead"></span><span v-html="args.lead"></span><span v-html="args.lead"></span>
+		</p>
+		<div slot="btns" :class="type+'-btns'">
+			<p class="btn btn-cancel">
+				<a href="#" @click.prevent="close">CANCEL</a>
+			</p><!--
+			--><p class="btn btn-submit">
+				<a href="#" onclick="return false;">OK</a>
 			</p>
 		</div>
 	</popup-base>
@@ -98,7 +109,7 @@
 			tmpl:'tmpl-dialog2',
 			args:{
 				title:'hoge',
-				lead:'内容いれておきますよいいですよね<br>これってどうなるかな？'
+				lead:'内容いれておきますよいいですよね<br>これってどうなるかな？<br>これってどうなるかな？<br>これってどうなるかな？<br>これってどうなるかな？<br>これってどうなるかな？<br>これってどうなるかな？<br>これってどうなるかな？<br>これってどうなるかな？<br>これってどうなるかな？'
 			}
 		});
 	}
