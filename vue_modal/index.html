@@ -26,7 +26,8 @@
 	内容入る<br>
 	内容入る<br>
 	内容入る<br>
-	<a href="#" onclick="vm_modal.open(this);return false;" data-tmpl="tmpl-dialog" data-args="title==見出し&&lead==内容入ります">クリック</a><br>
+	<a href="#" onclick="vm_modal.open(this);return false;" data-tmpl="tmpl-dialog" data-args="title==見出し&&lead==内容入ります">onclickでセットクリック</a><br>
+	<a href="#" onclick="openDialog();return false;">jsから開く</a><br>
 	内容入る<br>
 	内容入る<br>
 	内容入る<br>
@@ -43,11 +44,28 @@
 	内容入る<br>
 	内容入る<br>
 </div>
-<div id="page-cover"></div>
 <div id="modal"></div>
 <script type="text/x-template" id="tmpl-modal">
-	<div v-if="is_active" :class="type" :style="styleObj">
-		<component :is="tmpl" :type="type" :args="args" @close="close"></component>
+	<transition @after-enter="showAnime">
+		<div v-if="is_active" :class="class_obj" :style="style_obj">
+			<component :is="component" :type="type" :args="args" @close="close"></component>
+		</div>
+	</transition>
+</script>
+<script type="text/x-template" id="tmpl-modal-base">
+	<div :class="type+'-inner'">
+		<div v-if="args.title" :class="type+'-title'">
+			<slot name="title"></slot>
+			<p v-if="type==='fullpanel'" class="fullpanel-title-close">
+				<a href="#" @click.prevent="close"></a>
+			</p>
+		</div>
+		<div :class="type+'-main'">
+			<slot name="main"></slot>
+		</div>
+		<div :class="type+'-btns'">
+			<slot name="btns"></slot>
+		</div>
 	</div>
 </script>
 <script type="text/x-template" id="tmpl-dialog">
@@ -59,19 +77,24 @@
 			</p>
 		</div>
 		<div :class="type+'-main'">
-			{{args.lead}}
+			{{args.lead}}<br>{{args.lead}}<br>{{args.lead}}<br>{{args.lead}}<br>{{args.lead}}<br>{{args.lead}}<br>{{args.lead}}<br>{{args.lead}}<br>
 		</div>
 		<div :class="type+'-btns'">
 			<p class="btn">
 				<a href="#" @click.prevent="close">CLOSE</a>
 			</p>
 		</div>
-		<a href="#" @click.prevent="close">閉じる</a>
 	</div>
 </script>
 <script src="https://unpkg.com/vue/dist/vue.js"></script>
 <script src="common.js"></script>
 <script type="text/javascript">
+	function openDialog(){
+		vm_modal.open({
+			tmpl:'tmpl-dialog',
+			args:{lead:'内容いれておきますよいいですよね<br>これってどうなるかな？'}
+		});
+	}
 	(function(){
 		// comment
 	})();

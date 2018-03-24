@@ -52,23 +52,40 @@
 	var vm_modal = new Vue({
 		el: '#modal',
 		data:{
-			tmpl:null,
+			component:null,
 			is_active:false,
+			is_show:false,
 			type:'',
 			is_fixid_type:false,
+			args:{},
+			/* fullpanelのみ使用*/
+			is_adjusting:false,
 			pos_y:0,
-			args:{}
+			tmp_pos_y:0
 		},
 		computed: {
-			styleObj:function(){
-				var obj;
-				if(this.type==='fullpanel'){
+			class_obj:function(){
+				var obj = {};
+				obj['is-popup-show'] = this.type==='popup' && this.is_show ? true:false;
+				obj['is-fullpanel-show'] = this.type==='fullpanel' && this.is_show ? true:false;
+				obj['is-fullpanel-adjusting'] = this.type==='fullpanel' && this.is_adjusting ? true:false;
+				obj[this.type] = true;
+				obj[this.type+'-'+this.tmpl_name] = true;
+				return obj;
+			},
+			style_obj:function(){
+				var obj = {};
+				if(this.type === 'fullpanel'){
 					obj = {
 						top:this.pos_y+'px',
-						display:'block'
+						'min-height': window.innerHeight + 'px'
 					};
 				}
 				return obj;
+			},
+			tmpl_name:function(){
+				console.log(this.component);
+				return this.component && this.component.template && typeof this.component.template === 'string'?this.component.template.replace(/^#(tmpl-)?/,''):'';
 			}
 		},
 		template: "#tmpl-modal",
@@ -82,9 +99,9 @@
 			/* デバイス変更時のtype切り替え処理 */
 			onChangeDevice:function(device){
 				if(!this.is_fixid_type){
-					this.is_active = false;
+					this.hideAnime();
 					this.type = this._getTypeFromDevice();
-					this.is_active = true;
+					this.showAnime();
 				}
 				return;
 			},
@@ -93,7 +110,7 @@
 				return responsiveController.getCurrentDevice() === 'sp'?'fullpanel':'popup';
 			},
 			open:function(obj){
-				var component = {
+				var _component = {
 					props:{
 						type:String,
 						args:Object
@@ -109,7 +126,7 @@
 				var type;
 				if(obj && obj.nodeName ){
 					/* onclickによる呼び出し、objはHTML要素 */
-					component.template = obj.dataset.tmpl ? '#'+ obj.dataset.tmpl:'';
+					_component.template = obj.dataset.tmpl ? '#'+ obj.dataset.tmpl:'';
 					args = function(args_text){
 						return (args_text||'').split('&&').reduce(function(obj,v){
 							var pair = v.split('==');
@@ -121,38 +138,79 @@
 				}else{
 					/* JS内からの呼び出し */
 					if(obj.tmpl){
-						component.template = '#'+ obj.tmpl;
+						_component.template = '#'+ obj.tmpl;
 					}else if(obj.component){
-						component = obj.component;
+						_component = obj.component;
 					}
 					args = obj.args || {};
 					type = obj.type || '';
 				}
-				if(component.template){
+				if(_component.template){
 					this.args = args;
-					this.tmpl = component;
+					this.component = _component;
 					this.is_fixid_type = type?true:false;
 					this.type = type?type:this._getTypeFromDevice();
 					this.is_active = true;
-
-					// fullpanelの場合の表示処理
+					// fullpanelの場合の初期位置
 					if(this.type === 'fullpanel'){
-						this.pos_y = (document.documentElement.scrollTop || document.body.scrollTop)+window.innerHeight;
+						this.tmp_pos_y = (document.documentElement.scrollTop || document.body.scrollTop);
+						this.pos_y = (document.documentElement.scrollTop || document.body.scrollTop) + window.innerHeight;
 					}
-
-
 				}
 				return;
 			},
 			close:function(){
-				this.reset();
+				this.hideAnime(this.reset);
 			},
 			reset:function(){
-				this.tmpl = '';
+				// 初期値に戻す
+				console.log('reset',this);
+				this.component = '';
 				this.is_active = false;
+				this.is_show = false;
 				this.type = '';
-				this.is_fixid_type = false;
 				this.args = {};
+				this.is_fixid_type = false;
+				this.is_adjusting = false;
+				this.pos_y = 0;
+				this.tmp_pos_y = 0;
+			},
+			showAnime:function(){
+				var that = this;
+				if(this.type === 'fullpanel'){
+					this.is_show = true;
+					this.pos_y = (document.documentElement.scrollTop || document.body.scrollTop);
+					setTimeout(function(){
+						that.is_adjusting = true;
+						document.getElementsByClassName('l-wrapper')[0].style.display = "none";
+						that.pos_y = 0;
+					},500)
+				}else{
+					this.is_show = true;
+				}
+			},
+			hideAnime:function(callback){
+				var that = this;
+				if(this.type === 'fullpanel'){
+					document.getElementsByClassName('l-wrapper')[0].style.display = "block";
+					this.pos_y = this.tmp_pos_y;
+					scrollTo( 0, this.tmp_pos_y);
+					setTimeout(function(){
+						that.is_adjusting = false;
+						that.pos_y = (document.documentElement.scrollTop || document.body.scrollTop) + window.innerHeight;
+						if(callback && typeof callback === 'function' ){
+							// なんでここ.callなしでいけるのか？
+							setTimeout(callback,500);
+							//setTimeout(function(){callback.call(that)},500);
+						}
+					},200);
+				}else{
+					this.is_show = false;
+					if(callback && typeof callback === 'function' ){
+						setTimeout(callback,500);
+					}
+				}
+
 			}
 		},
 	});
