@@ -7,7 +7,7 @@
 
 	/**
 	 * メディアクエリ関連の処理
-	 * @returns {object.<function,function>}
+	 * @return {object.<function,function>}
 	 *               setEvents ブレイクポイントで切り替わるときに発動するイベントを登録する,
 	 *               getCurrentDevice 設定された メディアクエリ から算出されるデバイスの文字列をかえす
 	 */
@@ -60,7 +60,7 @@
 			/** @function getCurrentDevice
 			 * 設定された メディアクエリ から算出されるデバイスの文字列をかえす
 			 * @this responsiveController
-			 * @returns {string} ->sp(768px未満) か pc(768px以上)のいずれか
+			 * @return {string} ->sp(768px未満) か pc(768px以上)のいずれか
 			 */
 			getCurrentDevice:getCurrentDevice
 		};
@@ -80,7 +80,7 @@
 			 * @type {boolean} is_fixid_type メディアクエリから算出されるデバイスでtypeが切り替わらないか否か
 			 * @type {object} args template内で使用する変数
 			 * 以下はtype が fullpanel のときだけ使用
-			 * @type {boolean} is_adjusting 見えないところで表示調整中か否か → transition の設定が一時的にnoneになる
+			 * @type {boolean} is_adjusting 表示調整中か否か → transition の設定が一時的にnoneになる
 			 * @type {number} pos_y .fullpanelの top の値
 			 * @type {number} tmp_pos_y .fullpanel open時のスクロール位置
 			 */
@@ -96,8 +96,8 @@
 		},
 		computed: {
 			/**
-			 * .popup もしくは .fullpanel に適用される classを算出
-			 * @returns {object}
+			 * $el に適用される classを算出
+			 * @return {object}
 			 */
 			class_obj:function(){
 				var obj = {};
@@ -109,8 +109,8 @@
 				return obj;
 			},
 			/**
-			 * .popup もしくは .fullpanel に適用される styleを算出
-			 * @returns {object}
+			 * $el に適用される styleを算出
+			 * @return {object}
 			 */
 			style_obj:function(){
 				var obj = {};
@@ -124,7 +124,7 @@
 			},
 			/**
 			 * component.template が x-template で指定されている場合は テンプレートネームを返す
-			 * @returns {string}
+			 * @return {string}
 			 */
 			tmpl_name:function(){
 				return this.component && this.component.template && typeof this.component.template === 'string'?this.component.template.replace(/^#(tmpl-)?/,''):'';
@@ -153,7 +153,7 @@
 			},
 			/**
 			 * responsiveControllerに現在のデバイスを問い合わせて、modalのtypeを返す
-			 * @returns {string} fullpanel か popup のいずれか
+			 * @return {string} fullpanel か popup のいずれか
 			 * @private
 			 */
 			_getTypeFromDevice:function(){
@@ -167,17 +167,22 @@
 			 * @param {object.<string,object,object,string>}
 			 *                                    obj.tmpl x-templateのID名 ※
 			 *                                    obj.component data.componentに適用される ※
-			 *                                    obj.args data.argsに適用される
+			 *                                    [obj.args] data.argsに適用される
 			 *                                    [obj.type] 指定された場合、data.is_fixed_typeが trueになり data.type に適用される
 			 *                                    ※ tmpl と component はどちらかが必須、両方指定された場合はcomponentが優先される
 			 * ＜obj が HTML element の場合＞
 			 * @param {object.dataset.<string,string,string>}
 			 *                                    obj.dataset.tmpl x-templateのID名
-			 *                                    obj.dataset.args data.argsに変換するための文字列
-			 *                                    [obj.dataset.type] 定された場合、data.is_fixed_typeが trueになり data.type に適用される
+			 *                                    [obj.dataset.args] data.argsに変換するための文字列
+			 *                                    [obj.dataset.type] 指定された場合、data.is_fixed_typeが trueになり data.type に適用される
 			 */
 			open:function(obj){
-				var _component = {
+				if(!(obj.component || obj.tmpl || (obj.dataset && obj.dataset.tmpl))){
+					console.error('パラメータが不足しています');
+					return;
+				}
+				var _component = obj.component ? obj.component :{
+					template:obj.tmpl?'#'+obj.tmpl:'#'+obj.dataset.tmpl,
 					props:{
 						type:String,
 						args:Object
@@ -203,29 +208,9 @@
 						}
 					}
 				};
-				var _args;
-				var _type;
-				if(obj && obj.nodeName ){
-					/* onclickによる呼び出し、objはHTML要素 */
-					_component.template = obj.dataset.tmpl ? '#'+ obj.dataset.tmpl:'';
-					_args = function(args_text){
-						return (args_text||'').split('&&').reduce(function(obj,v){
-							var pair = v.split('==');
-							obj[pair[0]] = pair[1]||'';
-							return obj;
-						},{});
-					}(obj.dataset.args);
-					_type = obj.dataset.type || '';
-				}else{
-					/* JS内からの呼び出し */
-					if(obj.tmpl){
-						_component.template = '#'+ obj.tmpl;
-					}else if(obj.component){
-						_component = obj.component;
-					}
-					_args = obj.args || {};
-					_type = obj.type || '';
-				}
+				var _args = obj.dataset && obj.dataset.args ? makeArgsObj(obj.dataset.args) : (obj.args || {});
+				var _type = obj.dataset && obj.dataset.type ? obj.dataset.type : (obj.type || '');
+
 				if(_component.template){
 					this.args = _args;
 					this.component = _component;
@@ -238,31 +223,48 @@
 						this.pos_y = (document.documentElement.scrollTop || document.body.scrollTop) + window.innerHeight;
 					}
 				}
+				/**
+				 * パラメータ文字列をパラメータオブジェクトに変換
+				 * @param {string} args_text
+				 * @return {object}
+				 */
+				function makeArgsObj(args_text){
+					return (args_text||'').split('&&').reduce(function(obj,v){
+						var pair = v.split('==');
+						obj[pair[0]] = pair[1]||'';
+						return obj;
+					},{});
+				}
+
 				return;
 			},
 			/**
 			 * modalを閉じる
 			 */
 			close:function(){
-				this.hideAnime(this.reset);
+				this.hideAnime(this.resetData);
 			},
 			/**
 			 * dataの値を初期値に戻す
 			 */
-			reset:function(){
-				console.log('reset',this);
-				this.component = '';
-				this.is_active = false;
-				this.is_show = false;
-				this.type = '';
-				this.args = {};
-				this.is_fixid_type = false;
-				this.is_adjusting = false;
-				this.pos_y = 0;
-				this.tmp_pos_y = 0;
+			resetData:function(){
+				var data_def = {
+					component:'',
+					is_active:false,
+					is_show:false,
+					type:'',
+					is_fixid_type:false,
+					args:{},
+					is_adjusting:false,
+					pos_y:0,
+					tmp_pos_y:0
+				};
+				for(var i in data_def){
+					this[i] = data_def[i];
+				}
 			},
 			/**
-			 * 表示アニメーション
+			 * modal表示アニメーション
 			 */
 			showAnime:function(){
 				var that = this;
@@ -279,7 +281,7 @@
 				}
 			},
 			/**
-			 * 非表示アニメーション
+			 * modal非表示アニメーション
 			 * @param {function} callback アニメーション終了後のコールバック関数
 			 */
 			hideAnime:function(callback){

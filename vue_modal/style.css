@@ -114,7 +114,9 @@ body {
 	opacity:1;
 }
 .popup .popup-inner{
+	overflow-y: auto;
 	width:80%;
+	max-height:90%;
 	background-color:#fff;
 }
 .popup .popup-title{
