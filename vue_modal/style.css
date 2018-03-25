@@ -86,8 +86,23 @@ body {
 .btn a{
 	display:block;
 	padding:10px;
-	border:1px solid #000;
+	border:1px solid #666;
 	text-align: center;
+	transition: all .5s;
+}
+.btn.btn-submit a{
+	color:#666;
+	background-color:rgba(255,215,0,1);
+}
+.btn.btn-submit a:hover{
+	background-color:rgba(255,215,0,.5);
+}
+.btn.btn-cancel a{
+	color: #666;
+	background-color:rgba(204,204,204,1);
+}
+.btn.btn-cancel a:hover{
+	background-color:rgba(204,204,204,.5);
 }
 @media only screen and (min-width: 768px){
 	.btn {
@@ -95,7 +110,7 @@ body {
 	}
 }
 
-/* モジュール poopup */
+/* モジュール 基本poopup */
 .popup{
 	position:fixed;
 	display:flex;
@@ -107,7 +122,7 @@ body {
 	align-items: center;
 	background-color:rgba(0,0,0,.5);
 	opacity:0;
-	transition: opacity .5s;
+	transition: opacity .3s;
 	z-index:9999;
 }
 .popup.is-popup-show{
@@ -124,11 +139,17 @@ body {
 	background-color:#000;
 	color:#fff;
 }
-.popup .popup-main{
-	padding:15px 20px 0;
+.popup .popup-title h1{
+	font-size:1.125rem;
+	line-height:1.1111;
 }
 .popup .popup-main-inner{
+	padding:15px 20px 0;
 	min-height:200px;
+}
+.popup .popup-main p{
+	font-size:0.875rem;
+	line-height:1.2857;
 }
 .popup .popup-btns{
 	padding:15px 20px;
@@ -144,7 +165,15 @@ body {
 	}
 }
 
-/* モジュール fullpanel */
+/* モジュール プレイヤー詳細 poopup */
+.popup-playerDetail .popup-inner{
+	background:#fcf;
+}
+.popup-playerDetail .popup-title{
+	background-color:#f00;
+}
+
+/* モジュール 基本fullpanel */
 .fullpanel{
 	position:absolute;
 	display:flex;
@@ -168,11 +197,13 @@ body {
 .fullpanel .fullpanel-title{
 	position:relative;
 	min-height:30px;
+	padding:10px 30px 10px 15px;
 	background-color:#000;
 	color:#fff;
 }
 .fullpanel .fullpanel-title > h1{
-	padding:10px 30px 10px 15px;
+	font-size:1.125rem;
+	line-height:1.1111;
 }
 .fullpanel .fullpanel-title-close{
 	position: absolute;
@@ -207,4 +238,28 @@ body {
 	-webkit-transform: rotate(-45deg);
 	-ms-transform: rotate(-45deg);
 	transform: rotate(-45deg);
+}
+.fullpanel .fullpanel-main-inner{
+	min-height:100px;
+	padding:10px 15px;
+}
+.fullpanel .fullpanel-main p{
+	font-size:0.875rem;
+	line-height:1.2857;
+}
+.fullpanel .fullpanel-btns{
+	padding:15px 20px;
+	text-align:center;
+}
+.fullpanel .fullpanel-btns .btn{
+	display:inline-block;
+	margin:0 10px;
+}
+
+/* モジュール プレイヤー詳細 fullpanel */
+.fullpanel-playerDetail .fullpanel-inner{
+	background:#fcf;
+}
+.fullpanel-playerDetail .fullpanel-title{
+	background-color:#f00;
 }

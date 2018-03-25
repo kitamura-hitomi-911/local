@@ -26,8 +26,10 @@
 	内容入る<br>
 	内容入る<br>
 	内容入る<br>
-	<a href="#" onclick="vm_modal.open(this);return false;" data-tmpl="tmpl-dialog" data-args="title==見出し&&lead==内容入ります">onclickでセットクリック</a><br>
+	<a href="#" onclick="vm_modal.open(this);return false;" data-tmpl="tmpl-dialog" data-vars="title==見出し&&lead==内容入ります">onclickでopen</a><br>
 	<a href="#" onclick="openDialog();return false;">jsから開く</a><br>
+	<a href="#" onclick="vm_modal.open(this);return false;" data-tmpl="tmpl-playerDetail" data-vars="title==プレイヤー名&&lead==この人はこういう人です。">onclickでopen、デザイン赤</a><br>
+
 	内容入る<br>
 	内容入る<br>
 	内容入る<br>
@@ -45,16 +47,18 @@
 	内容入る<br>
 </div>
 <div id="modal"></div>
+<!-- vm_modal のテンプレート（編集不可） -->
 <script type="text/x-template" id="tmpl-modal">
 	<transition @after-enter="showAnime">
 		<div v-if="is_active" :class="class_obj" :style="style_obj" @click.prevent.self="close">
-			<component :is="component" :type="type" :args="args" @close="close"></component>
+			<component :is="component" :type="type" :vars="vars" @close="close"></component>
 		</div>
 	</transition>
 </script>
+<!-- vm_modal のローカルコンポーネントで使用するベースのテンプレート（編集不可） -->
 <script type="text/x-template" id="tmpl-modal-base">
 	<div :class="type+'-inner'">
-		<div v-if="args.title" :class="type+'-title'">
+		<div v-if="vars.title" :class="type+'-title'">
 			<slot name="title"></slot>
 			<p v-if="type==='fullpanel'" class="fullpanel-title-close">
 				<a href="#" @click.prevent="close"></a>
@@ -68,35 +72,50 @@
 		</div>
 	</div>
 </script>
+
+<!-- ここから下が、ページ実装時に追加して調整するテンプレート例 -->
 <script type="text/x-template" id="tmpl-dialog">
-	<popup-base :type="type" :args="args" @close="close">
+	<popup-base :type="type" :vars="vars" @close="close">
 		<h1 slot="title">
-			{{args.title}}
+			{{vars.title}}
 		</h1>
 		<p slot="main">
-			{{args.lead}}
+			{{vars.lead}}
 		</p>
 		<div slot="btns" :class="type+'-btns'">
-			<p class="btn">
+			<p class="btn btn-cancel">
 				<a href="#" @click.prevent="close">CLOSE</a>
 			</p>
 		</div>
 	</popup-base>
 </script>
 <script type="text/x-template" id="tmpl-dialog2">
-	<popup-base :type="type" :args="args" @close="close">
+	<popup-base :type="type" :vars="vars" @close="close">
 		<h1 slot="title">
-			{{args.title}}
+			{{vars.title}}
 		</h1>
-		<p slot="main">
-			<span v-html="args.lead"></span><span v-html="args.lead"></span><span v-html="args.lead"></span><span v-html="args.lead"></span>
-		</p>
+		<p slot="main" v-html="vars.lead"></p>
 		<div slot="btns" :class="type+'-btns'">
 			<p class="btn btn-cancel">
 				<a href="#" @click.prevent="close">CANCEL</a>
 			</p><!--
 			--><p class="btn btn-submit">
-				<a href="#" onclick="return false;">OK</a>
+				<a href="#" @click.prevent="close();">OK</a>
+			</p>
+		</div>
+	</popup-base>
+</script>
+<script type="text/x-template" id="tmpl-playerDetail">
+	<popup-base :type="type" :vars="vars" @close="close">
+		<h1 slot="title">
+			{{vars.title}}
+		</h1>
+		<p slot="main">
+			{{vars.lead}}
+		</p>
+		<div slot="btns" :class="type+'-btns'">
+			<p class="btn btn-cancel">
+				<a href="#" @click.prevent="close">CLOSE</a>
 			</p>
 		</div>
 	</popup-base>
@@ -107,7 +126,7 @@
 	function openDialog(){
 		vm_modal.open({
 			tmpl:'tmpl-dialog2',
-			args:{
+			vars:{
 				title:'hoge',
 				lead:'内容いれておきますよいいですよね<br>これってどうなるかな？<br>これってどうなるかな？<br>これってどうなるかな？<br>これってどうなるかな？<br>これってどうなるかな？<br>これってどうなるかな？<br>これってどうなるかな？<br>これってどうなるかな？<br>これってどうなるかな？'
 			}
