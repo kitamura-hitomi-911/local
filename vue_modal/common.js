@@ -11,9 +11,21 @@
 	 *               setEvents ブレイクポイントで切り替わるときに発動するイベントを登録する,
 	 *               getCurrentDevice 設定された メディアクエリ から算出されるデバイスの文字列をかえす
 	 */
-	var responsiveController = (function(){
+	var responsiveController = (function(breakpoint_settings){
 		var that = this;
-		var mql = window.matchMedia('screen and (min-width: 768px)');
+		var _breakpoint_settings = breakpoint_settings && Array.isArray(breakpoint_settings) && breakpoint_settings.length ? breakpoint_settings : [
+			{device:'sp',width:0},
+			{device:'pad',width:768},
+			{device:'pc',width:980}
+		];
+		var mql = {};
+		_breakpoint_settings.forEach(function(setting){
+			if(isFinite(setting.width) && setting.width > 0){
+				mql[setting.device] = window.matchMedia('screen and (min-width: '+setting.width+'px)');
+				mql[setting.device].addListener(checkBreakPoint);
+			}
+		});
+
 		var events = [];
 		function checkBreakPoint(mql){
 			events.forEach(function(event){
@@ -23,10 +35,14 @@
 		}
 
 		function getCurrentDevice(){
-			return mql.matches?'pc':'sp';
+			var device = 'sp';
+			_breakpoint_settings.forEach(function(setting){
+				if(mql[setting.device] && mql[setting.device].matches){
+					device = setting.device;
+				}
+			});
+			return device;
 		}
-
-		mql.addListener(checkBreakPoint);
 
 		return {
 			/** @function setEvents
@@ -47,6 +63,7 @@
 						fn:event.fn,
 						params:event.params||{}
 					});
+					/* first が指定されていたら、イベントセット時にも処理する*/
 					if(event.first){
 						var devide = getCurrentDevice();
 						var delay = isFinite(event.first)?event.first:0;
@@ -60,7 +77,7 @@
 			/** @function getCurrentDevice
 			 * 設定された メディアクエリ から算出されるデバイスの文字列をかえす
 			 * @this responsiveController
-			 * @return {string} ->sp(768px未満) か pc(768px以上)のいずれか
+			 * @return {string}
 			 */
 			getCurrentDevice:getCurrentDevice
 		};
@@ -141,23 +158,34 @@
 		methods: {
 			/**
 			 * デバイス変更時のtype切り替え処理
-			 * @param {string} device sp(768px未満) か pc(768px以上)のいずれか
+			 * @param {string} device
 			 */
 			onChangeDevice:function(device){
 				if(!this.is_fixid_type && this.is_active && this.is_show){
-					this.hideAnime();
-					this.type = this._getTypeFromDevice();
-					this.showAnime();
+					var _type = this._getTypeFromDevice(device);
+					if(this.type !== _type){
+						this.hideAnime();
+						this.type = _type;
+						this.showAnime();
+					}
 				}
 				return;
 			},
 			/**
-			 * responsiveControllerに現在のデバイスを問い合わせて、modalのtypeを返す
+			 * 現在のデバイスに対する modalのtypeを返す
+			 * @param {string} [device] 未指定の場合はresponsiveControllerに現在のデバイスを問い合わせする
 			 * @return {string} fullpanel か popup のいずれか
 			 * @private
 			 */
-			_getTypeFromDevice:function(){
-				return responsiveController.getCurrentDevice() === 'sp'?'fullpanel':'popup';
+			_getTypeFromDevice:function(device){
+				var _device = device || responsiveController.getCurrentDevice();
+				var _device2type = {
+					sp:'fullpanel',
+					pad:'popup',
+					pc:'popup'
+				}
+
+				return _device2type[_device]||'popup';
 			},
 			/**
 			 * modalをopenする
