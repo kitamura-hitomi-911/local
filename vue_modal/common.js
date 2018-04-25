@@ -215,41 +215,54 @@
 			 *                                    [obj.dataset.type] 指定された場合、data.is_fixed_typeが trueになり data.type に適用される
 			 */
 			open:function(obj){
-				if(!(obj.component || obj.tmpl || (obj.dataset && obj.dataset.tmpl))){
+				if(!obj){
 					console.error('パラメータが不足しています');
-					return;
+					return false;
 				}
-				var _component = obj.component ? obj.component :{
-					template:obj.tmpl?'#'+obj.tmpl:'#'+obj.dataset.tmpl,
-					props:{
-						type:String,
-						vars:Object
-					},
-					methods: {
-						close:function(){
-							this.$emit('close');
-							return false;
+				var _component;
+				var _tmpl;
+				var _vars;
+				var _type;
+				if(obj.component_name && Vue.component(obj.component_name)){
+					_component = obj.component_name;
+					_type = obj.type ||'';
+				}else if(obj.component){
+					_component = obj.component;
+					_type = obj.type ||'';
+				}else{
+					if(obj.nodeType && obj.nodeType ===1 && obj.dataset && (obj.dataset.tmpl || obj.dataset.vars)){
+						_tmpl = obj.dataset.tmpl || '';
+						_vars = obj.dataset.vars ? makeArgsObj(obj.dataset.vars):{};
+						_type = obj.dataset.type ||'';
+						if(!_tmpl && (!_vars.title || !_vars.lead)){
+							console.error('デフォルトテンプレートを使用する場合はtitleとleadパラメータが必須です');
+							return;
 						}
-					},
-					components:{
-						'popup-base': {
-							props: {
-								type: String,
-								vars: Object
-							},
-							template: '#tmpl-modal-base',
-							methods: {
-								close: function(){
-									this.$emit('close');
-								}
-							}
+					}else{
+						_tmpl = obj.tmpl||'';
+						_vars = obj.vars||null;
+						_type = obj.type ||'';
+						if(!_tmpl && (!_vars.title || !_vars.lead)){
+							console.error('デフォルトテンプレートを使用する場合はtitleとleadパラメータが必須です');
+							return;
 						}
 					}
-				};
-				var _vars = obj.dataset && obj.dataset.vars ? makeArgsObj(obj.dataset.vars) : (obj.vars || {});
-				var _type = obj.dataset && obj.dataset.type ? obj.dataset.type : (obj.type || '');
-
-				if(_component.template){
+					_component = {
+						template:'#'+(_tmpl||'tmpl-modal-base'),
+						props:{
+							type:String,
+							vars:Object
+						},
+						methods: {
+							close:function(){
+								this.$emit('close');
+								return false;
+							}
+						}
+					};
+				}
+				console.log(_component);
+				if(Vue.component(_component) || _component.template){
 					this.vars = _vars;
 					this.component = _component;
 					this.is_fixid_type = _type?true:false;

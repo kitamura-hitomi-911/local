@@ -29,7 +29,8 @@
 	<a href="#" onclick="vm_modal.open(this);return false;" data-tmpl="tmpl-dialog" data-vars="title==見出し&&lead==内容入ります">onclickでopen</a><br>
 	<a href="#" onclick="openDialog();return false;">jsから開く</a><br>
 	<a href="#" onclick="vm_modal.open(this);return false;" data-tmpl="tmpl-playerDetail" data-vars="title==プレイヤー名&&lead==この人はこういう人です。">onclickでopen、デザイン赤</a><br>
-
+	<a href="#" onclick="openDialog2();return false;">jsからグローバルコンポーネント開く</a><br>
+	<a href="#" onclick="vm_modal.open(this);return false;">data-でとるときthisをわたさないとだめか？→だめだった</a><br>
 	内容入る<br>
 	内容入る<br>
 	内容入る<br>
@@ -56,71 +57,102 @@
 	</transition>
 </script>
 <!-- vm_modal のローカルコンポーネントで使用するベースのテンプレート（編集不可） -->
-<script type="text/x-template" id="tmpl-modal-base">
+<script type="text/x-template" id="tmpl-modal-default">
 	<div :class="type+'-inner'">
 		<div v-if="vars.title" :class="type+'-title'">
-			<slot name="title"></slot>
+			<h1>{{vars.title}}</h1>
 			<p v-if="type==='fullpanel'" class="fullpanel-title-close">
 				<a href="#" @click.prevent="close"></a>
 			</p>
 		</div>
 		<div :class="type+'-main'">
 			<div :class="type+'-main-inner'">
-				<slot name="main"></slot>
+				<p>{{vars.lead}}</p>
 			</div>
-			<slot name="btns"></slot>
+			<div :class="type+'-btns'">
+				<p class="btn btn-cancel">
+					<a href="#" @click.prevent="close">CLOSE</a>
+				</p>
+			</div>
 		</div>
 	</div>
 </script>
 
 <!-- ここから下が、ページ実装時に追加して調整するテンプレート例 -->
 <script type="text/x-template" id="tmpl-dialog">
-	<popup-base :type="type" :vars="vars" @close="close">
-		<h1 slot="title">
-			{{vars.title}}
-		</h1>
-		<p slot="main">
-			{{vars.lead}}
-		</p>
-		<div slot="btns" :class="type+'-btns'">
-			<p class="btn btn-cancel">
-				<a href="#" @click.prevent="close">CLOSE</a>
+	<div :class="type+'-inner'">
+		<div v-if="vars.title" :class="type+'-title'">
+			<h1>{{vars.title}}</h1>
+			<p v-if="type==='fullpanel'" class="fullpanel-title-close">
+				<a href="#" @click.prevent="close"></a>
 			</p>
 		</div>
-	</popup-base>
+		<div :class="type+'-main'">
+			<div :class="type+'-main-inner'">
+				<p>{{vars.lead}}</p>
+			</div>
+			<div :class="type+'-btns'">
+				<p class="btn btn-cancel">
+					<a href="#" @click.prevent="close">CLOSE</a>
+				</p>
+			</div>
+		</div>
+	</div>
 </script>
 <script type="text/x-template" id="tmpl-dialog2">
-	<popup-base :type="type" :vars="vars" @close="close">
-		<h1 slot="title">
-			{{vars.title}}
-		</h1>
-		<p slot="main" v-html="vars.lead"></p>
-		<div slot="btns" :class="type+'-btns'">
-			<p class="btn btn-cancel">
-				<a href="#" @click.prevent="close">CANCEL</a>
-			</p><!--
-			--><p class="btn btn-submit">
-				<a href="#" @click.prevent="close();">OK</a>
+	<div :class="type+'-inner'">
+		<div v-if="vars.title" :class="type+'-title'">
+			<h1>{{vars.title}}</h1>
+			<p v-if="type==='fullpanel'" class="fullpanel-title-close">
+				<a href="#" @click.prevent="close"></a>
 			</p>
 		</div>
-	</popup-base>
+		<div :class="type+'-main'">
+			<div :class="type+'-main-inner'">
+				<p>{{vars.lead}}</p>
+			</div>
+			<div :class="type+'-btns'">
+				<p class="btn btn-cancel">
+					<a href="#" @click.prevent="close">CANCEL</a>
+				</p>
+				<p class="btn btn-cancel">
+					<a href="#" @click.prevent="close">CLOSE</a>
+				</p>
+			</div>
+		</div>
+	</div>
 </script>
 <script type="text/x-template" id="tmpl-playerDetail">
-	<popup-base :type="type" :vars="vars" @close="close">
-		<h1 slot="title">
-			{{vars.title}}
-		</h1>
-		<p slot="main">
-			{{vars.lead}}
-		</p>
-		<div slot="btns" :class="type+'-btns'">
-			<p class="btn btn-cancel">
-				<a href="#" @click.prevent="close">CLOSE</a>
+	<div :class="type+'-inner'">
+		<div v-if="vars.title" :class="type+'-title'">
+			<h1>{{vars.title}}</h1>
+			<p v-if="type==='fullpanel'" class="fullpanel-title-close">
+				<a href="#" @click.prevent="close"></a>
 			</p>
 		</div>
-	</popup-base>
+		<div :class="type+'-main'">
+			<div :class="type+'-main-inner'">
+				<p>{{vars.lead}}</p>
+			</div>
+			<div :class="type+'-btns'">
+				<p class="btn btn-cancel">
+					<a href="#" @click.prevent="close">CLOSE</a>
+				</p>
+			</div>
+		</div>
+	</div>
 </script>
 <script src="https://unpkg.com/vue/dist/vue.js"></script>
+<script type="text/javascript">
+	Vue.component('global_component', {
+		data: function () {
+			return {
+				test: 'yaho'
+			}
+		},
+		template: '<p>{{test}}</p>'
+	})
+</script>
 <script src="common.js"></script>
 <script type="text/javascript">
 	function openDialog(){
@@ -131,6 +163,9 @@
 				lead:'内容いれておきますよいいですよね<br>これってどうなるかな？<br>これってどうなるかな？<br>これってどうなるかな？<br>これってどうなるかな？<br>これってどうなるかな？<br>これってどうなるかな？<br>これってどうなるかな？<br>これってどうなるかな？<br>これってどうなるかな？'
 			}
 		});
+	}
+	function openDialog2(){
+		vm_modal.open({component_name:'global_component'});
 	}
 	(function(){
 		// comment
