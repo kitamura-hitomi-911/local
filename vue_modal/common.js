@@ -5,6 +5,38 @@
 !(function(){
 	"use strict";
 
+	var supportsPassive = function(){
+		var _supportsPassive = false;
+		try {
+			var opts = Object.defineProperty({}, 'passive', {
+				get: function() {
+					_supportsPassive = true;
+				}
+			});
+			window.addEventListener("test", null, opts);
+		} catch (e) {}
+		return _supportsPassive;
+	}();
+
+	console.log(supportsPassive);
+	/**
+	 *
+	 * @param target
+	 * @param type
+	 * @param handler
+	 * @param options
+	 */
+	function addEventListenerWithOptions(target, type, handler, options) {
+		var optionsOrCapture = options;
+		if (!supportsPassive) {
+			// 非対応ブラウザでは、他のオプションは全て捨て
+			// { capture: bool } の値を useCapture の値として採用する
+			optionsOrCapture = options.capture;
+		}
+		//
+		target.addEventListener(type, handler, optionsOrCapture);
+	}
+
 	/**
 	 * メディアクエリ関連の処理
 	 * @return {object.<function,function>}
@@ -335,6 +367,7 @@
 					},500);
 				}else{
 					this.is_show = true;
+					this._stopScroll();
 				}
 			},
 			/**
@@ -361,12 +394,71 @@
 						}
 					},200);
 				}else{
+					this._restartScroll();
 					this.is_show = false;
 					if(callback && typeof callback === 'function' ){
 						setTimeout(callback,300);
 					}
 				}
 
+			},
+			_stopScroll:function(){
+				console.log('_stopScroll');
+
+				var mousewheelevent = 'onwheel' in document ? 'wheel' : 'onmousewheel' in document ? 'mousewheel' : 'DOMMouseScroll';
+				addEventListenerWithOptions(document,mousewheelevent,this._scrollOff,{once: false ,capture: false ,passive: false });
+
+				if('ontouchstart' in window){
+					addEventListenerWithOptions(document,'touchmove',this._scrollOff,{once: false ,capture: false ,passive: false });
+				}
+
+				return;
+			},
+			_restartScroll:function(){
+				var mousewheelevent = 'onwheel' in document ? 'wheel' : 'onmousewheel' in document ? 'mousewheel' : 'DOMMouseScroll';
+				document.removeEventListener( mousewheelevent, this._scrollOff, false );
+				if('ontouchstart' in window){
+					document.removeEventListener('touchmove', this._scrollOff, false);
+				}
+				return;
+			},
+			_scrollOff:function(e){
+				var target = e.target;
+				console.log(e);
+				if(!isScrollableElement(target)){
+					e.preventDefault();
+				}
+				// popup-main-innerの内側にいて、 popup-inner が scrollable か
+				function isScrollableElement(elm){
+					var is_inner_popup_inner_scrollable = false;
+					var is_inner_popup_main_inner = false;
+					var parent = elm.parentNode;
+					for(var i = 0; parent; i++) {
+						if(elm.classList.contains('popup-main-inner')){
+							is_inner_popup_main_inner = true;
+						}
+						if(is_inner_popup_main_inner && elm.classList.contains('popup-inner')){
+							var _scroll_height = elm.scrollHeight;
+							var _apparent_height = elm.offsetHeight;
+							var _scroll_top = elm.scrollTop;
+							if(_scroll_height > _apparent_height){
+								if(_scroll_top === 0){
+									elm.scrollTop = 1;
+								}else{
+									var scrolling_left = _scroll_height - _apparent_height - _scroll_top;
+									if(scrolling_left <= 0){
+										elm.scrollTop = _scroll_height - _apparent_height - 1;
+									}
+								}
+								is_inner_popup_inner_scrollable = true;
+							}
+							break;
+						}
+						elm = parent;
+						parent = parent.parentNode;
+					}
+					return is_inner_popup_inner_scrollable;
+				}
 			}
 		},
 	});

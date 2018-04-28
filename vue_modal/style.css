@@ -145,11 +145,11 @@ body {
 }
 .popup .popup-main-inner{
 	padding:15px 20px 0;
-	min-height:200px;
+	min-height:100px;
 }
 .popup .popup-main p{
 	font-size:0.875rem;
-	line-height:1.2857;
+	line-height:1.285714285714;
 }
 .popup .popup-btns{
 	padding:15px 20px;
