@@ -109,11 +109,15 @@
 		</div>
 		<div :class="type+'-main'">
 			<div :class="type+'-main-inner'">
-				<p>{{vars.lead}}<br>{{vars.lead}}<br>{{vars.lead}}<br>{{vars.lead}}<br>{{vars.lead}}<br>{{vars.lead}}<br>{{vars.lead}}<br>{{vars.lead}}<br>{{vars.lead}}<br>{{vars.lead}}<br>{{vars.lead}}<br>{{vars.lead}}<br>{{vars.lead}}<br>{{vars.lead}}<br>{{vars.lead}}<br>{{vars.lead}}<br>{{vars.lead}}<br>{{vars.lead}}<br>{{vars.lead}}<br>{{vars.lead}}<br>{{vars.lead}}<br>{{vars.lead}}<br>{{vars.lead}}<br>{{vars.lead}}<br>{{vars.lead}}<br>{{vars.lead}}<br>{{vars.lead}}<br>{{vars.lead}}<br>{{vars.lead}}<br>{{vars.lead}}<br>{{vars.lead}}<br>{{vars.lead}}<br>{{vars.lead}}<br>{{vars.lead}}<br>{{vars.lead}}<br>{{vars.lead}}<br>{{vars.lead}}<br>{{vars.lead}}<br>{{vars.lead}}<br>{{vars.lead}}<br>{{vars.lead}}<br>{{vars.lead}}<br>{{vars.lead}}<br>{{vars.lead}}<br>{{vars.lead}}<br></p>
+				<p v-html="vars.lead"></p>
+				<p v-html="vars.lead"></p>
+				<p>{{vars.point|addFigure}}点</p>
+				<p>{{vars.date|formatDate('YYYY年MM月')}}</p>
+				<p v-formatDateHtml="vars.date" data-format="YYYY<span>年</span>"></p>
 			</div>
 			<div :class="type+'-btns'">
 				<p class="btn btn-cancel">
-					<a href="#" @click.prevent="close">CANCEL</a>
+					<a href="#" @click.prevent="demo">DEMO</a>
 				</p>
 				<p class="btn btn-cancel">
 					<a href="#" @click.prevent="close">CLOSE</a>
@@ -160,7 +164,15 @@
 			tmpl:'tmpl-dialog2',
 			vars:{
 				title:'hoge',
-				lead:'内容いれておきますよいいですよね<br>これってどうなるかな？<br>これってどうなるかな？<br>これってどうなるかな？<br>これってどうなるかな？<br>これってどうなるかな？<br>これってどうなるかな？<br>これってどうなるかな？<br>これってどうなるかな？<br>これってどうなるかな？'
+				lead:"改行いれたよ<br>改行れたよ<br>内容いれておきますよいいですよね<br>これってどうなるかな？<br>これってどうなるかな？<br>これってどうなるかな？<br>これってどうなるかな？<br>これってどうなるかな？<br>これってどうなるかな？<br>これってどうなるかな？<br>これってどうなるかな？<br>これってどうなるかな？",
+				point:900000000,
+				date:'2018-11-11 10:00:00'
+			},
+			methods:{
+				demo:function(){
+					alert('yaho');
+					return;
+				}
 			}
 		});
 	}

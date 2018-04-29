@@ -2,8 +2,47 @@
  * Created by hinit on 2018/03/23.
  */
 
+
+
 !(function(){
 	"use strict";
+
+	/**
+	 * stringかどうか？
+	 * @param obj
+	 * @returns {boolean}
+	 */
+	function isString(obj) {
+		return (typeof (obj) === "string" || obj instanceof String);
+	}
+	window.isString = isString;
+
+	/**
+	 * 日時フォーマット
+	 * @param {Date | string} date フォーマットしたい日時情報
+	 * @param format
+	 * @returns {*}
+	 */
+	function formatDate (date, format) {
+		if(isString(date)){
+			date = new Date(date);
+		}
+		if(!format) format = window.date_format ? window.date_format : 'YYYY年MM月DD日(WD)';
+		var weekdaylist = ["日", "月", "火", "水", "木", "金", "土"];
+		format = format.replace(/YYYY/g, date.getFullYear());
+		format = format.replace(/MM/g, ('0' + (date.getMonth() + 1)).slice(-2));
+		format = format.replace(/DD/g, ('0' + date.getDate()).slice(-2));
+		format = format.replace(/hh/g, ('0' + date.getHours()).slice(-2));
+		format = format.replace(/mm/g, ('0' + date.getMinutes()).slice(-2));
+		format = format.replace(/ss/g, ('0' + date.getSeconds()).slice(-2));
+		format = format.replace(/WD/g, weekdaylist[date.getDay()]);
+		if(format.match(/S/g)){
+			var milliSeconds = ('00' + date.getMilliseconds()).slice(-3);
+			var length = format.match(/S/g).length;
+			for(var i = 0; i < length; i++) format = format.replace(/S/, milliSeconds.substring(i, i + 1));
+		}
+		return format;
+	};
 
 	var supportsPassive = function(){
 		var _supportsPassive = false;
@@ -36,6 +75,8 @@
 		//
 		target.addEventListener(type, handler, optionsOrCapture);
 	}
+
+
 
 	/**
 	 * メディアクエリ関連の処理
@@ -124,6 +165,23 @@
 			getCurrentDevice:getCurrentDevice
 		};
 	})();
+
+
+
+	// フィルター設定
+	Vue.filter('addFigure', function (value) {
+		return String(value).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,");
+	});
+	Vue.filter('formatDate', formatDate);
+
+	// カスタムディレクティブ
+	Vue.directive('formatDateHtml', {
+		bind: function (el, binding, vnode) {
+			var format = el.dataset && el.dataset.format?el.dataset.format:null;
+			el.innerHTML = formatDate(binding.value, format);
+		}
+	})
+
 	/**
 	 * popup もしくは fullpanel の表示を制御する vueインスタンス
 	 * @type {Vue}
@@ -203,12 +261,14 @@
 			 * @param {string} device
 			 */
 			onChangeDevice:function(device){
+				var that = this;
 				if(!this.is_fixid_type && this.is_active && this.is_show){
 					var _type = this._getTypeFromDevice(device);
 					if(this.type !== _type){
-						this.hideAnime();
-						this.type = _type;
-						this.showAnime();
+						this.hideAnime(function(){
+							that.type = _type;
+							that.showAnime();
+						});
 					}
 				}
 				return;
@@ -255,6 +315,7 @@
 				var _tmpl;
 				var _vars;
 				var _type;
+				var _methods = {};
 				if(obj.component_name && Vue.component(obj.component_name)){
 					_component = obj.component_name;
 					_type = obj.type ||'';
@@ -274,6 +335,7 @@
 						_tmpl = obj.tmpl||'';
 						_vars = obj.vars||null;
 						_type = obj.type ||'';
+						_methods = obj.methods || _methods;
 						if(!_tmpl && (!_vars.title || !_vars.lead)){
 							console.error('デフォルトテンプレートを使用する場合はtitleとleadパラメータが必須です');
 							return;
@@ -292,6 +354,9 @@
 							}
 						}
 					};
+					for(var i in _methods){
+						_component.methods[i] = _methods[i];
+					}
 				}
 				console.log(_component);
 				if(Vue.component(_component) || _component.template){
@@ -402,63 +467,26 @@
 				}
 
 			},
+			/**
+			 * 背景エリアスクロールをとめる (type が popup のときのみ）
+			 * @private
+			 */
 			_stopScroll:function(){
 				console.log('_stopScroll');
-
-				var mousewheelevent = 'onwheel' in document ? 'wheel' : 'onmousewheel' in document ? 'mousewheel' : 'DOMMouseScroll';
-				addEventListenerWithOptions(document,mousewheelevent,this._scrollOff,{once: false ,capture: false ,passive: false });
-
-				if('ontouchstart' in window){
-					addEventListenerWithOptions(document,'touchmove',this._scrollOff,{once: false ,capture: false ,passive: false });
-				}
-
+				var tgt_elm_style = this.$el.previousElementSibling.style;
+				tgt_elm_style.position = 'fixed';
+				tgt_elm_style.top = -1 * (document.documentElement.scrollTop || document.body.scrollTop) + 'px';
 				return;
 			},
+			/**
+			 * 背景エリアスクロールストップの解除 (type が popup のときのみ）
+			 * @private
+			 */
 			_restartScroll:function(){
-				var mousewheelevent = 'onwheel' in document ? 'wheel' : 'onmousewheel' in document ? 'mousewheel' : 'DOMMouseScroll';
-				document.removeEventListener( mousewheelevent, this._scrollOff, false );
-				if('ontouchstart' in window){
-					document.removeEventListener('touchmove', this._scrollOff, false);
-				}
+				var tgt_elm_style = this.$el.previousElementSibling.style;
+				tgt_elm_style.position = '';
+				tgt_elm_style.top = '';
 				return;
-			},
-			_scrollOff:function(e){
-				var target = e.target;
-				console.log(e);
-				if(!isScrollableElement(target)){
-					e.preventDefault();
-				}
-				// popup-main-innerの内側にいて、 popup-inner が scrollable か
-				function isScrollableElement(elm){
-					var is_inner_popup_inner_scrollable = false;
-					var is_inner_popup_main_inner = false;
-					var parent = elm.parentNode;
-					for(var i = 0; parent; i++) {
-						if(elm.classList.contains('popup-main-inner')){
-							is_inner_popup_main_inner = true;
-						}
-						if(is_inner_popup_main_inner && elm.classList.contains('popup-inner')){
-							var _scroll_height = elm.scrollHeight;
-							var _apparent_height = elm.offsetHeight;
-							var _scroll_top = elm.scrollTop;
-							if(_scroll_height > _apparent_height){
-								if(_scroll_top === 0){
-									elm.scrollTop = 1;
-								}else{
-									var scrolling_left = _scroll_height - _apparent_height - _scroll_top;
-									if(scrolling_left <= 0){
-										elm.scrollTop = _scroll_height - _apparent_height - 1;
-									}
-								}
-								is_inner_popup_inner_scrollable = true;
-							}
-							break;
-						}
-						elm = parent;
-						parent = parent.parentNode;
-					}
-					return is_inner_popup_inner_scrollable;
-				}
 			}
 		},
 	});
