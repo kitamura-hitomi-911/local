@@ -109,11 +109,20 @@
 		var _current_pos = document.documentElement.scrollTop || document.body.scrollTop;
 		var _tgt_pos = tgt_elm.getBoundingClientRect().top + _current_pos;
 		var _distance = _tgt_pos - _current_pos;
-		var _speed = 1000;
+		var _speed = Math.abs(_distance) > 1333 ? 1000 : 750;
+		var _distance_per_1ms = _distance / _speed;
 		var _ua = window.navigator.userAgent.toLowerCase();
 
-		console.log(tgt_elm,_current_pos,_tgt_pos);
-
+		console.log(tgt_elm,_current_pos,_tgt_pos,_distance_per_1ms);
+		var now = window.performance && (
+			performance.now ||
+			performance.mozNow ||
+			performance.msNow ||
+			performance.oNow ||
+			performance.webkitNow );
+		var getTime = function() {
+			return ( now && now.call( performance ) ) || ( new Date().getTime() );
+		};
 
 		if ('scrollingElement' in document) {
 			_scroll_tgt = document.scrollingElement;
@@ -122,14 +131,24 @@
 		}else{
 			_scroll_tgt = document.getElementsByTagName('body')[0];
 		}
-		console.log(_scroll_tgt);
-		// document.scrollingElement.scrollTop = tgt_top;
-		/* currentPos =$(elmName).scrollTop();
-		distance = Math.abs(currentPos - hrefPos);
-		if(distance<1333){
-			speed = distance * 0.75;
-		}
-		$(elmName).animate({scrollTop : hrefPos}, speed);*/
+		var start_time = getTime();
+		( function loop(){
+			var last_time = getTime();
+			var elapsed_time = Math.floor(last_time - start_time);
+			_current_pos += _distance_per_1ms * Math.floor(last_time - start_time);
+			if(_current_pos >= _tgt_pos && _distance >= 0 || _current_pos <= _tgt_pos && _distance < 0 || elapsed_time > 10000){
+				_current_pos = _tgt_pos;
+				document.scrollingElement.scrollTop = _current_pos;
+			}else{
+				document.scrollingElement.scrollTop = _current_pos;
+				requestAnimationFrame( loop );
+			}
+
+			console.log('現在の位置',_current_pos);
+
+			console.log('経過時間',Math.floor(last_time - start_time)); // ms？
+		} )();
+
 
 		return false;
 	};
