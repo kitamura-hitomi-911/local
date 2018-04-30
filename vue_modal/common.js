@@ -7,6 +7,11 @@
 !(function(){
 	"use strict";
 
+	window.requestAnimationFrame = window.requestAnimationFrame ||
+		window.mozRequestAnimationFrame ||
+		window.webkitRequestAnimationFrame ||
+		window.msRequestAnimationFrame;
+
 	/**
 	 * stringかどうか？
 	 * @param obj
@@ -59,7 +64,7 @@
 
 	console.log(supportsPassive);
 	/**
-	 *
+	 * addEventListener のoptionパラメータオブジェクト対応・未対応を吸収
 	 * @param target
 	 * @param type
 	 * @param handler
@@ -76,6 +81,58 @@
 		target.addEventListener(type, handler, optionsOrCapture);
 	}
 
+	/*
+	 * スムーススクロール
+	 * @param {HTML element}
+	 * ある一定の距離以下の場合は距離に対してスピードを変更
+	 */
+	window.smoothScroll = function(tgt) {
+		var tgt_elm;
+		if(!tgt){
+			return false;
+		}
+		if(isString(tgt)){
+			if(tgt.match(/^#\S+$/)){
+				tgt_elm = document.getElementById(tgt.replace(/^#/,''));
+			}else{
+				tgt_elm = document.querySelector(tgt);
+			}
+		}
+		if(tgt.nodeType && obj.nodeType ===1){
+			tgt_elm = tgt;
+		}
+		if(!tgt_elm){
+			return;
+		}
+
+		var _scroll_tgt;
+		var _current_pos = document.documentElement.scrollTop || document.body.scrollTop;
+		var _tgt_pos = tgt_elm.getBoundingClientRect().top + _current_pos;
+		var _distance = _tgt_pos - _current_pos;
+		var _speed = 1000;
+		var _ua = window.navigator.userAgent.toLowerCase();
+
+		console.log(tgt_elm,_current_pos,_tgt_pos);
+
+
+		if ('scrollingElement' in document) {
+			_scroll_tgt = document.scrollingElement;
+		}else if (_ua.indexOf('msie') > -1 || _ua.indexOf('trident') > -1 || _ua.indexOf('firefox') > -1) {
+			_scroll_tgt = document.getElementsByTagName('html')[0];
+		}else{
+			_scroll_tgt = document.getElementsByTagName('body')[0];
+		}
+		console.log(_scroll_tgt);
+		// document.scrollingElement.scrollTop = tgt_top;
+		/* currentPos =$(elmName).scrollTop();
+		distance = Math.abs(currentPos - hrefPos);
+		if(distance<1333){
+			speed = distance * 0.75;
+		}
+		$(elmName).animate({scrollTop : hrefPos}, speed);*/
+
+		return false;
+	};
 
 
 	/**
