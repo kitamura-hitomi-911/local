@@ -83,6 +83,73 @@
 		target.addEventListener(type, handler, optionsOrCapture);
 	}
 
+	window.hashChangeController = {
+		hashChangeEvents:[],
+		hashChangeEventsByHash:{},
+		init:function(){
+			var that= this;
+			window.addEventListener('hashchange', function(){that.runHashChangeEvents();}, false);
+			return;
+		},
+		setEvent:function(obj){
+			if(!obj || !obj.fn){return;}
+			var hash = this._getHash();
+			obj.parent = obj.parent||window;
+			this.hashChangeEvents.push({fn:obj.fn,parent:obj.parent});
+			// セットされたタイミングで処理
+			if(obj.first){
+				if(!isNaN(obj.first)){
+					setTimeout(function(){
+						obj.fn.call(obj.parent,hash);
+					},obj.first);
+				}else{
+					obj.fn.call(obj.parent,hash);
+				}
+			}
+			return;
+		},
+		setEventByHash:function(obj_ary){
+			if(!obj_ary || !obj_ary.length){return;}
+			var that = this;
+			var hash = this._getHash();
+			obj_ary.forEach(function(obj){
+				if(!obj.fn || !obj.hash){return;}
+				obj.parent = obj.parent||window;
+				that.hashChangeEventsByHash[obj.hash] = {fn:obj.fn,parent:obj.parent};
+				if(hash == obj.hash){
+					obj.fn.call(obj.parent,hash);
+				}
+			});
+			return;
+		},
+		runHashChangeEvents:function(){
+			var self = hashChangeController;
+			var hash = this._getHash();
+			this.hashChangeEvents.each(function(event_obj){
+				event_obj.fn.call(event_obj.parent,hash);
+			});
+			if(this.hashChangeEventsByHash[hash]){
+				this.hashChangeEventsByHash[hash].fn.call(this.hashChangeEventsByHash[hash].parent,hash);
+			}
+			return;
+		},
+		_getHash:function(){
+			var ret_hash = '';
+			if(location.search){
+				var tmp_search = (location.search.replace('?','')).split('=');
+				if(tmp_search[0] == '_escaped_fragment_'){
+					ret_hash = '!'+tmp_search[1];
+				}
+			}
+			if(!ret_hash){
+				ret_hash = location.hash?(location.hash).replace('#',''):'';
+			}
+			return ret_hash;
+		}
+	};
+	hashChangeController.init();
+	hashChangeController.setEvent({fn:function(hash){console.log(hash);}})
+
 	/**
 	 * スムーススクロール
 	 * @param {HTML element | string} tgt
