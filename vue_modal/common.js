@@ -62,7 +62,6 @@
 		return _supportsPassive;
 	}();
 
-	console.log(supportsPassive);
 
 
 	/**
@@ -326,6 +325,34 @@
 		};
 	})();
 
+
+	var wrapperController = (function(){
+		var wrapper_elm = document.getElementById('wrapper');
+		var wrapper_elm_style = wrapper_elm && wrapper_elm.nodeType && wrapper_elm.nodeType ===1 ? wrapper_elm.style : null;
+		var pre_scroll_top = 0;
+		return {
+			fixed:function(){
+				if(!wrapper_elm_style){
+					console.log('対象のwrapperがありません');
+					return;
+				}
+				pre_scroll_top = document.documentElement.scrollTop || document.body.scrollTop;
+				wrapper_elm_style.position = 'fixed';
+				wrapper_elm_style.top = (-1 * pre_scroll_top) + 'px';
+				scrollTo( 0, 0);
+			},
+			cancelFixed:function(){
+				if(!wrapper_elm_style){
+					console.log('対象のwrapperがありません');
+					return;
+				}
+				wrapper_elm_style.position = '';
+				wrapper_elm_style.top ='';
+				scrollTo( 0, pre_scroll_top);
+			}
+		};
+	})();
+	window.wrapperController = wrapperController;
 
 
 	// フィルター設定
@@ -633,9 +660,10 @@
 			 */
 			_stopScroll:function(){
 				console.log('_stopScroll');
-				var tgt_elm_style = this.$el.previousElementSibling.style;
+				wrapperController.fixed();
+				/* var tgt_elm_style = this.$el.previousElementSibling.style;
 				tgt_elm_style.position = 'fixed';
-				tgt_elm_style.top = -1 * (document.documentElement.scrollTop || document.body.scrollTop) + 'px';
+				tgt_elm_style.top = -1 * (document.documentElement.scrollTop || document.body.scrollTop) + 'px';*/
 				return;
 			},
 			/**
@@ -643,9 +671,10 @@
 			 * @private
 			 */
 			_restartScroll:function(){
-				var tgt_elm_style = this.$el.previousElementSibling.style;
+				wrapperController.cancelFixed();
+				/* var tgt_elm_style = this.$el.previousElementSibling.style;
 				tgt_elm_style.position = '';
-				tgt_elm_style.top = '';
+				tgt_elm_style.top = '';*/
 				return;
 			}
 		},
