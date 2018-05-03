@@ -1,0 +1,180 @@
+/* reset */
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed,
+figure, figcaption, footer, header,
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font: inherit;
+  font-size: 100%;
+  vertical-align: baseline;
+  box-sizing: border-box;
+}
+
+ol, ul {
+  list-style: none;
+}
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+caption, th, td {
+  text-align: left;
+  font-weight: normal;
+  vertical-align: middle;
+}
+
+q, blockquote {
+  quotes: none;
+}
+
+q:before, q:after, blockquote:before, blockquote:after {
+  content: "";
+  content: none;
+}
+
+a img {
+  border: none;
+}
+
+a {
+  text-decoration: none;
+}
+
+article, aside, details, figcaption, figure, footer, header, menu, nav, section, summary {
+  display: block;
+}
+
+.wrapper {
+  width: 100%;
+  height: 100%;
+}
+
+.slide_menu {
+  display: none;
+  width: 100%;
+  min-height: 100%;
+  opacity: 0;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.is-drawer-open .slide_menu {
+  display: block;
+  animation: show .25s linear 0s forwards;
+}
+
+.is-drawer-close .slide_menu {
+  animation: hide .75s linear 0s forwards;
+}
+
+.slide_menu .slide_menu-inner {
+  overflow: hidden;
+  max-width: 860px;
+  min-height: 100%;
+  margin: 0 auto;
+}
+
+.slide_menu .slide_menu-inner .slide_menu-close {
+  display: block;
+  position: fixed;
+  right: 288px;
+  top: 24px;
+  width: 24px;
+  height: 1px;
+  opacity: 0;
+  animation: show 1s linear 1s forwards;
+}
+
+.slide_menu .slide_menu-inner .slide_menu-close:before, .slide_menu .slide_menu-inner .slide_menu-close:after {
+  margin: -5px 0 0 0;
+  position: absolute;
+  display: block;
+  width: 24px;
+  height: 3px;
+  content: "";
+  background: #FFF;
+  -webkit-transform: rotate(45deg);
+  -ms-transform: rotate(45deg);
+  transform: rotate(45deg);
+  border-radius: 5px;
+}
+
+.slide_menu .slide_menu-inner .slide_menu-close:before {
+  -webkit-transform: rotate(-45deg);
+  -ms-transform: rotate(-45deg);
+  transform: rotate(-45deg);
+}
+
+.slide_menu .slide_menu-inner .slide_menu-nav {
+  float: right;
+  width: 280px;
+  color: #fff;
+  margin-right: -280px;
+  background-color: #000;
+}
+
+.is-drawer-open .slide_menu .slide_menu-inner .slide_menu-nav {
+  animation: show-drawer .5s linear .25s forwards;
+}
+
+.is-drawer-close .slide_menu .slide_menu-inner .slide_menu-nav {
+  animation: hide-drawer .5s linear 0s forwards;
+}
+
+@keyframes show {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes hide {
+  0% {
+    display: block;
+    opacity: 1;
+  }
+  51% {
+    opacity: 1;
+  }
+  99% {
+    opacity: 0;
+  }
+  to {
+    display: none;
+    opacity: 0;
+  }
+}
+
+@keyframes show-drawer {
+  from {
+    margin-right: -280px;
+  }
+  to {
+    margin-right: 0;
+  }
+}
+
+@keyframes hide-drawer {
+  from {
+    margin-right: 0;
+  }
+  to {
+    margin-right: -280px;
+  }
+}
+
+/*# sourceMappingURL=style.css.map */
