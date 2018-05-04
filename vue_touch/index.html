@@ -10,14 +10,14 @@
 	<link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-<div id="touch"></div>
+<div id="touch"><vm_list category="top"></vm_list></div>
 
 
 <script type="text/x-template" id="tmpl-list">
 	<div class="l-list">
 		<div class="l-list-inner" :style="style_obj">
 			<item v-for="memo in selectedMemo" :key="memo.id" :memo="memo"></item>
-			<div class="l-item l-item-more">
+			<div class="l-item l-item-more" v-if="readmore_flg">
 				<div class="item-more">
 					<a href="#"></a>
 				</div>
@@ -47,33 +47,43 @@
 <script src="./vue-touch.js"></script>
 <script type="text/javascript">
 	(function(){
-		var vm_list = new Vue({
-			el:'#touch',
+		Vue.component('vm_list', {
 			template:'#tmpl-list',
-			data:{
-				left:0,
-				memos:[
-					{id:1,title:'タイトル',lead:'内容部分',category:['top']},
-					{id:2,title:'タイトル2',lead:'内容部分2',category:['top']},
-					{id:3,title:'タイトル3',lead:'内容部分3',category:['top','hoge']},
-					{id:4,title:'タイトル4',lead:'内容部分4',category:['hoge']},
-					{id:5,title:'タイトル5',lead:'内容部分5',category:['top']},
-					{id:6,title:'タイトル6',lead:'内容部分6',category:['top']},
-					{id:7,title:'タイトル7',lead:'内容部分7内容部分7内容部分7内容部分7',category:['top']}
-				]
+			props:{
+				category:String
+			},
+			data: function(){
+				return {
+					readmore_flg:false,
+					memos: [
+						{id: 1, title: 'タイトル', lead: '内容部分', category: ['top']},
+						{id: 2, title: 'タイトル2', lead: '内容部分2', category: ['top']},
+						{id: 3, title: 'タイトル3', lead: '内容部分3', category: ['top', 'hoge']},
+						{id: 4, title: 'タイトル4', lead: '内容部分4', category: ['hoge']},
+						{id: 5, title: 'タイトル5', lead: '内容部分5', category: ['top']},
+						{id: 6, title: 'タイトル6', lead: '内容部分6', category: ['top']},
+						{id: 7, title: 'タイトル7', lead: '内容部分7内容部分7内容部分7内容部分7', category: ['top']}
+					]
+				}
 			},
 			computed: {
 				style_obj:function(){
 					return {
-						width:(this.selectedMemo.length * 200 + 20) + 'px'
+						width:(this.selectedMemo.length * 200 + (this.readmore_flg?20:0)) + 'px'
 					}
 				},
 				selectedMemo:function(){
+					var that = this;
 					var ret = [];
 					var max_num = 6;
+					var category = this.category || '';
 					this.memos.forEach(function(memo){
-						if(ret.length < 6){
-							ret.push(memo);
+						if(!category || memo.category.indexOf(category) >= 0){
+							if(ret.length < max_num){
+								ret.push(memo);
+							}else{
+								that.readmore_flg = true;
+							}
 						}
 					});
 					return ret;
@@ -97,10 +107,10 @@
 					},
 					template:'#tmpl-item'
 				}
-			},
-			methods:{
-
 			}
+		});
+		var vm_memo = new Vue({
+			el:'#touch'
 		});
 	})();
 </script>
