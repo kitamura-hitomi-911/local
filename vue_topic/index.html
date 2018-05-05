@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="x-ua-compatible" content="ie=edge">
+	<title>Vue Topics</title>
+	<meta name="description" content="">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="format-detection" content="telephone=no">
+	<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div id="topics_summary"></div>
+
+<div id="topics_all"></div>
+
+
+<script type="text/x-template" id="tmpl-topics">
+	<div :class="{'l-topics':type==='summary','l-topics_all':type==='all'}">
+		<div :class="{'l-topics-inner':type==='summary','l-topics_all-inner':type==='all'}" :style="inner_style_obj">
+			<item v-for="topic in selected_list" :key="topic.id" :topic="topic" :type="type" :item_style_obj="item_style_obj"></item>
+			<div class="l-topics-item l-topics-item-more" v-if="readmore_flg">
+				<div class="topic-more">
+					<a href="#"></a>
+				</div>
+			</div>
+		</div>
+	</div>
+</script>
+<script type="text/x-template" id="tmpl-topics-item">
+	<div :class="{'l-topics-item':type==='summary','l-topics_all-item':type==='all'}" :style="item_style_obj">
+		<div class="topic">
+			<a href="#">
+				<dl>
+					<dt>{{topic.title}}</dt>
+					<dd>{{topic.lead}}</dd>
+				</dl>
+			</a>
+		</div>
+	</div>
+</script>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Swiper/4.2.6/css/swiper.css">
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Swiper/4.2.6/js/swiper.js"></script>
+
+<script src="https://unpkg.com/vue/dist/vue.js"></script>
+<script src="./common.js"></script>
+<script type="text/javascript">
+	(function(){
+		Vue.component('vm_topics_list', {
+			template:'#tmpl-topics',
+			props:{
+				type:{type:String,default:'summary'},
+				category:{type:String,default:''}
+			},
+			data: function(){
+				return {
+					readmore_flg:false,
+					item_width:0,
+					readmore_width:0,
+					list: [
+						{id: 1, title: 'タイトル', lead: '内容部分', category: ['top']},
+						{id: 2, title: 'タイトル2', lead: '内容部分2', category: ['top']},
+						{id: 3, title: 'タイトル3', lead: '内容部分3', category: ['top', 'hoge']},
+						{id: 4, title: 'タイトル4', lead: '内容部分4', category: ['hoge']},
+						{id: 5, title: 'タイトル5', lead: '内容部分5', category: ['top']},
+						{id: 6, title: 'タイトル6', lead: '内容部分6', category: ['top']},
+						{id: 7, title: 'タイトル7', lead: '内容部分7内容部分7内容部分7内容部分7', category: ['top']},
+						{id: 8, title: 'タイトル8', lead: '内容部分8', category: ['top']},
+						{id: 9, title: 'タイトル9', lead: '内容部分9', category: ['top']},
+						{id: 10, title: 'タイトル10', lead: '内容部分10', category: ['top']}
+					]
+				}
+			},
+			computed: {
+				inner_style_obj:function(){
+					var ret = {};
+					if(this.type == 'summary'){
+						ret = {
+							width:(this.selected_list.length * this.item_width + (this.readmore_flg?this.readmore_width:0)) + 'px'
+						};
+					}
+					return ret;
+				},
+				item_style_obj:function(){
+					var ret = {};
+					if(this.type == 'summary'){
+						ret = {
+							width: this.item_width + 'px'
+						};
+					}
+					return ret;
+				},
+				/**
+				 * 表示するものだけにした配列を返す
+				 * @returns {Array}
+				 */
+				selected_list:function(){
+					var that = this;
+					var ret = [];
+					var max_num = 6;
+					var category = this.category || '';
+					this.list.forEach(function(topic){
+						if(!category || topic.category.indexOf(category) >= 0){
+							if(ret.length < max_num || that.type != 'summary'){
+								ret.push(topic);
+							}else{
+								that.readmore_flg = true;
+							}
+						}
+					});
+					return ret;
+				}
+			},
+			created:function(){
+				console.log('created',this.type);
+				if(this.type == 'summary'){
+					// type が summary の場合は item の横幅をセットする
+					this.setItemWidthFromDevice(responsiveController.getCurrentDevice());
+				}
+			},
+			mounted: function () {
+				console.log('mounted',this.type);
+				if(this.type == 'summary'){
+					// type が summary の場合は スワイプイベントをセット
+					new Swiper ('.l-topics', {
+						wrapperClass:'l-topics-inner',
+						slideClass:'l-topics-item',
+						slidesPerView: 'auto',
+						freeMode: true,
+						freeModeMomentumRatio:0.5,
+						shortSwipes:false,
+						longSwipesRatio:0.25
+					});
+
+					// type が summary の場合は ブレイクポイント切り替え時に item の横幅を再セット
+					/* responsiveController にブレイクポイント切り替え時に呼んでほしいイベントをセット */
+					responsiveController.setEvents({
+						fn:this.setItemWidthFromDevice,
+						parent:this
+					});
+				}
+			},
+			components:{
+				item: {
+					props: {
+						item_style_obj:Object,
+						type: String,
+						topic: Object
+					},
+					template: '#tmpl-topics-item'
+				}
+			},
+			methods:{
+				setItemWidthFromDevice:function(device){
+					// device は sp, pad, pc
+					var device2item_width = {
+						sp:200,
+						pad:300,
+						pc:300
+					};
+					var device2readmore_width = {
+						sp:20,
+						pad:20,
+						pc:20
+					};
+					this.item_width = device2item_width[device];
+					this.readmore_width = device2readmore_width[device];
+				}
+			}
+		});
+		var vm_topics_summary = new Vue({
+			el:'#topics_summary',
+			template:'<vm_topics_list category="top" type="summary"></vm_topics_list>'
+		});
+		var vm_topics_all = new Vue({
+			el:'#topics_all',
+			template:'<vm_topics_list category="top" type="all"></vm_topics_list>'
+		});
+	})();
+</script>
+</body>
+</html>

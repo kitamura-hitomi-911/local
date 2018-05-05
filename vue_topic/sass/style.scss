@@ -1,0 +1,112 @@
+@charset "UTF-8";
+
+/* reset */
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed,
+figure, figcaption, footer, header,
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	font: inherit;
+	font-size: 100%;
+	vertical-align: baseline;
+	box-sizing: border-box;
+}
+ol, ul {
+	list-style: none;
+}
+table {
+	border-collapse: collapse;
+	border-spacing: 0;
+}
+caption, th, td {
+	text-align: left;
+	font-weight: normal;
+	vertical-align: middle;
+}
+q, blockquote {
+	quotes: none;
+}
+q:before, q:after, blockquote:before, blockquote:after {
+	content: "";
+	content: none;
+}
+a img {
+	border: none;
+}
+a {
+	text-decoration: none;
+}
+article, aside, details, figcaption, figure, footer, header, menu, nav, section, summary {
+	display: block;
+}
+
+/* 横スクロール あり */
+.l-topics{
+	overflow:hidden;
+	width:100%;
+}
+.l-topics-inner{
+	display:flex;
+	align-items: stretch;
+}
+// 横スクロール有の場合は、横幅はJSの処理に連動するのでVue側に情報を持つ
+.l-topics-item{
+
+}
+.l-topics-item-more{
+	width:20px;
+}
+
+/* 全件表示 あり */
+.l-topics_all{
+	width:300px;
+	margin:0 auto;
+}
+.l-topics_all-inner{
+	display:flex;
+	flex-wrap: wrap;
+	align-items: stretch;
+}
+.l-topics_all-item{
+	width:100%;
+}
+@media only screen and (min-width: 360px) {
+	.l-topics_all{
+		width:auto;
+	}
+	.l-topics_all-item {
+		width:50%;
+	}
+}
+@media only screen and (min-width: 768px) {
+	.l-topics_all-item {
+		width:25%;
+	}
+}
+
+
+.topic{
+	height:100%;
+	border:1px solid #ccc;
+	> a{
+		display:block;
+	}
+}
+.topic-more{
+	height:100%;
+	border:1px solid #ccc;
+	> a{
+		display:block;
+	}
+}
