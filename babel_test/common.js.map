@@ -1,0 +1,1 @@
+{"version":3,"sources":["common.es6"],"names":[],"mappings":";;;;;;IAAM,I;;;;;;;+BACO;AACX,OAAI,eAAe,SAAf,YAAe;AAAA,WAAM,MAAM,MAAN,CAAN;AAAA,IAAnB;AACA","file":"common.js","sourcesContent":["class hoge{\r\n\thogeMethod(){\r\n\t\tlet hogeFunction = () => alert('test')\r\n\t}\r\n}"]}
