@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="x-ua-compatible" content="ie=edge">
+	<title>継承練習</title>
+	<meta name="description" content="">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="format-detection" content="telephone=no">
+</head>
+<body>
+
+<script type="text/javascript">
+	function Base(type){
+		this.type = type;
+	}
+	Base.prototype.method01 = function(msg){
+		if(!msg){
+			msg = 'デフォルト';
+		}
+		console.log(msg + '!');
+	};
+	function Hoge(prop1){
+		Base.call(this, "Hoge");
+		this.prop1 = prop1;
+	}
+	// 古いブラウザに対応する場合？
+	// Hoge.prototype = new Base();
+	Hoge.prototype = Object.create(Base.prototype);
+	Hoge.prototype.constructor = Hoge;
+	Hoge.prototype.method01 = function(){
+		// Base側の処理を継承する場合
+		Base.prototype.method01.call(this,'ホゲでござる');
+		// 独自処理
+		console.log('Hoge独自');
+	};
+	var hoge = new Hoge('プロパティ１');
+	hoge.method01();// ホゲでござる！
+	console.log(hoge instanceof Base);// true
+	console.log(hoge instanceof Hoge);// true
+	console.log(Base.prototype.isPrototypeOf(hoge));// true
+	console.log(Hoge.prototype.isPrototypeOf(hoge));// true
+</script>
+</body>
+</html>
