@@ -1,0 +1,15 @@
+.test {
+  line-height: 1.5;
+}
+
+.test .aaa {
+  font-size: 80%;
+  line-height: 1.2;
+}
+
+.test p.abc {
+  font-size: 10px;
+  color: #006;
+}
+
+/*# sourceMappingURL=test.css.map */
