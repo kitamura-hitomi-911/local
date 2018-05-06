@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="x-ua-compatible" content="ie=edge">
+	<title>Title</title>
+	<meta name="description" content="">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="format-detection" content="telephone=no">
+	<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div id="form-area">
+	<form action="" method="get">
+		<form-select :form_data="hoge"></form-select>
+		<p class="btn"><a href="#" @click.stop="submit">送信</a></p>
+	</form>
+</div>
+
+<script type="text/x-template" id="tmpl-form-select">
+	<div class="select_parts">
+		<p class="select_parts-label">{{selected_label}}</p>
+		<select :name="form_data.name" @input="updateValue">
+			<option v-for="option in form_data.list" :key="option.value" :value="option.value" :selected="option.value === selected_value">{{option.label}}</option>
+		</select>
+	</div>
+</script>
+<script src="https://unpkg.com/vue/dist/vue.js"></script>
+<script type="text/javascript">
+	Vue.component('form-select',{
+		props:{
+			form_data:{type:Object, require: true}
+		},
+		data:function(){
+			return {
+				selected_value:'',
+				selected_label:''
+			}
+		},
+		created:function(){
+			// propsからうけとれる情報からの初期値セット
+			this.selected_value = this.form_data.selected || '';
+		},
+		mounted:function(){
+			this.setSelected();
+		},
+		methods:{
+			setSelected:function(){
+				var tmp_select = this.$el.getElementsByTagName('select');
+				var selected_option;
+				if(tmp_select && tmp_select.length > 0){
+					this.selected_value = this.selected_value || tmp_select[0].value;
+					selected_option = tmp_select[0].selectedOptions[0];
+					this.selected_label = selected_option.innerText;
+				}
+			},
+			updateValue:function(e){
+				console.log('updateValue',e);
+				var selected_option = e.target.selectedOptions.length ? e.target.selectedOptions[0]:null;
+				this.selected_label =  selected_option?selected_option.text:'';
+				this.selected_value = selected_option?selected_option.value:'';
+				/* var value = e.target.selectedOptions.length ? e.target.selectedOptions[0]._value : null
+				this.$emit('input', value)
+				this.$emit('selected', value)*/
+			}
+		},
+		template:'#tmpl-form-select'
+	});
+
+
+	new Vue({
+		el:'#form-area',
+		data: {
+			hoge: {
+				name:'hoge',
+				selected:'hoge3',
+				list: [
+					{
+						value: '',
+						label: '↓選択してください'
+					},
+					{
+						value: 'hoge1',
+						label: 'ほげ1です'
+					},
+					{
+						value: 'hoge2',
+						label: 'ほげ2です',
+						selected: true
+					},
+					{
+						value: 'hoge3',
+						label: 'ほげ3です'
+					},
+					{
+						value: 'hoge4',
+						label: 'ほげ4です'
+					}
+				]
+			}
+		},
+		computed: {
+		},
+		methods:{
+			submit:function(){
+				console.log('submit');
+			}
+		}
+	});
+</script>
+</body>
+</html>
