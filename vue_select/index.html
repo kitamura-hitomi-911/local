@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="x-ua-compatible" content="ie=edge">
+	<title>Title</title>
+	<meta name="description" content="">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="format-detection" content="telephone=no">
+	<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="js_select_parts select_parts">
+	<p class="select_parts-label" :style="label_style_obj">{{selected_label}}</p>
+	<select name="fuga" v-model="selected" @change="onChangeSelect">
+		<option value="">↓選択してください</option>
+		<option value="1">選択1</option>
+		<option value="2">選択2</option>
+		<option value="3">選択3</option>
+		<option value="4">選択4</option>
+		<option value="5">選択5</option>
+		<option value="6">選択6</option>
+	</select>
+</div>
+
+<div class="js_select_parts select_parts">
+	<p class="select_parts-label" :style="label_style_obj">{{selected_label}}</p>
+	<select name="hoge" v-model="selected" @change="onChangeSelect">
+		<option value="">↓選択してください</option>
+		<option value="hoge1">hoge選択1</option>
+		<option value="hoge2">hoge選択2</option>
+		<option value="hoge3">hoge選択3</option>
+		<option value="hoge4">hoge選択4</option>
+		<option value="hoge5">hoge選択5</option>
+		<option value="hoge6">hoge選択6</option>
+	</select>
+</div>
+<script src="https://unpkg.com/vue/dist/vue.js"></script>
+<script type="text/javascript">
+	var select_parts = document.getElementsByClassName('js_select_parts');
+	Array.prototype.forEach.call(select_parts,function(select_part){
+		new Vue({
+			el:select_part,
+			data:function(){
+				return {
+					selected:'',
+					selected_label:''
+				}
+			},
+			computed: {
+				label_style_obj:function(){
+					return {opacity:1};
+				}
+			},
+			mounted:function(){
+				this.setSelectedLabel();
+			},
+			methods:{
+				onChangeSelect:function(){
+					this.setSelectedLabel();
+					console.log('なにか処理入る');
+				},
+				setSelectedLabel:function(){
+					var tmp_select = this.$el.getElementsByTagName('select');
+					var selected_option;
+					if(tmp_select && tmp_select.length > 0){
+						selected_option = tmp_select[0].selectedOptions[0];
+						this.selected_label = selected_option.innerText;
+					}
+				}
+			}
+		});
+	});
+</script>
+</body>
+</html>
