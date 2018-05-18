@@ -13,7 +13,8 @@
 
 <div id="form-area">
 	<form action="" method="get">
-		<form-select :form_data="hoge"></form-select>
+		<form-input :form_data="input_text_sample" @update-form-data="updateFormData"></form-input>
+		<form-select :form_data="select_sample" @update-form-data="updateFormData"></form-select>
 		<p class="btn"><a href="#" @click.stop="submit">送信</a></p>
 	</form>
 </div>
@@ -22,47 +23,68 @@
 	<div class="select_parts">
 		<p class="select_parts-label">{{selected_label}}</p>
 		<select :name="form_data.name" @input="updateValue">
-			<option v-for="option in form_data.list" :key="option.value" :value="option.value" :selected="option.value === selected_value">{{option.label}}</option>
+			<option v-for="option in form_data.list" :key="option.value" :value="option.value" :selected="option.value === form_data.value">{{option.label}}</option>
 		</select>
 	</div>
 </script>
+<script type="text/x-template" id="tmpl-form-input">
+	<div class="input_parts">
+		<input :type="form_data.type" :value="form_data.value" :placeholder="form_data.placeholder" @input="updateValue">
+	</div>
+</script>
+
 <script src="https://unpkg.com/vue/dist/vue.js"></script>
 <script type="text/javascript">
+	Vue.component('form-input',{
+		props:{
+			form_data:{type:Object, require: true}
+		},
+		data:function(){
+			return {
+			}
+		},
+		created:function(){
+			// propsからうけとれる情報からの初期値セット
+			this.current_value = this.form_data.value || '';
+		},
+		methods:{
+			updateValue:function(e){
+				console.log('updateValue',e);
+
+				//インスタンスのデータを更新
+				this.$emit('update-form-data',{name:this.form_data.name,value:e.target.value});
+			}
+		},
+		template:'#tmpl-form-input'
+
+	});
 	Vue.component('form-select',{
 		props:{
 			form_data:{type:Object, require: true}
 		},
 		data:function(){
 			return {
-				selected_value:'',
 				selected_label:''
 			}
 		},
 		created:function(){
-			// propsからうけとれる情報からの初期値セット
-			this.selected_value = this.form_data.selected || '';
-		},
-		mounted:function(){
-			this.setSelected();
+			// propsからうけとる情報からのlabel初期値セット
+			var that = this;
+			var selected_label;
+			this.form_data.list.forEach(function(option){
+				if(that.form_data.value === option.value){
+					that.selected_label = option.label;
+				}
+			});
 		},
 		methods:{
-			setSelected:function(){
-				var tmp_select = this.$el.getElementsByTagName('select');
-				var selected_option;
-				if(tmp_select && tmp_select.length > 0){
-					this.selected_value = this.selected_value || tmp_select[0].value;
-					selected_option = tmp_select[0].selectedOptions[0];
-					this.selected_label = selected_option.innerText;
-				}
-			},
 			updateValue:function(e){
 				console.log('updateValue',e);
 				var selected_option = e.target.selectedOptions.length ? e.target.selectedOptions[0]:null;
 				this.selected_label =  selected_option?selected_option.text:'';
-				this.selected_value = selected_option?selected_option.value:'';
-				/* var value = e.target.selectedOptions.length ? e.target.selectedOptions[0]._value : null
-				this.$emit('input', value)
-				this.$emit('selected', value)*/
+				var selected_value = selected_option?selected_option.value:'';
+				//インスタンスのデータを更新
+				this.$emit('update-form-data',{name:this.form_data.name,value:selected_value});
 			}
 		},
 		template:'#tmpl-form-select'
@@ -72,9 +94,15 @@
 	new Vue({
 		el:'#form-area',
 		data: {
-			hoge: {
-				name:'hoge',
-				selected:'hoge3',
+			input_text_sample:{
+				name:'input_text_sample',
+				type:'text',
+				value:'',
+				placeholder:'入力してください'
+			},
+			select_sample: {
+				name:'select_sample',
+				value:'hoge3',
 				list: [
 					{
 						value: '',
@@ -86,8 +114,7 @@
 					},
 					{
 						value: 'hoge2',
-						label: 'ほげ2です',
-						selected: true
+						label: 'ほげ2です'
 					},
 					{
 						value: 'hoge3',
@@ -103,6 +130,11 @@
 		computed: {
 		},
 		methods:{
+			updateFormData:function(obj){
+				console.log('updateFormData',obj);
+				this[obj.name].value = obj.value;
+				return;
+			},
 			submit:function(){
 				console.log('submit');
 			}
