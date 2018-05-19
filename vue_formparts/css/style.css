@@ -98,4 +98,128 @@ article, aside, details, figcaption, figure, footer, header, menu, nav, section,
   font-size: 100%;
 }
 
+.radio_parts p.radio_parts-item {
+  display: inline-block;
+}
+
+.radio_parts p.radio_parts-item input {
+  display: none;
+}
+
+.radio_parts p.radio_parts-item label {
+  position: relative;
+  display: inline-block;
+  padding: 0.5em 0 0.5em 1.25em;
+  margin-right: 1em;
+  vertical-align: middle;
+  cursor: pointer;
+}
+
+.radio_parts p.radio_parts-item label:before, .radio_parts p.radio_parts-item label:after {
+  position: absolute;
+  display: block;
+  content: "";
+}
+
+.radio_parts p.radio_parts-item label:before {
+  width: 1em;
+  height: 1em;
+  top: 50%;
+  left: 0;
+  margin-top: -0.5em;
+  box-sizing: border-box;
+  border-radius: 0.5em;
+  border: 1px solid #aaa;
+}
+
+.radio_parts p.radio_parts-item label:after {
+  -webkit-transition: opacity 0.2s linear;
+  transition: opacity 0.2s linear;
+  width: 0.5em;
+  height: 0.5em;
+  top: 50%;
+  left: 0.25em;
+  margin-top: -0.25em;
+  border-radius: 0.25em;
+  box-sizing: border-box;
+  background-color: #53b300;
+  opacity: 0;
+}
+
+.radio_parts p.radio_parts-item input:checked + label:after {
+  opacity: 1;
+}
+
+.radio_parts p.radio_parts-item input:disabled + label {
+  color: #999;
+}
+
+.radio_parts p.radio_parts-item input:disabled + label:before {
+  border-color: #ddd;
+  background-color: #efefef;
+}
+
+.checkbox_parts p.checkbox_parts-item {
+  display: inline-block;
+}
+
+.checkbox_parts p.checkbox_parts-item input {
+  display: none;
+}
+
+.checkbox_parts p.checkbox_parts-item label {
+  position: relative;
+  display: inline-block;
+  padding: 0.5em 0 0.5em 1.25em;
+  margin-right: 1em;
+  vertical-align: middle;
+  cursor: pointer;
+}
+
+.checkbox_parts p.checkbox_parts-item label:before, .checkbox_parts p.checkbox_parts-item label:after {
+  position: absolute;
+  display: block;
+  content: "";
+}
+
+.checkbox_parts p.checkbox_parts-item label:before {
+  width: 1em;
+  height: 1em;
+  top: 50%;
+  left: 0;
+  margin-top: -0.5em;
+  box-sizing: border-box;
+  border-radius: 2px;
+  border: 1px solid #aaa;
+}
+
+.checkbox_parts p.checkbox_parts-item label:after {
+  -webkit-transition: opacity 0.2s linear;
+  transition: opacity 0.2s linear;
+  width: 0.3em;
+  height: 0.6em;
+  top: 50%;
+  left: 0.30em;
+  margin-top: -0.5em;
+  border-right: 2px solid #53b300;
+  border-bottom: 2px solid #53b300;
+  -webkit-transform: rotate(45deg);
+  -moz-transform: rotate(45deg);
+  transform: rotate(45deg);
+  opacity: 0;
+}
+
+.checkbox_parts p.checkbox_parts-item input:checked + label:after {
+  opacity: 1;
+}
+
+.checkbox_parts p.checkbox_parts-item input:disabled + label {
+  color: #999;
+}
+
+.checkbox_parts p.checkbox_parts-item input:disabled + label:before {
+  border-color: #ddd;
+  background-color: #efefef;
+}
+
 /*# sourceMappingURL=style.css.map */

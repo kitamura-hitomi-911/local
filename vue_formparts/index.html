@@ -14,22 +14,44 @@
 <div id="form-area">
 	<form action="" method="get">
 		<form-input :form_data="input_text_sample" @update-form-data="updateFormData"></form-input>
+		<form-input :form_data="input_password_sample" @update-form-data="updateFormData"></form-input>
+		<form-input :form_data="input_number_sample" @update-form-data="updateFormData"></form-input>
+		<form-radio :form_data="input_radio_sample" @update-form-data="updateFormData"></form-radio>
+		<form-checkbox :form_data="input_checkbox_sample" @update-form-data="updateFormData"></form-checkbox>
 		<form-select :form_data="select_sample" @update-form-data="updateFormData"></form-select>
 		<p class="btn"><a href="#" @click.stop="submit">送信</a></p>
 	</form>
 </div>
 
+<script type="text/x-template" id="tmpl-form-radio">
+	<div class="radio_parts">
+		<template v-for="radio in form_data.list" >
+			<p class="radio_parts-item">
+				<input :type="form_data.type" :id="form_data.name+'_'+radio.value" name="form_data.name" :value="radio.value"><label :for="form_data.name+'_'+radio.value">{{radio.label}}</label>
+			</p>
+		</template>
+	</div>
+</script>
+<script type="text/x-template" id="tmpl-form-checkbox">
+	<div class="checkbox_parts">
+		<template v-for="checkbox in form_data.list" >
+			<p class="checkbox_parts-item">
+				<input :type="form_data.type" :id="form_data.name+'_'+checkbox.value" name="form_data.name" :value="checkbox.value"><label :for="form_data.name+'_'+checkbox.value">{{checkbox.label}}</label>
+			</p>
+		</template>
+	</div>
+</script>
 <script type="text/x-template" id="tmpl-form-select">
 	<div class="select_parts">
 		<p class="select_parts-label">{{selected_label}}</p>
-		<select :name="form_data.name" @input="updateValue">
-			<option v-for="option in form_data.list" :key="option.value" :value="option.value" :selected="option.value === form_data.value">{{option.label}}</option>
+		<select :name="form_data.name" @input="updateValue" :value="form_data.value">
+			<option v-for="option in form_data.list" :key="option.value" :value="option.value">{{option.label}}</option>
 		</select>
 	</div>
 </script>
 <script type="text/x-template" id="tmpl-form-input">
 	<div class="input_parts">
-		<input :type="form_data.type" :value="form_data.value" :placeholder="form_data.placeholder" @input="updateValue">
+		<input :type="form_data.type" :value="form_data.value" :maxlength="form_data.maxlength" :minlength="form_data.minlength" :step="form_data.step" :min="form_data.min" :max="form_data.max" :placeholder="form_data.placeholder" @input="updateValue">
 	</div>
 </script>
 
@@ -56,7 +78,50 @@
 			}
 		},
 		template:'#tmpl-form-input'
+	});
+	Vue.component('form-radio',{
+		props:{
+			form_data:{type:Object, require: true}
+		},
+		data:function(){
+			return {
+			}
+		},
+		created:function(){
+			// propsからうけとれる情報からの初期値セット
+			this.current_value = this.form_data.value || '';
+		},
+		methods:{
+			updateValue:function(e){
+				console.log('updateValue',e);
 
+				//インスタンスのデータを更新
+				this.$emit('update-form-data',{name:this.form_data.name,value:e.target.value});
+			}
+		},
+		template:'#tmpl-form-radio'
+	});
+	Vue.component('form-checkbox',{
+		props:{
+			form_data:{type:Object, require: true}
+		},
+		data:function(){
+			return {
+			}
+		},
+		created:function(){
+			// propsからうけとれる情報からの初期値セット
+			this.current_value = this.form_data.value || '';
+		},
+		methods:{
+			updateValue:function(e){
+				console.log('updateValue',e);
+
+				//インスタンスのデータを更新
+				this.$emit('update-form-data',{name:this.form_data.name,value:e.target.value});
+			}
+		},
+		template:'#tmpl-form-checkbox'
 	});
 	Vue.component('form-select',{
 		props:{
@@ -90,7 +155,6 @@
 		template:'#tmpl-form-select'
 	});
 
-
 	new Vue({
 		el:'#form-area',
 		data: {
@@ -98,7 +162,57 @@
 				name:'input_text_sample',
 				type:'text',
 				value:'',
+				maxlength:12,
 				placeholder:'入力してください'
+			},
+			input_password_sample:{
+				name:'input_password_sample',
+				type:'password',
+				value:'',
+				placeholder:'入力してください'
+			},
+			input_number_sample:{
+				name:'input_number_sample',
+				type:'number',
+				step:2,
+				min:4,
+				value:''
+			},
+			input_radio_sample:{
+				name:'input_radio_sample',
+				type:'radio',
+				list:[
+					{
+						value:'a',
+						label:'選択肢A'
+					},
+					{
+						value:'b',
+						label:'選択肢B'
+					},
+					{
+						value:'c',
+						label:'選択肢C'
+					}
+				]
+			},
+			input_checkbox_sample:{
+				name:'input_checkbox_sample',
+				type:'checkbox',
+				list:[
+					{
+						value:'a',
+						label:'選択肢A'
+					},
+					{
+						value:'b',
+						label:'選択肢B'
+					},
+					{
+						value:'c',
+						label:'選択肢C'
+					}
+				]
 			},
 			select_sample: {
 				name:'select_sample',
