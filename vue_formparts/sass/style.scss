@@ -51,6 +51,12 @@ article, aside, details, figcaption, figure, footer, header, menu, nav, section,
 	display: block;
 }
 
+.form-item-err{
+	color:#f00;
+}
+.form-item-note{
+	color:#999;
+}
 .select_parts{
 	position: relative;
 	.select_parts-label{

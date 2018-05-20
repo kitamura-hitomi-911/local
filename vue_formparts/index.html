@@ -13,13 +13,16 @@
 
 <div id="form-area">
 	<form action="" method="get">
-		<form-input :form_data="input_text_sample" @update-form-data="updateFormData"></form-input>
-		<form-input :form_data="input_password_sample" @update-form-data="updateFormData"></form-input>
-		<form-input :form_data="input_number_sample" @update-form-data="updateFormData"></form-input>
-		<form-radio :form_data="input_radio_sample" @update-form-data="updateFormData"></form-radio>
-		<form-checkbox :form_data="input_checkbox_sample" @update-form-data="updateFormData"></form-checkbox>
-		<form-select :form_data="select_sample" @update-form-data="updateFormData"></form-select>
-		<p class="btn"><a href="#" @click.stop="submit">送信</a></p>
+		<form-item :form_data="form_data.input_text_sample" @update-form-data="updateFormData"></form-item>
+		<form-item :form_data="form_data.input_password_sample" @update-form-data="updateFormData"></form-item>
+		<form-item :form_data="form_data.input_number_sample" @update-form-data="updateFormData"></form-item>
+		<form-item :form_data="form_data.input_radio_sample" @update-form-data="updateFormData"></form-item>
+		<form-item :form_data="form_data.input_radio_text_sample" @update-form-data="updateFormData">
+			<form-input :form_data="form_data.input_add_text_sample" @update-form-data="updateFormData"></form-input>
+		</form-item>
+		<form-item :form_data="form_data.input_checkbox_sample" @update-form-data="updateFormData"></form-item>
+		<form-item :form_data="form_data.select_sample" @update-form-data="updateFormData"></form-item>
+		<p class="btn"><a href="#" @click.stop.prevent="submit">送信</a></p>
 	</form>
 </div>
 
@@ -27,7 +30,7 @@
 	<div class="radio_parts">
 		<template v-for="radio in form_data.list" >
 			<p class="radio_parts-item">
-				<input :type="form_data.type" :id="form_data.name+'_'+radio.value" name="form_data.name" :value="radio.value"><label :for="form_data.name+'_'+radio.value">{{radio.label}}</label>
+				<input :type="form_data.type" :id="form_data.name+'_'+radio.value" name="form_data.name" :value="radio.value" :disabled="radio.disabled" @input="updateValue"><label :for="form_data.name+'_'+radio.value">{{radio.label}}</label>
 			</p>
 		</template>
 	</div>
@@ -36,7 +39,7 @@
 	<div class="checkbox_parts">
 		<template v-for="checkbox in form_data.list" >
 			<p class="checkbox_parts-item">
-				<input :type="form_data.type" :id="form_data.name+'_'+checkbox.value" name="form_data.name" :value="checkbox.value"><label :for="form_data.name+'_'+checkbox.value">{{checkbox.label}}</label>
+				<input :type="form_data.type" :id="form_data.name+'_'+checkbox.value" name="form_data.name" :value="checkbox.value" :disabled="checkbox.disabled" @input="updateValue"><label :for="form_data.name+'_'+checkbox.value">{{checkbox.label}}</label>
 			</p>
 		</template>
 	</div>
@@ -44,15 +47,27 @@
 <script type="text/x-template" id="tmpl-form-select">
 	<div class="select_parts">
 		<p class="select_parts-label">{{selected_label}}</p>
-		<select :name="form_data.name" @input="updateValue" :value="form_data.value">
+		<select :name="form_data.name" @input="updateValue" :value="form_data.value" :disabled="form_data.disabled">
 			<option v-for="option in form_data.list" :key="option.value" :value="option.value">{{option.label}}</option>
 		</select>
 	</div>
 </script>
 <script type="text/x-template" id="tmpl-form-input">
 	<div class="input_parts">
-		<input :type="form_data.type" :value="form_data.value" :maxlength="form_data.maxlength" :minlength="form_data.minlength" :step="form_data.step" :min="form_data.min" :max="form_data.max" :placeholder="form_data.placeholder" @input="updateValue">
+		<input :type="form_data.type" :value="form_data.value" :maxlength="form_data.maxlength" :minlength="form_data.minlength" :step="form_data.step" :min="form_data.min" :max="form_data.max" :placeholder="form_data.placeholder" :disabled="form_data.disabled" @input="updateValue">
 	</div>
+</script>
+
+<script type="text/x-template" id="tmpl-form-item">
+	<dl class="form-item">
+		<dt>{{form_data.item_name}}</dt>
+		<dd>
+			<component :is="component_name" :form_data="form_data" @update-form-data="updateFormData"></component>
+			<slot></slot>
+			<p class="form-item-err" v-if="form_data.err_msg">{{form_data.err_msg}}</p>
+			<p class="form-item-note" v-if="form_data.note">{{form_data.note}}</p>
+		</dd>
+	</dl>
 </script>
 
 <script src="https://unpkg.com/vue/dist/vue.js"></script>
@@ -66,8 +81,7 @@
 			}
 		},
 		created:function(){
-			// propsからうけとれる情報からの初期値セット
-			this.current_value = this.form_data.value || '';
+			// TODO:propsで渡されるデータに不足がないかチェック
 		},
 		methods:{
 			updateValue:function(e){
@@ -88,8 +102,7 @@
 			}
 		},
 		created:function(){
-			// propsからうけとれる情報からの初期値セット
-			this.current_value = this.form_data.value || '';
+			// TODO:propsで渡されるデータに不足がないかチェック
 		},
 		methods:{
 			updateValue:function(e){
@@ -110,8 +123,7 @@
 			}
 		},
 		created:function(){
-			// propsからうけとれる情報からの初期値セット
-			this.current_value = this.form_data.value || '';
+			// TODO:propsで渡されるデータに不足がないかチェック
 		},
 		methods:{
 			updateValue:function(e){
@@ -134,123 +146,242 @@
 		},
 		created:function(){
 			// propsからうけとる情報からのlabel初期値セット
-			var that = this;
-			var selected_label;
-			this.form_data.list.forEach(function(option){
-				if(that.form_data.value === option.value){
-					that.selected_label = option.label;
-				}
-			});
+			this._updateLabel();
 		},
 		methods:{
+			_updateLabel:function(){
+				var that = this;
+				this.form_data.list.forEach(function(option){
+					if(that.form_data.value === option.value){
+						that.selected_label = option.label;
+					}
+				});
+			},
 			updateValue:function(e){
 				console.log('updateValue',e);
-				var selected_option = e.target.selectedOptions.length ? e.target.selectedOptions[0]:null;
-				this.selected_label =  selected_option?selected_option.text:'';
-				var selected_value = selected_option?selected_option.value:'';
 				//インスタンスのデータを更新
-				this.$emit('update-form-data',{name:this.form_data.name,value:selected_value});
+				this.$emit('update-form-data',{name:this.form_data.name,value:e.target.value});
+				// ラベルの更新
+				this._updateLabel();
 			}
 		},
 		template:'#tmpl-form-select'
 	});
 
+	Vue.component('form-item',{
+		props:{
+			form_data:{type:Object, require: true}
+		},
+		data:function(){
+			return {
+				component_name:'form-input'
+			}
+		},
+		created:function(){
+			var component_of = {
+				test:'form-input',
+				password:'form-input',
+				number:'form-input',
+				radio:'form-radio',
+				checkbox:'form-checkbox',
+				select:'form-select'
+			};
+			this.component_name = component_of[this.form_data.type] || this.component_name;
+			return;
+		},
+		methods:{
+			updateFormData:function(obj){
+				console.log('form-item の updateFormData',obj);
+				//インスタンスのデータを更新
+				this.$emit('update-form-data',obj);
+			}
+		},
+		template:'#tmpl-form-item'
+	});
 	new Vue({
 		el:'#form-area',
 		data: {
-			input_text_sample:{
-				name:'input_text_sample',
-				type:'text',
-				value:'',
-				maxlength:12,
-				placeholder:'入力してください'
-			},
-			input_password_sample:{
-				name:'input_password_sample',
-				type:'password',
-				value:'',
-				placeholder:'入力してください'
-			},
-			input_number_sample:{
-				name:'input_number_sample',
-				type:'number',
-				step:2,
-				min:4,
-				value:''
-			},
-			input_radio_sample:{
-				name:'input_radio_sample',
-				type:'radio',
-				list:[
-					{
-						value:'a',
-						label:'選択肢A'
-					},
-					{
-						value:'b',
-						label:'選択肢B'
-					},
-					{
-						value:'c',
-						label:'選択肢C'
-					}
-				]
-			},
-			input_checkbox_sample:{
-				name:'input_checkbox_sample',
-				type:'checkbox',
-				list:[
-					{
-						value:'a',
-						label:'選択肢A'
-					},
-					{
-						value:'b',
-						label:'選択肢B'
-					},
-					{
-						value:'c',
-						label:'選択肢C'
-					}
-				]
-			},
-			select_sample: {
-				name:'select_sample',
-				value:'hoge3',
-				list: [
-					{
-						value: '',
-						label: '↓選択してください'
-					},
-					{
-						value: 'hoge1',
-						label: 'ほげ1です'
-					},
-					{
-						value: 'hoge2',
-						label: 'ほげ2です'
-					},
-					{
-						value: 'hoge3',
-						label: 'ほげ3です'
-					},
-					{
-						value: 'hoge4',
-						label: 'ほげ4です'
-					}
-				]
+			form_data:{
+				input_text_sample:{
+					item_name:'テキスト入力フォーム',
+					name:'input_text_sample',
+					type:'text',
+					value:'',
+					disabled:false,
+					maxlength:12,
+					placeholder:'入力してください',
+					require: true,
+					err_msg:'エラーテキスト',
+					note:'※補足テキスト'
+				},
+				input_password_sample:{
+					item_name:'パスワード入力フォーム',
+					name:'input_password_sample',
+					type:'password',
+					value:'',
+					disabled:false,
+					placeholder:'入力してください',
+					require: true,
+					err_msg:'',
+					note:''
+				},
+				input_number_sample:{
+					item_name:'数値入力フォーム',
+					name:'input_number_sample',
+					type:'number',
+					step:2,
+					min:4,
+					value:'',
+					disabled:false,
+					require: true,
+					err_msg:'',
+					note:''
+				},
+				input_radio_sample:{
+					item_name:'ラジオボタン',
+					name:'input_radio_sample',
+					type:'radio',
+					value:'',
+					disabled:false,
+					require: true,
+					err_msg:'',
+					note:'',
+					list:[
+						{
+							value:'a',
+							label:'選択肢A'
+						},
+						{
+							value:'b',
+							label:'選択肢B'
+						},
+						{
+							value:'c',
+							label:'選択肢C',
+							disabled:true
+						}
+					]
+				},
+				input_checkbox_sample:{
+					item_name:'チェックボックス',
+					name:'input_checkbox_sample',
+					type:'checkbox',
+					value:'',
+					require: true,
+					err_msg:'',
+					note:'',
+					list:[
+						{
+							value:'a',
+							label:'選択肢A',
+							disabled:false
+						},
+						{
+							value:'b',
+							label:'選択肢B',
+							disabled:false
+						},
+						{
+							value:'c',
+							label:'選択肢C',
+							disabled:true
+						}
+					]
+				},
+				select_sample: {
+					item_name:'プルダウン',
+					name:'select_sample',
+					type:'select',
+					value:'hoge3',
+					disabled:false,
+					require: true,
+					err_msg:'',
+					note:'',
+					list: [
+						{
+							value: '',
+							label: '↓選択してください'
+						},
+						{
+							value: 'hoge1',
+							label: 'ほげ1です'
+						},
+						{
+							value: 'hoge2',
+							label: 'ほげ2です'
+						},
+						{
+							value: 'hoge3',
+							label: 'ほげ3です'
+						},
+						{
+							value: 'hoge4',
+							label: 'ほげ4です'
+						}
+					]
+				},
+				input_radio_text_sample:{
+					item_name:'ラジオボタンとテキストフォームの組み合わせ',
+					name:'input_radio_text_sample',
+					type:'radio',
+					value:'',
+					require: true,
+					err_msg:'',
+					note:'',
+					list:[
+						{
+							value:'a',
+							label:'こっちは選択したら以上',
+							disabled:false
+						},
+						{
+							value:'b',
+							label:'テキストも入力',
+							disabled:false
+						}
+					]
+				},
+				input_add_text_sample:{
+					name:'input_add_text_sample',
+					type:'text',
+					value:'',
+					disabled:true
+				}
 			}
 		},
 		computed: {
 		},
 		methods:{
 			updateFormData:function(obj){
-				console.log('updateFormData',obj);
-				this[obj.name].value = obj.value;
+				console.log('親、updateFormData',obj);
+				this.form_data[obj.name].value = obj.value;
+
+				if(obj.name === 'input_radio_text_sample'){
+					if(obj.value === 'b'){
+						this.form_data.input_add_text_sample.disabled = false;
+					}else{
+						this.form_data.input_add_text_sample.disabled = true;
+					}
+				}
+
 				return;
 			},
 			submit:function(){
 				console.log('submit');
+				for(var form_name in this.form_data){
+					this.form_data[form_name].err_msg = '';
+					if(this.form_data[form_name].require && !this.form_data[form_name].value){
+						this.form_data[form_name].err_msg = '入力必須項目です';
+					}
+					// 個別チェック
+					if(form_name === 'input_add_text_sample'){
+						if(this.form_data.input_radio_text_sample.value === 'b' && !this.form_data.input_add_text_sample.value){
+							this.form_data.input_radio_text_sample.err_msg = 'Bを選択した場合は補足テキスト入力必須';
+						}
+					}
+					
+				}
+				return false;
 			}
 		}
 	});
