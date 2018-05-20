@@ -22,6 +22,7 @@
 		</form-item>
 		<form-item :form_data="form_data.input_checkbox_sample" @update-form-data="updateFormData"></form-item>
 		<form-item :form_data="form_data.select_sample" @update-form-data="updateFormData"></form-item>
+		<form-item :form_data="form_data.textarea_sample" @update-form-data="updateFormData"></form-item>
 		<p class="btn"><a href="#" @click.stop.prevent="submit">送信</a></p>
 	</form>
 </div>
@@ -55,6 +56,11 @@
 <script type="text/x-template" id="tmpl-form-input">
 	<div class="input_parts">
 		<input :type="form_data.type" :value="form_data.value" :maxlength="form_data.maxlength" :minlength="form_data.minlength" :step="form_data.step" :min="form_data.min" :max="form_data.max" :placeholder="form_data.placeholder" :disabled="form_data.disabled" @input="updateValue">
+	</div>
+</script>
+<script type="text/x-template" id="tmpl-form-textarea">
+	<div class="input_textarea">
+		<textarea :value="form_data.value" :placeholder="form_data.placeholder" :disabled="form_data.disabled" @input="updateValue"></textarea>
 	</div>
 </script>
 
@@ -168,6 +174,28 @@
 		template:'#tmpl-form-select'
 	});
 
+	Vue.component('form-textarea',{
+		props:{
+			form_data:{type:Object, require: true}
+		},
+		data:function(){
+			return {
+			}
+		},
+		created:function(){
+			// TODO:propsで渡されるデータに不足がないかチェック
+		},
+		methods:{
+			updateValue:function(e){
+				console.log('updateValue',e);
+
+				//インスタンスのデータを更新
+				this.$emit('update-form-data',{name:this.form_data.name,value:e.target.value});
+			}
+		},
+		template:'#tmpl-form-textarea'
+	});
+
 	Vue.component('form-item',{
 		props:{
 			form_data:{type:Object, require: true}
@@ -208,10 +236,13 @@
 					type:'text',
 					value:'',
 					disabled:false,
+					minlength:3,
 					maxlength:12,
 					placeholder:'入力してください',
+					pattern:'^[0-9a-zA-Z_-]{3,12}$',
+					pattern_err_msg:'半角英数字_-のみで3～12文字で入力',
 					require: true,
-					err_msg:'エラーテキスト',
+					err_msg:'',
 					note:'※補足テキスト'
 				},
 				input_password_sample:{
@@ -249,11 +280,13 @@
 					list:[
 						{
 							value:'a',
-							label:'選択肢A'
+							label:'選択肢A',
+							disabled:false
 						},
 						{
 							value:'b',
-							label:'選択肢B'
+							label:'選択肢B',
+							disabled:false
 						},
 						{
 							value:'c',
@@ -292,7 +325,7 @@
 					item_name:'プルダウン',
 					name:'select_sample',
 					type:'select',
-					value:'hoge3',
+					value:'',
 					disabled:false,
 					require: true,
 					err_msg:'',
@@ -319,6 +352,17 @@
 							label: 'ほげ4です'
 						}
 					]
+				},
+				textarea_sample:{
+					item_name:'textarea',
+					name:'textarea_sample',
+					type:'textarea',
+					value:'',
+					disabled:false,
+					placeholder:'入力してください',
+					require: true,
+					err_msg:'',
+					note:'※補足テキスト'
 				},
 				input_radio_text_sample:{
 					item_name:'ラジオボタンとテキストフォームの組み合わせ',
@@ -368,11 +412,29 @@
 			},
 			submit:function(){
 				console.log('submit');
+				var err_flg = false;
 				for(var form_name in this.form_data){
 					this.form_data[form_name].err_msg = '';
+					// 未入力チェック
 					if(this.form_data[form_name].require && !this.form_data[form_name].value){
-						this.form_data[form_name].err_msg = '入力必須項目です';
+						if(this.form_data[form_name].list && this.form_data[form_name].list.length){
+							this.form_data[form_name].err_msg = '選択必須項目です';
+						}else{
+							this.form_data[form_name].err_msg = '入力必須項目です';
+						}
+						err_flg = true;
 					}
+					// フォーマットチェック
+					if(!err_flg){
+						if(this.form_data[form_name].pattern && this.form_data[form_name].value){
+							var re = new RegExp(this.form_data[form_name].pattern);
+							if(!this.form_data[form_name].value.match(re)){
+								this.form_data[form_name].err_msg = this.form_data[form_name].pattern_err_msg || '入力内容を確認してください';
+							}
+						}
+					}
+
+
 					// 個別チェック
 					if(form_name === 'input_add_text_sample'){
 						if(this.form_data.input_radio_text_sample.value === 'b' && !this.form_data.input_add_text_sample.value){
