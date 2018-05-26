@@ -23,6 +23,7 @@
 		<form-item :form_data="form_data.input_checkbox_sample" @update-form-data="updateFormData"></form-item>
 		<form-item :form_data="form_data.select_sample" @update-form-data="updateFormData"></form-item>
 		<form-item :form_data="form_data.textarea_sample" @update-form-data="updateFormData"></form-item>
+		<form-item :form_data="form_data.textarea_sample2" @update-form-data="updateFormData"></form-item>
 		<p class="btn"><a href="#" @click.stop.prevent="submit">送信</a></p>
 	</form>
 </div>
@@ -80,14 +81,17 @@
 <script type="text/javascript">
 	Vue.component('form-input',{
 		props:{
-			form_data:{type:Object, require: true}
+			form_data:{
+				type:Object,
+				require: true,
+				validator:function (val) {
+					return val.name && 'err_msg' in val && 'value' in val;
+				}
+			}
 		},
 		data:function(){
 			return {
 			}
-		},
-		created:function(){
-			// TODO:propsで渡されるデータに不足がないかチェック
 		},
 		methods:{
 			updateValue:function(e){
@@ -101,14 +105,17 @@
 	});
 	Vue.component('form-radio',{
 		props:{
-			form_data:{type:Object, require: true}
+			form_data:{
+				type:Object,
+				require: true,
+				validator:function (val) {
+					return val.name && 'err_msg' in val && 'value' in val;
+				}
+			}
 		},
 		data:function(){
 			return {
 			}
-		},
-		created:function(){
-			// TODO:propsで渡されるデータに不足がないかチェック
 		},
 		methods:{
 			updateValue:function(e){
@@ -122,14 +129,17 @@
 	});
 	Vue.component('form-checkbox',{
 		props:{
-			form_data:{type:Object, require: true}
+			form_data:{
+				type:Object,
+				require: true,
+				validator:function (val) {
+					return val.name && 'err_msg' in val && 'value' in val;
+				}
+			}
 		},
 		data:function(){
 			return {
 			}
-		},
-		created:function(){
-			// TODO:propsで渡されるデータに不足がないかチェック
 		},
 		methods:{
 			updateValue:function(e){
@@ -143,7 +153,13 @@
 	});
 	Vue.component('form-select',{
 		props:{
-			form_data:{type:Object, require: true}
+			form_data:{
+				type:Object,
+				require: true,
+				validator:function (val) {
+					return val.name && 'err_msg' in val && 'value' in val;
+				}
+			}
 		},
 		data:function(){
 			return {
@@ -176,14 +192,17 @@
 
 	Vue.component('form-textarea',{
 		props:{
-			form_data:{type:Object, require: true}
+			form_data:{
+				type:Object,
+				require: true,
+				validator:function (val) {
+					return val.name && 'err_msg' in val && 'value' in val;
+				}
+			}
 		},
 		data:function(){
 			return {
 			}
-		},
-		created:function(){
-			// TODO:propsで渡されるデータに不足がないかチェック
 		},
 		methods:{
 			updateValue:function(e){
@@ -198,7 +217,13 @@
 
 	Vue.component('form-item',{
 		props:{
-			form_data:{type:Object, require: true}
+			form_data: {
+				type: Object,
+				require: true,
+				validator:function(val){
+					return ['text', 'password', 'number','radio','checkbox','select','textarea'].indexOf(val.type) !== -1 && val.item_name;
+				}
+			}
 		},
 		data:function(){
 			return {
@@ -207,12 +232,13 @@
 		},
 		created:function(){
 			var component_of = {
-				test:'form-input',
+				text:'form-input',
 				password:'form-input',
 				number:'form-input',
 				radio:'form-radio',
 				checkbox:'form-checkbox',
-				select:'form-select'
+				select:'form-select',
+				textarea:'form-textarea'
 			};
 			this.component_name = component_of[this.form_data.type] || this.component_name;
 			return;
@@ -354,7 +380,7 @@
 					]
 				},
 				textarea_sample:{
-					item_name:'textarea',
+					item_name:'textarea見出し',
 					name:'textarea_sample',
 					type:'textarea',
 					value:'',
@@ -363,6 +389,14 @@
 					require: true,
 					err_msg:'',
 					note:'※補足テキスト'
+				},
+				textarea_sample2:{
+					item_name:'textarea見出し2',
+					name:'textarea_sample2',
+					type:'textarea',
+					value:'',
+					require: true,
+					err_msg:''
 				},
 				input_radio_text_sample:{
 					item_name:'ラジオボタンとテキストフォームの組み合わせ',
@@ -389,7 +423,8 @@
 					name:'input_add_text_sample',
 					type:'text',
 					value:'',
-					disabled:true
+					disabled:true,
+					err_msg:''
 				}
 			}
 		},
