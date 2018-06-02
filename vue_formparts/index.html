@@ -474,11 +474,13 @@
 				for(var form_name in this.form_data){
 					this.form_data[form_name].err_msg = '';
 					// 未入力チェック
-					if(this.form_data[form_name].require && !this.form_data[form_name].value){
-						if(this.form_data[form_name].list && this.form_data[form_name].list.length){
-							this.form_data[form_name].err_msg = '選択必須項目です';
-						}else{
-							this.form_data[form_name].err_msg = '入力必須項目です';
+					if(this.form_data[form_name].require){
+						if(!this.form_data[form_name].value || Array.isArray(this.form_data[form_name].value) && !this.form_data[form_name].value.length){
+							if(this.form_data[form_name].list && this.form_data[form_name].list.length){
+								this.form_data[form_name].err_msg = '選択必須項目です';
+							}else{
+								this.form_data[form_name].err_msg = '入力必須項目です';
+							}
 						}
 						err_flg = true;
 					}
