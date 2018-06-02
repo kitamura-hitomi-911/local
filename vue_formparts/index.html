@@ -330,8 +330,7 @@
 					}
 				}
 			},
-			submit:function(){
-				console.log('submit');
+			_checkForm:function(){
 				var err_flg = false;
 				for(var form_name in this.form_data){
 					this.form_data[form_name].err_msg = '';
@@ -343,8 +342,9 @@
 							}else{
 								this.form_data[form_name].err_msg = '入力必須項目です';
 							}
+							err_flg = true;
 						}
-						err_flg = true;
+
 					}
 					// フォーマットチェック
 					if(!err_flg){
@@ -352,19 +352,37 @@
 							var re = new RegExp(this.form_data[form_name].pattern);
 							if(!this.form_data[form_name].value.match(re)){
 								this.form_data[form_name].err_msg = this.form_data[form_name].pattern_err_msg || '入力内容を確認してください';
+								err_flg = true;
 							}
 						}
 					}
 
-
 					// 個別チェック
-					if(form_name === 'input_add_text_sample'){
-						if(this.form_data.input_radio_text_sample.value === 'b' && !this.form_data.input_add_text_sample.value){
-							this.form_data.input_radio_text_sample.err_msg = 'Bを選択した場合は補足テキスト入力必須';
-						}
-					}
-					
+					err_flg = this._checkFormAddedBy(form_name) || err_flg;
+
 				}
+				return err_flg;
+			},
+			_checkFormAddedBy:function(form_name){
+				var that = this;
+				var err_flg = false;
+				var checkFn = {
+					input_add_text_sample:function(){
+						var err_flg = false;
+						if(that.form_data.input_radio_text_sample.value === 'b' && !that.form_data.input_add_text_sample.value){
+							that.form_data.input_radio_text_sample.err_msg = 'Bを選択した場合は補足テキスト入力必須';
+							err_flg = true;
+						}
+						return err_flg;
+					}
+				};
+				err_flg = checkFn[form_name] && checkFn[form_name]();
+				return err_flg;
+			},
+			submit:function(){
+				console.log('submit');
+				var err_flg = this._checkForm();
+
 				return false;
 			}
 		}

@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="x-ua-compatible" content="ie=edge">
+	<title>Case1</title>
+	<meta name="description" content="">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="format-detection" content="telephone=no">
+	<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div id="tgt">
+	ローディング
+</div>
+
+<script type="text/x-template" id="tmpl-page-accept">
+	<div>
+		accept<br>
+		<input type="checkbox" value="a1" :checked="accept_value.a1" @input="input"><br>
+		<input type="checkbox" value="a2" :checked="accept_value.a2" @input="input"><br>
+		<input type="checkbox" value="a3" :checked="accept_value.a3" @input="input"><br>
+		<input type="checkbox" value="a4" :checked="accept_value.a4" @input="input"><br>
+		<p class="btn">
+			<a href="#" @click.prevent="next" v-if="is_accepted">次へ</a>
+			<span v-else>次へ</span>
+		</p>
+		<p class="disable-msg" v-if="!is_accepted">全部にチェックが必要</p>
+	</div>
+</script>
+<script type="text/x-template" id="tmpl-page-entry">
+	<div>
+		entry<br>
+		<form-select :form_data="enquete_data.team" @update-form-data="updateFormData"></form-select>
+		<p class="form-item-err" v-if="enquete_data.team.err_msg">{{enquete_data.team.err_msg}}</p>
+		<form-input :form_data="enquete_data.comment" @update-form-data="updateFormData"></form-input>
+		<p class="form-item-err" v-if="enquete_data.comment.err_msg">{{enquete_data.comment.err_msg}}</p>
+		<form-textarea :form_data="enquete_data.message" @update-form-data="updateFormData"></form-textarea>
+		<p class="form-item-err" v-if="enquete_data.message.err_msg">{{enquete_data.message.err_msg}}</p>
+		<p class="btn">
+			<a href="#" @click.prevent="entry">エントリー</a>
+		</p>
+	</div>
+</script>
+
+<script type="text/x-template" id="tmpl-form-radio">
+	<div class="radio_parts">
+		<template v-for="radio in form_data.list" >
+			<p class="radio_parts-item">
+				<input :type="form_data.type" :id="form_data.name+'_'+radio.value" name="form_data.name" :value="radio.value" :disabled="radio.disabled" @input="updateValue"><label :for="form_data.name+'_'+radio.value">{{radio.label}}</label>
+			</p>
+		</template>
+	</div>
+</script>
+<script type="text/x-template" id="tmpl-form-checkbox">
+	<div class="checkbox_parts">
+		<template v-for="checkbox in form_data.list" >
+			<p class="checkbox_parts-item">
+				<input :type="form_data.type" :id="form_data.name+'_'+checkbox.value" name="form_data.name" :value="checkbox.value" :disabled="checkbox.disabled" @input="updateValue"><label :for="form_data.name+'_'+checkbox.value">{{checkbox.label}}</label>
+			</p>
+		</template>
+	</div>
+</script>
+<script type="text/x-template" id="tmpl-form-select">
+	<div class="select_parts">
+		<p class="select_parts-label">{{selected_label}}</p>
+		<select :name="form_data.name" @input="updateValue" :value="form_data.value" :disabled="form_data.disabled">
+			<option v-for="option in form_data.list" :key="option.value" :value="option.value">{{option.label}}</option>
+		</select>
+	</div>
+</script>
+<script type="text/x-template" id="tmpl-form-input">
+	<div class="input_parts">
+		<input :type="form_data.type" :value="form_data.value" :maxlength="form_data.maxlength" :minlength="form_data.minlength" :step="form_data.step" :min="form_data.min" :max="form_data.max" :placeholder="form_data.placeholder" :disabled="form_data.disabled" @input="updateValue">
+	</div>
+</script>
+<script type="text/x-template" id="tmpl-form-textarea">
+	<div class="input_textarea">
+		<textarea :value="form_data.value" :placeholder="form_data.placeholder" :disabled="form_data.disabled" @input="updateValue"></textarea>
+	</div>
+</script>
+
+
+<script src="https://unpkg.com/vue/dist/vue.js"></script>
+<script src="./global_components.js"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script type="text/javascript">
+	var vm_page = new Vue({
+		el:'#tgt',
+		data:{
+			page:'page_accept',
+			accept_value:{
+				a1:false,
+				a2:false,
+				a3:false,
+				a4:false
+			},
+			enquete_data:{
+				team: {
+					name:'team',
+					type:'select',
+					value:'',
+					disabled:false,
+					require: true,
+					err_msg:'',
+					list: [
+						{
+							value: '',
+							label: '↓選択してください'
+						},
+						{
+							value: 'hoge1',
+							label: 'ほげ1です'
+						},
+						{
+							value: 'hoge2',
+							label: 'ほげ2です'
+						},
+						{
+							value: 'hoge3',
+							label: 'ほげ3です'
+						},
+						{
+							value: 'hoge4',
+							label: 'ほげ4です'
+						}
+					]
+				},
+				comment:{
+					name:'comment',
+					type:'text',
+					value:'',
+					disabled:false,
+					placeholder:'入力してください',
+					require: true,
+					err_msg:''
+				},
+				message:{
+					name:'message',
+					type:'textarea',
+					value:'',
+					disabled:false,
+					placeholder:'入力してください',
+					require: true,
+					err_msg:''
+				}
+			}
+		},
+		template:'<compnent :is="page" :accept_value="accept_value" :enquete_data="enquete_data" @update-accept-value="updateAcceptValue" @update-form-data="updateFormData" @next="next" @entry="entry"></compnent>',
+		created:function(){
+			var already_accept = localStorage.getItem('already_accept');
+			if(already_accept){
+				this.page = 'page_entry';
+			}
+		},
+		components:{
+			'page_accept':{
+				template:'#tmpl-page-accept',
+				props:{
+					accept_value:{
+						type:Object,
+						require:true
+					}
+				},
+				computed:{
+					is_accepted:function(){
+						var ret = true;
+						for(var i in this.accept_value){
+							if(!this.accept_value[i]){
+								ret = false;
+								break;
+							}
+						}
+						return ret;
+					}
+				},
+				data:function(){
+					return {
+						aaa:[]
+					}
+				},
+				methods:{
+					next:function(){
+						console.log('next');
+						this.$emit('next');
+					},
+					input:function(e){
+						// console.log(e.target.value);
+						// console.log(e.target.checked);
+						this.$emit('update-accept-value',{name:e.target.value,value:e.target.checked});
+					}
+				}
+
+			},
+			'page_entry':{
+				template:'#tmpl-page-entry',
+				props:{
+					enquete_data:{
+						type:Object,
+						require:true
+					}
+				},
+				methods:{
+					entry:function(){
+						console.log('entry');
+						this.$emit('entry');
+					},
+					updateFormData:function(obj){
+						console.log('updateFormData',obj);
+						this.$emit('update-form-data',obj);
+					}
+				}
+			}
+		},
+		methods:{
+			next:function(){
+				this.page = 'page_entry';
+				localStorage.setItem('already_accept', 1);
+				return;
+			},
+			updateAcceptValue:function(obj){
+				console.log('updateAcceptValue',obj);
+				this.accept_value[obj.name] = obj.value;
+			},
+			updateFormData:function(obj){
+				console.log('updateFormData',obj);
+				if(Array.isArray(this.enquete_data[obj.name].value)){
+					var index_of_value = this.enquete_data[obj.name].value.indexOf(obj.value);
+					if(obj.checked){
+						// 追加
+						if (index_of_value == -1){
+							// なければ追加
+							this.enquete_data[obj.name].value.push(obj.value);
+						}
+					}else{
+						// 削除
+						if (index_of_value >= 0){
+							// あればトルツメ
+							this.enquete_data[obj.name].value.splice( index_of_value, 1 ) ;
+						}
+					}
+				}else{
+					this.enquete_data[obj.name].value = obj.value;
+				}
+			},
+			_checkForm:function(){
+				var err_flg = false;
+				for(var form_name in this.enquete_data){
+					this.enquete_data[form_name].err_msg = '';
+					// 未入力チェック
+					if(this.enquete_data[form_name].require){
+						if(!this.enquete_data[form_name].value || Array.isArray(this.enquete_data[form_name].value) && !this.enquete_data[form_name].value.length){
+							if(this.enquete_data[form_name].list && this.enquete_data[form_name].list.length){
+								this.enquete_data[form_name].err_msg = '選択必須項目です';
+							}else{
+								this.enquete_data[form_name].err_msg = '入力必須項目です';
+							}
+							err_flg = true;
+						}
+
+					}
+					// フォーマットチェック
+					if(!err_flg){
+						if(this.enquete_data[form_name].pattern && this.enquete_data[form_name].value){
+							var re = new RegExp(this.enquete_data[form_name].pattern);
+							if(!this.enquete_data[form_name].value.match(re)){
+								this.enquete_data[form_name].err_msg = this.enquete_data[form_name].pattern_err_msg || '入力内容を確認してください';
+								err_flg = true;
+							}
+						}
+					}
+
+				}
+				console.log()
+				return err_flg;
+			},
+			entry:function(){
+				console.log('entry');
+				var err_flg = this._checkForm();
+				console.log(err_flg);
+				if(!err_flg){
+					axios.get("https://yesno.wtf/api").then(function(r){
+						console.log(r);
+					});
+				}
+
+			}
+		}
+	});
+</script>
+</body>
+</html>
