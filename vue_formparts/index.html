@@ -121,8 +121,11 @@
 			updateValue:function(e){
 				console.log('updateValue',e);
 
-				//インスタンスのデータを更新
-				this.$emit('update-form-data',{name:this.form_data.name,value:e.target.value});
+				if(e.target.checked){
+					//インスタンスのデータを更新
+					this.$emit('update-form-data',{name:this.form_data.name,value:e.target.value});
+				}
+
 			}
 		},
 		template:'#tmpl-form-radio'
@@ -133,7 +136,7 @@
 				type:Object,
 				require: true,
 				validator:function (val) {
-					return val.name && 'err_msg' in val && 'value' in val;
+					return val.name && 'err_msg' in val && 'value' in val && Array.isArray(val.value);
 				}
 			}
 		},
@@ -146,7 +149,7 @@
 				console.log('updateValue',e);
 
 				//インスタンスのデータを更新
-				this.$emit('update-form-data',{name:this.form_data.name,value:e.target.value});
+				this.$emit('update-form-data',{name:this.form_data.name,value:e.target.value,checked:e.target.checked});
 			}
 		},
 		template:'#tmpl-form-checkbox'
@@ -325,7 +328,7 @@
 					item_name:'チェックボックス',
 					name:'input_checkbox_sample',
 					type:'checkbox',
-					value:'',
+					value:[],
 					require: true,
 					err_msg:'',
 					note:'',
@@ -433,8 +436,30 @@
 		methods:{
 			updateFormData:function(obj){
 				console.log('親、updateFormData',obj);
-				this.form_data[obj.name].value = obj.value;
+				if(Array.isArray(this.form_data[obj.name].value)){
+					var index_of_value = this.form_data[obj.name].value.indexOf(obj.value);
+					if(obj.checked){
+						// 追加
+						if (index_of_value == -1){
+							// なければ追加
+							this.form_data[obj.name].value.push(obj.value);
+						}
+					}else{
+						// 削除
+						if (index_of_value >= 0){
+							// あればトルツメ
+							this.form_data[obj.name].value.splice( index_of_value, 1 ) ;
+						}
+					}
+				}else{
+					this.form_data[obj.name].value = obj.value;
+				}
 
+				this.actionWithUpdateFormData(obj);
+
+				return;
+			},
+			actionWithUpdateFormData:function(obj){
 				if(obj.name === 'input_radio_text_sample'){
 					if(obj.value === 'b'){
 						this.form_data.input_add_text_sample.disabled = false;
@@ -442,8 +467,6 @@
 						this.form_data.input_add_text_sample.disabled = true;
 					}
 				}
-
-				return;
 			},
 			submit:function(){
 				console.log('submit');
