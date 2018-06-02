@@ -32,12 +32,9 @@
 <script type="text/x-template" id="tmpl-page-entry">
 	<div>
 		entry<br>
-		<form-select :form_data="enquete_data.team" @update-form-data="updateFormData"></form-select>
-		<p class="form-item-err" v-if="enquete_data.team.err_msg">{{enquete_data.team.err_msg}}</p>
-		<form-input :form_data="enquete_data.comment" @update-form-data="updateFormData"></form-input>
-		<p class="form-item-err" v-if="enquete_data.comment.err_msg">{{enquete_data.comment.err_msg}}</p>
-		<form-textarea :form_data="enquete_data.message" @update-form-data="updateFormData"></form-textarea>
-		<p class="form-item-err" v-if="enquete_data.message.err_msg">{{enquete_data.message.err_msg}}</p>
+		<form-item :form_data="enquete_data.team" @update-form-data="updateFormData"></form-item>
+		<form-item :form_data="enquete_data.comment" @update-form-data="updateFormData"></form-item>
+		<form-item :form_data="enquete_data.message" @update-form-data="updateFormData"></form-item>
 		<p class="btn">
 			<a href="#" @click.prevent="entry">エントリー</a>
 		</p>
@@ -81,11 +78,24 @@
 	</div>
 </script>
 
+<script type="text/x-template" id="tmpl-form-item">
+	<dl class="form-item">
+		<dt>{{form_data.item_name}}</dt>
+		<dd>
+			<component :is="component_name" :form_data="form_data" @update-form-data="updateFormData"></component>
+			<slot></slot>
+			<p class="form-item-err" v-if="form_data.err_msg">{{form_data.err_msg}}</p>
+			<p class="form-item-note" v-if="form_data.note">{{form_data.note}}</p>
+		</dd>
+	</dl>
+</script>
+
 
 <script src="https://unpkg.com/vue/dist/vue.js"></script>
 <script src="./global_components.js"></script>
-<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/superagent/3.8.3/superagent.min.js"></script>
 <script type="text/javascript">
+	var request = window.superagent;
 	var vm_page = new Vue({
 		el:'#tgt',
 		data:{
@@ -98,6 +108,7 @@
 			},
 			enquete_data:{
 				team: {
+					item_name:'チーム',
 					name:'team',
 					type:'select',
 					value:'',
@@ -128,6 +139,7 @@
 					]
 				},
 				comment:{
+					item_name:'コメント',
 					name:'comment',
 					type:'text',
 					value:'',
@@ -137,6 +149,7 @@
 					err_msg:''
 				},
 				message:{
+					item_name:'メッセージ',
 					name:'message',
 					type:'textarea',
 					value:'',
@@ -280,9 +293,26 @@
 				var err_flg = this._checkForm();
 				console.log(err_flg);
 				if(!err_flg){
-					axios.get("https://yesno.wtf/api").then(function(r){
-						console.log(r);
-					});
+					var params_obj = {};
+					for(var i in this.enquete_data){
+						params_obj[this.enquete_data[i].name]=this.enquete_data[i].value;
+					}
+					request
+						.post('https://yesno.wtf/api')
+						/* .query(params_obj)*/
+						.end(function(err, res){
+							console.log(res);
+							console.log(err);
+							if(res.ok){
+								// res.body, res.headers, res.status
+								console.log(res);
+							}else{
+								// err.message, err.response
+								console.log(err);
+							}
+
+
+						});
 				}
 
 			}

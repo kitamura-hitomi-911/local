@@ -136,3 +136,41 @@ Vue.component('form-textarea',{
 	},
 	template:'#tmpl-form-textarea'
 });
+
+Vue.component('form-item',{
+	props:{
+		form_data: {
+			type: Object,
+			require: true,
+			validator:function(val){
+				return ['text', 'password', 'number','radio','checkbox','select','textarea'].indexOf(val.type) !== -1 && val.item_name;
+			}
+		}
+	},
+	data:function(){
+		return {
+			component_name:'form-input'
+		}
+	},
+	created:function(){
+		var component_of = {
+			text:'form-input',
+			password:'form-input',
+			number:'form-input',
+			radio:'form-radio',
+			checkbox:'form-checkbox',
+			select:'form-select',
+			textarea:'form-textarea'
+		};
+		this.component_name = component_of[this.form_data.type] || this.component_name;
+		return;
+	},
+	methods:{
+		updateFormData:function(obj){
+			console.log('form-item の updateFormData',obj);
+			//インスタンスのデータを更新
+			this.$emit('update-form-data',obj);
+		}
+	},
+	template:'#tmpl-form-item'
+});

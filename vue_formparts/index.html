@@ -3,7 +3,7 @@
 <head>
 	<meta charset="UTF-8">
 	<meta http-equiv="x-ua-compatible" content="ie=edge">
-	<title>Title</title>
+	<title>formparts</title>
 	<meta name="description" content="">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta name="format-detection" content="telephone=no">
@@ -80,43 +80,7 @@
 <script src="https://unpkg.com/vue/dist/vue.js"></script>
 <script src="./global_components.js"></script>
 <script type="text/javascript">
-	Vue.component('form-item',{
-		props:{
-			form_data: {
-				type: Object,
-				require: true,
-				validator:function(val){
-					return ['text', 'password', 'number','radio','checkbox','select','textarea'].indexOf(val.type) !== -1 && val.item_name;
-				}
-			}
-		},
-		data:function(){
-			return {
-				component_name:'form-input'
-			}
-		},
-		created:function(){
-			var component_of = {
-				text:'form-input',
-				password:'form-input',
-				number:'form-input',
-				radio:'form-radio',
-				checkbox:'form-checkbox',
-				select:'form-select',
-				textarea:'form-textarea'
-			};
-			this.component_name = component_of[this.form_data.type] || this.component_name;
-			return;
-		},
-		methods:{
-			updateFormData:function(obj){
-				console.log('form-item の updateFormData',obj);
-				//インスタンスのデータを更新
-				this.$emit('update-form-data',obj);
-			}
-		},
-		template:'#tmpl-form-item'
-	});
+
 	new Vue({
 		el:'#form-area',
 		data: {
@@ -299,17 +263,14 @@
 			updateFormData:function(obj){
 				console.log('親、updateFormData',obj);
 				if(Array.isArray(this.form_data[obj.name].value)){
+					// valueが配列 ＝ checkbox
 					var index_of_value = this.form_data[obj.name].value.indexOf(obj.value);
 					if(obj.checked){
-						// 追加
 						if (index_of_value == -1){
-							// なければ追加
 							this.form_data[obj.name].value.push(obj.value);
 						}
 					}else{
-						// 削除
 						if (index_of_value >= 0){
-							// あればトルツメ
 							this.form_data[obj.name].value.splice( index_of_value, 1 ) ;
 						}
 					}
@@ -317,11 +278,12 @@
 					this.form_data[obj.name].value = obj.value;
 				}
 
-				this.actionWithUpdateFormData(obj);
+				// 個別に追加
+				this.updateFormDataCustom(obj);
 
 				return;
 			},
-			actionWithUpdateFormData:function(obj){
+			updateFormDataCustom:function(obj){
 				if(obj.name === 'input_radio_text_sample'){
 					if(obj.value === 'b'){
 						this.form_data.input_add_text_sample.disabled = false;
@@ -332,15 +294,16 @@
 			},
 			_checkForm:function(){
 				var err_flg = false;
-				for(var form_name in this.form_data){
-					this.form_data[form_name].err_msg = '';
+				var form_data = this.form_data;
+				for(var form_name in form_data){
+					form_data[form_name].err_msg = '';
 					// 未入力チェック
-					if(this.form_data[form_name].require){
-						if(!this.form_data[form_name].value || Array.isArray(this.form_data[form_name].value) && !this.form_data[form_name].value.length){
-							if(this.form_data[form_name].list && this.form_data[form_name].list.length){
-								this.form_data[form_name].err_msg = '選択必須項目です';
+					if(form_data[form_name].require){
+						if(!form_data[form_name].value || Array.isArray(form_data[form_name].value) && !form_data[form_name].value.length){
+							if(form_data[form_name].list && form_data[form_name].list.length){
+								form_data[form_name].err_msg = '選択必須項目です';
 							}else{
-								this.form_data[form_name].err_msg = '入力必須項目です';
+								form_data[form_name].err_msg = '入力必須項目です';
 							}
 							err_flg = true;
 						}
@@ -348,22 +311,24 @@
 					}
 					// フォーマットチェック
 					if(!err_flg){
-						if(this.form_data[form_name].pattern && this.form_data[form_name].value){
-							var re = new RegExp(this.form_data[form_name].pattern);
-							if(!this.form_data[form_name].value.match(re)){
-								this.form_data[form_name].err_msg = this.form_data[form_name].pattern_err_msg || '入力内容を確認してください';
+						if(form_data[form_name].pattern && form_data[form_name].value){
+							var re = new RegExp(form_data[form_name].pattern);
+							if(!form_data[form_name].value.match(re)){
+								form_data[form_name].err_msg = form_data[form_name].pattern_err_msg || '入力内容を確認してください';
 								err_flg = true;
 							}
 						}
 					}
 
 					// 個別チェック
-					err_flg = this._checkFormAddedBy(form_name) || err_flg;
+					if(this._checkFormCustom){
+						err_flg = this._checkFormCustom(form_name) || err_flg;
+					}
 
 				}
 				return err_flg;
 			},
-			_checkFormAddedBy:function(form_name){
+			_checkFormCustom:function(form_name){
 				var that = this;
 				var err_flg = false;
 				var checkFn = {
@@ -376,7 +341,7 @@
 						return err_flg;
 					}
 				};
-				err_flg = checkFn[form_name] && checkFn[form_name]();
+				err_flg = checkFn[form_name] && checkFn[form_name]() || false;
 				return err_flg;
 			},
 			submit:function(){
