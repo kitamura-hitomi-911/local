@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="x-ua-compatible" content="ie=edge">
+	<title>VueJSテスト</title>
+	<meta name="description" content="">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="format-detection" content="telephone=no">
+</head>
+<body>
+<div id="tgt">
+ローディング
+</div>
+<script type="text/x-template" id="tmpl-page-accept">
+	<div>
+		accept<br>
+		<input type="checkbox" value="a1" :checked="accept_value.a1" @input="input"><br>
+		<input type="checkbox" value="a2" :checked="accept_value.a2" @input="input"><br>
+		<input type="checkbox" value="a3" :checked="accept_value.a3" @input="input"><br>
+		<input type="checkbox" value="a4" :checked="accept_value.a4" @input="input"><br>
+		<p class="btn">
+			<a href="#" @click.prevent="next" v-if="is_accepted">次へ</a>
+			<span v-else>次へ</span>
+		</p>
+		<p class="disable-msg" v-if="!is_accepted">全部にチェックが必要</p>
+	</div>
+</script>
+<script type="text/x-template" id="tmpl-page-entry">
+	<div>
+		entry<br>
+		<p class="btn">
+			<a href="#" @click.prevent="entry">エントリー</a>
+		</p>
+	</div>
+</script>
+<script src="https://unpkg.com/vue/dist/vue.js"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script type="text/javascript">
+	var vm_page = new Vue({
+		el:'#tgt',
+		data:{
+			page:'page_accept',
+			accept_value:{
+				a1:false,
+				a2:false,
+				a3:false,
+				a4:false
+			}
+		},
+		template:'<compnent :is="page" :accept_value="accept_value" @update_accept_value="update_value" @next="next" @entry="entry"></compnent>',
+		created:function(){
+			var already_accept = localStorage.getItem('already_accept');
+			if(already_accept){
+				this.page = 'page_entry';
+			}
+		},
+		components:{
+			'page_accept':{
+				template:'#tmpl-page-accept',
+				props:{
+					accept_value:{
+						type:Object,
+						require:true
+					}
+				},
+				computed:{
+					is_accepted:function(){
+						var ret = true;
+						for(var i in this.accept_value){
+							if(!this.accept_value[i]){
+								ret = false;
+								break;
+							}
+						}
+						return ret;
+					}
+				},
+				data:function(){
+					return {
+						aaa:[]
+					}
+				},
+				methods:{
+					next:function(){
+						console.log('next');
+						this.$emit('next');
+					},
+					input:function(e){
+						// console.log(e.target.value);
+						// console.log(e.target.checked);
+						this.$emit('update_accept_value',{name:e.target.value,value:e.target.checked});
+					}
+				}
+
+			},
+			'page_entry':{
+				template:'#tmpl-page-entry',
+				methods:{
+					entry:function(){
+						console.log('entry');
+						this.$emit('entry');
+					}
+				}
+			}
+		},
+		methods:{
+			next:function(){
+				this.page = 'page_entry';
+				localStorage.setItem('already_accept', 1);
+				return;
+			},
+			update_value:function(obj){
+				console.log('update_accept_value',obj);
+				this.accept_value[obj.name] = obj.value;
+			},
+			entry:function(){
+				console.log('entry');
+				axios.get("https://yesno.wtf/api").then(function(r){
+					console.log(r);
+				});
+
+			}
+		}
+	});
+</script>
+</body>
+</html>
