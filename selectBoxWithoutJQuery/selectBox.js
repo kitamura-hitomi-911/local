@@ -11,7 +11,7 @@
 	 *   obj.select_exp    : tgt_elm 内の select要素 のセレクタ文字列（任意）
 	 *   obj.select_p_exp  : tgt_elm 内の セレクトされている内容の表示用要素のセレクタ文字列（任意）
 	 *   obj.changeCallback: セレクト変更時のコールバック関数（任意、デフォルトはnull）
-	 *                       1つめの引数には現在選択中のoptionが渡される。
+	 *                       コールバック関数の1つめの引数で現在選択中のoptionが渡される。
 	 *                       parent や 追加で2つめの引数を指定したい場合は {fn:コールバック関数,parent:親,params:オブジェクト} という形で渡す
 	 *   obj.is_exec_change_callback_at_init @type {boolean}
 	 *                     : changeCallback が指定されている場合、初期化時にも処理するか否か（任意、デフォルトはfalse）
@@ -31,7 +31,7 @@
 		this.is_exec_change_callback_at_init = obj.is_exec_change_callback_at_init || false;
 		// セレクトされている要素
 		this.current_select = null;
-		console.log(this);
+
 		if(this.tgt_select.length){
 			this.init();
 		}
@@ -81,8 +81,10 @@
 			var op = {
 				tgt_elm:tgt_elm
 			};
-			if(obj.changeCallback){
-				op.changeCallback = obj.changeCallback;
+			for(var i in obj){
+				if(i != 'tgt_elm'){
+					op[i] = obj[i];
+				}
 			}
 			new SetLabelOfSelectBox(op);
 		});
