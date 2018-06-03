@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="x-ua-compatible" content="ie=edge">
+	<title>SelectBox</title>
+	<meta name="description" content="">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="format-detection" content="telephone=no">
+	<link rel="stylesheet" href="./style.css">
+</head>
+<body>
+<div id="wrapper">
+	<div class="select-box type-1">
+		<p>未設定</p>
+		<select>
+			<option value="">未設定</option>
+			<option value="aa">あああ</option>
+			<option value="bb">いいい</option>
+		</select>
+	</div>
+
+	<div class="select-box type-2">
+		<p>未設定</p>
+		<select>
+			<option value="">未設定</option>
+			<option value="aa">あああ</option>
+			<option value="bb">いいい</option>
+		</select>
+	</div>
+
+	<div class="select-box type-3">
+		<p>未設定</p>
+		<select>
+			<option value="">未設定</option>
+			<option value="aa">あああ</option>
+			<option value="bb">いいい</option>
+		</select>
+	</div>
+</div>
+<script src="./selectBox.js"></script>
+<script type="text/javascript">
+	(function(){
+		var tgt_elm = document.querySelectorAll('.select-box');
+		setLabelOfSelectBox({
+			tgt_elm:tgt_elm,
+			changeCallback:function(selected_option){
+				console.log(this);
+				console.log(selected_option);
+				console.log('kita');
+			}
+		});
+
+		// comment
+	})();
+</script>
+</body>
+</html>
