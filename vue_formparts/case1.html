@@ -302,6 +302,7 @@
 						.get('https://yesno.wtf/api')
 						.query(params_obj)
 						.end(function(err, res){
+							console.log(res.status);
 							if(!err){
 								if(res.ok){
 									console.log(res.body);
