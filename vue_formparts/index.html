@@ -79,8 +79,9 @@
 
 <script src="https://unpkg.com/vue/dist/vue.js"></script>
 <script src="./global_components.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/superagent/3.8.3/superagent.min.js"></script>
 <script type="text/javascript">
-
+	var request = window.superagent;
 	new Vue({
 		el:'#form-area',
 		data: {
@@ -262,20 +263,21 @@
 		methods:{
 			updateFormData:function(obj){
 				console.log('親、updateFormData',obj);
-				if(Array.isArray(this.form_data[obj.name].value)){
+				var form_data = this.form_data;
+				if(Array.isArray(form_data[obj.name].value)){
 					// valueが配列 ＝ checkbox
-					var index_of_value = this.form_data[obj.name].value.indexOf(obj.value);
+					var index_of_value = form_data[obj.name].value.indexOf(obj.value);
 					if(obj.checked){
 						if (index_of_value == -1){
-							this.form_data[obj.name].value.push(obj.value);
+							form_data[obj.name].value.push(obj.value);
 						}
 					}else{
 						if (index_of_value >= 0){
-							this.form_data[obj.name].value.splice( index_of_value, 1 ) ;
+							form_data[obj.name].value.splice( index_of_value, 1 ) ;
 						}
 					}
 				}else{
-					this.form_data[obj.name].value = obj.value;
+					form_data[obj.name].value = obj.value;
 				}
 
 				// 個別に追加
@@ -284,11 +286,12 @@
 				return;
 			},
 			updateFormDataCustom:function(obj){
+				var form_data = this.form_data;
 				if(obj.name === 'input_radio_text_sample'){
 					if(obj.value === 'b'){
-						this.form_data.input_add_text_sample.disabled = false;
+						form_data.input_add_text_sample.disabled = false;
 					}else{
-						this.form_data.input_add_text_sample.disabled = true;
+						form_data.input_add_text_sample.disabled = true;
 					}
 				}
 			},
@@ -329,13 +332,13 @@
 				return err_flg;
 			},
 			_checkFormCustom:function(form_name){
-				var that = this;
 				var err_flg = false;
+				var form_data = this.form_data;
 				var checkFn = {
 					input_add_text_sample:function(){
 						var err_flg = false;
-						if(that.form_data.input_radio_text_sample.value === 'b' && !that.form_data.input_add_text_sample.value){
-							that.form_data.input_radio_text_sample.err_msg = 'Bを選択した場合は補足テキスト入力必須';
+						if(form_data.input_radio_text_sample.value === 'b' && !form_data.input_add_text_sample.value){
+							form_data.input_radio_text_sample.err_msg = 'Bを選択した場合は補足テキスト入力必須';
 							err_flg = true;
 						}
 						return err_flg;
@@ -347,6 +350,28 @@
 			submit:function(){
 				console.log('submit');
 				var err_flg = this._checkForm();
+				if(!err_flg){
+					var form_data = this.form_data;
+					var params_obj = {};
+					for(var i in form_data){
+						params_obj[form_data[i].name]=form_data[i].value;
+					}
+					request
+						.get('https://yesno.wtf/api')
+						.query(params_obj)
+						.end(function(err, res){
+							if(!err){
+								if(res.ok){
+									console.log(res.body);
+								}else{
+									console.log(res.status);
+								}
+							}else{
+								console.log(err);
+							}
+						});
+				}
+
 
 				return false;
 			}

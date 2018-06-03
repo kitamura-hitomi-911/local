@@ -238,36 +238,36 @@
 			},
 			updateFormData:function(obj){
 				console.log('updateFormData',obj);
-				if(Array.isArray(this.enquete_data[obj.name].value)){
-					var index_of_value = this.enquete_data[obj.name].value.indexOf(obj.value);
+				var form_data = this.enquete_data;
+				if(Array.isArray(form_data[obj.name].value)){
+					// valueが配列 ＝ checkbox
+					var index_of_value = form_data[obj.name].value.indexOf(obj.value);
 					if(obj.checked){
-						// 追加
 						if (index_of_value == -1){
-							// なければ追加
-							this.enquete_data[obj.name].value.push(obj.value);
+							form_data[obj.name].value.push(obj.value);
 						}
 					}else{
-						// 削除
 						if (index_of_value >= 0){
-							// あればトルツメ
-							this.enquete_data[obj.name].value.splice( index_of_value, 1 ) ;
+							form_data[obj.name].value.splice( index_of_value, 1 ) ;
 						}
 					}
 				}else{
-					this.enquete_data[obj.name].value = obj.value;
+					form_data[obj.name].value = obj.value;
 				}
+				return;
 			},
 			_checkForm:function(){
 				var err_flg = false;
-				for(var form_name in this.enquete_data){
-					this.enquete_data[form_name].err_msg = '';
+				var form_data = this.enquete_data;
+				for(var form_name in form_data){
+					form_data[form_name].err_msg = '';
 					// 未入力チェック
-					if(this.enquete_data[form_name].require){
-						if(!this.enquete_data[form_name].value || Array.isArray(this.enquete_data[form_name].value) && !this.enquete_data[form_name].value.length){
-							if(this.enquete_data[form_name].list && this.enquete_data[form_name].list.length){
-								this.enquete_data[form_name].err_msg = '選択必須項目です';
+					if(form_data[form_name].require){
+						if(!form_data[form_name].value || Array.isArray(form_data[form_name].value) && !form_data[form_name].value.length){
+							if(form_data[form_name].list && form_data[form_name].list.length){
+								form_data[form_name].err_msg = '選択必須項目です';
 							}else{
-								this.enquete_data[form_name].err_msg = '入力必須項目です';
+								form_data[form_name].err_msg = '入力必須項目です';
 							}
 							err_flg = true;
 						}
@@ -275,10 +275,10 @@
 					}
 					// フォーマットチェック
 					if(!err_flg){
-						if(this.enquete_data[form_name].pattern && this.enquete_data[form_name].value){
-							var re = new RegExp(this.enquete_data[form_name].pattern);
-							if(!this.enquete_data[form_name].value.match(re)){
-								this.enquete_data[form_name].err_msg = this.enquete_data[form_name].pattern_err_msg || '入力内容を確認してください';
+						if(form_data[form_name].pattern && form_data[form_name].value){
+							var re = new RegExp(form_data[form_name].pattern);
+							if(!form_data[form_name].value.match(re)){
+								form_data[form_name].err_msg = form_data[form_name].pattern_err_msg || '入力内容を確認してください';
 								err_flg = true;
 							}
 						}
@@ -293,21 +293,22 @@
 				var err_flg = this._checkForm();
 				console.log(err_flg);
 				if(!err_flg){
+					var form_data = this.enquete_data;
 					var params_obj = {};
-					for(var i in this.enquete_data){
-						params_obj[this.enquete_data[i].name]=this.enquete_data[i].value;
+					for(var i in form_data){
+						params_obj[form_data[i].name]=form_data[i].value;
 					}
 					request
-						.post('https://yesno.wtf/api')
-						/* .query(params_obj)*/
+						.get('https://yesno.wtf/api')
+						.query(params_obj)
 						.end(function(err, res){
-							console.log(res);
-							console.log(err);
-							if(res.ok){
-								// res.body, res.headers, res.status
-								console.log(res);
+							if(!err){
+								if(res.ok){
+									console.log(res.body);
+								}else{
+									console.log(res.status);
+								}
 							}else{
-								// err.message, err.response
 								console.log(err);
 							}
 
