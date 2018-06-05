@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="x-ua-compatible" content="ie=edge">
+	<title>Case2</title>
+	<meta name="description" content="">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="format-detection" content="telephone=no">
+	<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div id="tgt">
+	ローディング
+</div>
+
+<script type="text/x-template" id="tmpl-page-loading">
+	ローディング
+</script>
+
+<script type="text/x-template" id="tmpl-page-entry">
+	<div>
+		entry<br>
+		<form-item :form_data="enquete_data.prefecture" @update-form-data="updateFormData"></form-item>
+		<p class="btn">
+			<a href="#" @click.prevent="entry" v-if="is_entry_available">次へ</a>
+			<span v-else>次へ</span>
+		</p>
+		<p class="disable-msg" v-if="!is_entry_available">都道府県を選択してください</p>
+	</div>
+</script>
+<script type="text/x-template" id="tmpl-page-already_entry">
+	<div>
+		already_entry<br>
+		<p class="btn">
+			<a href="#" @click.prevent="entry">エントリー</a>
+		</p>
+	</div>
+</script>
+
+<script type="text/x-template" id="tmpl-form-radio">
+	<div class="radio_parts">
+		<template v-for="radio in form_data.list" >
+			<p class="radio_parts-item">
+				<input :type="form_data.type" :id="form_data.name+'_'+radio.value" name="form_data.name" :value="radio.value" :disabled="radio.disabled" @input="updateValue"><label :for="form_data.name+'_'+radio.value">{{radio.label}}</label>
+			</p>
+		</template>
+	</div>
+</script>
+<script type="text/x-template" id="tmpl-form-checkbox">
+	<div class="checkbox_parts">
+		<template v-for="checkbox in form_data.list" >
+			<p class="checkbox_parts-item">
+				<input :type="form_data.type" :id="form_data.name+'_'+checkbox.value" name="form_data.name" :value="checkbox.value" :disabled="checkbox.disabled" @input="updateValue"><label :for="form_data.name+'_'+checkbox.value">{{checkbox.label}}</label>
+			</p>
+		</template>
+	</div>
+</script>
+<script type="text/x-template" id="tmpl-form-select">
+	<div class="select_parts">
+		<p class="select_parts-label">{{selected_label}}</p>
+		<select :name="form_data.name" @input="updateValue" :value="form_data.value" :disabled="form_data.disabled">
+			<option v-for="option in form_data.list" :key="option.value" :value="option.value">{{option.label}}</option>
+		</select>
+	</div>
+</script>
+<script type="text/x-template" id="tmpl-form-input">
+	<div class="input_parts">
+		<input :type="form_data.type" :value="form_data.value" :maxlength="form_data.maxlength" :minlength="form_data.minlength" :step="form_data.step" :min="form_data.min" :max="form_data.max" :placeholder="form_data.placeholder" :disabled="form_data.disabled" @input="updateValue">
+	</div>
+</script>
+<script type="text/x-template" id="tmpl-form-textarea">
+	<div class="input_textarea">
+		<textarea :value="form_data.value" :placeholder="form_data.placeholder" :disabled="form_data.disabled" @input="updateValue"></textarea>
+	</div>
+</script>
+
+<script type="text/x-template" id="tmpl-form-item">
+	<dl class="form-item">
+		<dt>{{form_data.item_name}}</dt>
+		<dd>
+			<component :is="component_name" :form_data="form_data" @update-form-data="updateFormData"></component>
+			<slot></slot>
+			<p class="form-item-err" v-if="form_data.err_msg">{{form_data.err_msg}}</p>
+			<p class="form-item-note" v-if="form_data.note">{{form_data.note}}</p>
+		</dd>
+	</dl>
+</script>
+
+
+<script src="https://unpkg.com/vue/dist/vue.js"></script>
+<script src="./global_components.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/superagent/3.8.3/superagent.min.js"></script>
+<script type="text/javascript">
+	var request = window.superagent;
+	var vm_page = new Vue({
+		el:'#tgt',
+		data:{
+			page:'loading',
+			enquete_data:{
+				prefecture: {
+					item_name:'都道府県',
+					name:'prefecture',
+					type:'select',
+					value:'',
+					disabled:false,
+					require: true,
+					err_msg:'',
+					list: [
+						{
+							value: '',
+							label: '↓選択してください'
+						},
+						{
+							value: 1,
+							label: '北海道'
+						},
+						{
+							value: 2,
+							label: '青森県'
+						},
+						{
+							value: 3,
+							label: '秋田県'
+						},
+						{
+							value: 4,
+							label: '岩手県'
+						}
+					]
+				}
+			}
+		},
+		template:'<compnent :is="page" :enquete_data="enquete_data" @update-form-data="updateFormData" @next="next" @entry="entry"></compnent>',
+		created:function(){
+			var that = this;
+			request
+				.get('https://yesno.wtf/api')
+				.end(function(err, res){
+					console.log('kita');
+					that.page = 'page_entry';
+				});
+		},
+		components:{
+			'page_entry':{
+				template:'#tmpl-page-entry',
+				props:{
+					enquete_data:{
+						type:Object,
+						require:true
+					}
+				},
+				computed:{
+					is_entry_available:function(){
+						var ret = false;
+						if(this.enquete_data.prefecture.value){
+							ret = true;
+						}
+						return ret;
+					}
+				},
+				data:function(){
+					return {
+						aaa:[]
+					}
+				},
+				methods:{
+					entry:function(){
+						console.log('entry');
+						this.$emit('entry');
+					},
+					updateFormData:function(obj){
+						console.log('updateFormData',obj);
+						this.$emit('update-form-data',obj);
+					}
+				}
+
+			},
+			'page_already_entry':{
+				template:'#tmpl-page-already_entry'
+			}
+		},
+		methods:{
+			next:function(){
+				this.page = 'page_entry';
+				localStorage.setItem('already_accept', 1);
+				return;
+			},
+			updateAcceptValue:function(obj){
+				console.log('updateAcceptValue',obj);
+				this.accept_value[obj.name] = obj.value;
+			},
+			updateFormData:function(obj){
+				console.log('updateFormData',obj);
+				var form_data = this.enquete_data;
+				if(Array.isArray(form_data[obj.name].value)){
+					// valueが配列 ＝ checkbox
+					var index_of_value = form_data[obj.name].value.indexOf(obj.value);
+					if(obj.checked){
+						if (index_of_value == -1){
+							form_data[obj.name].value.push(obj.value);
+						}
+					}else{
+						if (index_of_value >= 0){
+							form_data[obj.name].value.splice( index_of_value, 1 ) ;
+						}
+					}
+				}else{
+					form_data[obj.name].value = obj.value;
+				}
+				return;
+			},
+			_checkForm:function(){
+				var err_flg = false;
+				var form_data = this.enquete_data;
+				for(var form_name in form_data){
+					form_data[form_name].err_msg = '';
+					// 未入力チェック
+					if(form_data[form_name].require){
+						if(!form_data[form_name].value || Array.isArray(form_data[form_name].value) && !form_data[form_name].value.length){
+							if(form_data[form_name].list && form_data[form_name].list.length){
+								form_data[form_name].err_msg = '選択必須項目です';
+							}else{
+								form_data[form_name].err_msg = '入力必須項目です';
+							}
+							err_flg = true;
+						}
+
+					}
+					// フォーマットチェック
+					if(!err_flg){
+						if(form_data[form_name].pattern && form_data[form_name].value){
+							var re = new RegExp(form_data[form_name].pattern);
+							if(!form_data[form_name].value.match(re)){
+								form_data[form_name].err_msg = form_data[form_name].pattern_err_msg || '入力内容を確認してください';
+								err_flg = true;
+							}
+						}
+					}
+
+				}
+				console.log()
+				return err_flg;
+			},
+			entry:function(){
+				console.log('entry');
+				var err_flg = this._checkForm();
+				console.log(err_flg);
+				if(!err_flg){
+					var form_data = this.enquete_data;
+					var params_obj = {};
+					for(var i in form_data){
+						params_obj[form_data[i].name]=form_data[i].value;
+					}
+					request
+						.get('https://yesno.wtf/api')
+						.query(params_obj)
+						.end(function(err, res){
+							console.log(res.status);
+							if(!err){
+								if(res.ok){
+									console.log(res.body);
+								}else{
+									console.log(res.status);
+								}
+							}else{
+								console.log(err);
+							}
+
+
+						});
+				}
+
+			}
+		}
+	});
+</script>
+</body>
+</html>
