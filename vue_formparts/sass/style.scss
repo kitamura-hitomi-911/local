@@ -209,7 +209,7 @@ article, aside, details, figcaption, figure, footer, header, menu, nav, section,
 }
 
 /* loading ----------------------------- */
-/* 差し込み先がmin-heightをもっている */
+/* 差し込み先がheight もしくは min-heightをもっている */
 .loading{
 	width: 70px;
 	height:100%;
