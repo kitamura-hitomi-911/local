@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="x-ua-compatible" content="ie=edge">
+	<title>superAgent練習</title>
+	<meta name="description" content="">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="format-detection" content="telephone=no">
+	<link rel="stylesheet" href="">
+</head>
+<body>
+
+テスト：<a href="#" id="tgt_a">ajaxテスト</a><br>
+テスト：<a href="https://yesno.wtf/api" onclick="onClickTest(this);return false;">onclick ajaxテスト</a><br>
+<p id="tgt"></p>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/superagent/3.8.3/superagent.min.js"></script>
+<script type="text/javascript">
+	var request = window.superagent;
+	(function(){
+		var target = document.getElementById('tgt_a');
+		target.addEventListener('click', function(e){
+			var tgt_elm = e.currentTarget;
+			request
+				.get('https://yesno.wtf/api')
+				.end(function(err, res){
+					if(!err){
+						if(res.ok){
+							console.log(res.body);
+							console.log(tgt_elm);
+							document.getElementById('tgt').innerHTML = res.body.answer;
+						}else{
+							console.log(res.status);
+						}
+					}else{
+						console.log(err);
+					}
+
+
+				});
+		}, false);
+	})();
+	function onClickTest(self){
+		if(!self){
+			return;
+		}
+		var tgt_url = self.getAttribute('href');
+		request
+			.get(tgt_url)
+			.end(function(err, res){
+				if(!err){
+					if(res.ok){
+						document.getElementById('tgt').innerHTML = res.body.answer;
+					}else{
+						console.log(res.status);
+					}
+				}else{
+					console.log(err);
+				}
+
+
+			});
+	}
+</script>
+</body>
+</html>
