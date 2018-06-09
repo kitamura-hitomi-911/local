@@ -1,3 +1,4 @@
+@charset "UTF-8";
 /* reset */
 html, body, div, span, applet, object, iframe,
 h1, h2, h3, h4, h5, h6, p, blockquote, pre,
@@ -228,6 +229,57 @@ article, aside, details, figcaption, figure, footer, header, menu, nav, section,
 .checkbox_parts p.checkbox_parts-item input:disabled + label:before {
   border-color: #ddd;
   background-color: #efefef;
+}
+
+/* loading ----------------------------- */
+/* 差し込み先がmin-heightをもっている */
+.loading {
+  width: 70px;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.loading .loading-item {
+  width: 18px;
+  height: 18px;
+  background-color: #ccc;
+  border-radius: 100%;
+  display: inline-block;
+  -webkit-animation: loading-anime 1.4s infinite ease-in-out both;
+  animation: loading-anime 1.4s infinite ease-in-out both;
+}
+
+.loading .loading-item1 {
+  -webkit-animation-delay: -0.32s;
+  animation-delay: -0.32s;
+}
+
+.loading .loading-item2 {
+  -webkit-animation-delay: -0.16s;
+  animation-delay: -0.16s;
+}
+
+@-webkit-keyframes loading-anime {
+  0%, 80%, 100% {
+    -webkit-transform: scale(0);
+  }
+  40% {
+    -webkit-transform: scale(1);
+  }
+}
+
+@keyframes loading-anime {
+  0%, 80%, 100% {
+    -webkit-transform: scale(0);
+    transform: scale(0);
+  }
+  40% {
+    -webkit-transform: scale(1);
+    transform: scale(1);
+  }
 }
 
 /*# sourceMappingURL=style.css.map */

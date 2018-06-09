@@ -96,7 +96,7 @@ Vue.component('form-select',{
 		_updateLabel:function(){
 			var that = this;
 			this.form_data.list.forEach(function(option){
-				if(that.form_data.value === option.value){
+				if(that.form_data.value == option.value){
 					that.selected_label = option.label;
 				}
 			});

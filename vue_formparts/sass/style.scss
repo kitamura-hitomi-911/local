@@ -207,3 +207,48 @@ article, aside, details, figcaption, figure, footer, header, menu, nav, section,
 		}
 	}
 }
+
+/* loading ----------------------------- */
+/* 差し込み先がmin-heightをもっている */
+.loading{
+	width: 70px;
+	height:100%;
+	display:flex;
+	justify-content: center;
+	align-items: center;
+	text-align: center;
+	.loading-item{
+		width: 18px;
+		height: 18px;
+		background-color: #ccc;
+
+		border-radius: 100%;
+		display: inline-block;
+		-webkit-animation: loading-anime 1.4s infinite ease-in-out both;
+		animation: loading-anime 1.4s infinite ease-in-out both;
+	}
+	.loading-item1 {
+		-webkit-animation-delay: -0.32s;
+		animation-delay: -0.32s;
+	}
+	.loading-item2 {
+		-webkit-animation-delay: -0.16s;
+		animation-delay: -0.16s;
+	}
+
+}
+
+@-webkit-keyframes loading-anime {
+	0%, 80%, 100% { -webkit-transform: scale(0) }
+	40% { -webkit-transform: scale(1.0) }
+}
+
+@keyframes loading-anime {
+	0%, 80%, 100% {
+		-webkit-transform: scale(0);
+		transform: scale(0);
+	} 40% {
+			-webkit-transform: scale(1.0);
+			transform: scale(1.0);
+		}
+}
