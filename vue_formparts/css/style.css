@@ -282,4 +282,63 @@ article, aside, details, figcaption, figure, footer, header, menu, nav, section,
   }
 }
 
+/* loading2 ----------------------------- */
+.loading2 {
+  margin: 100px auto;
+  width: 60px;
+  height: 40px;
+  text-align: center;
+  font-size: 10px;
+}
+
+.loading2 .loading-item {
+  background-color: #eee;
+  height: 100%;
+  width: 8px;
+  margin: 0 1px;
+  display: inline-block;
+  -webkit-animation: loading2-anime 1.2s infinite ease-in-out;
+  animation: loading2-anime 1.2s infinite ease-in-out;
+}
+
+.loading2 .loading-item2 {
+  -webkit-animation-delay: -1.1s;
+  animation-delay: -1.1s;
+}
+
+.loading2 .loading-item3 {
+  -webkit-animation-delay: -1.0s;
+  animation-delay: -1.0s;
+}
+
+.loading2 .loading-item4 {
+  -webkit-animation-delay: -0.9s;
+  animation-delay: -0.9s;
+}
+
+.loading2 .loading-item5 {
+  -webkit-animation-delay: -0.8s;
+  animation-delay: -0.8s;
+}
+
+@-webkit-keyframes loading2-anime {
+  0%, 40%, 100% {
+    -webkit-transform: scaleY(0.5);
+  }
+  20% {
+    -webkit-transform: scaleY(1);
+  }
+}
+
+@keyframes loading2-anime {
+  0%, 40%, 100% {
+    transform: scaleY(0.5);
+    -webkit-transform: scaleY(0.5);
+  }
+  20% {
+    transform: scaleY(1);
+    -webkit-transform: scaleY(1);
+  }
+}
+
 /*# sourceMappingURL=style.css.map */
