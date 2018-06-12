@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="x-ua-compatible" content="ie=edge">
+	<title>vueランキング</title>
+	<meta name="description" content="">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="format-detection" content="telephone=no">
+</head>
+<body>
+
+<div id="tgt"></div>
+
+
+
+<script type="text/x-template" id="tmpl-ranking">
+	<div class="ranking">
+		<ul>
+			<ranking_item v-for="item in list" :item="item" :key="item.id"></ranking_item>
+		</ul>
+	</div>
+</script>
+
+<script type="text/x-template" id="tmpl-ranking-item">
+	<li>
+		<a href="#">
+			<dl>
+				<dt>{{item.rank}}位</dt>
+				<dd class="name">{{item.name}}</dd>
+				<dd class="score">{{item.score}} pt</dd>
+			</dl>
+		</a>
+	</li>
+</script>
+
+
+<script src="https://unpkg.com/vue/dist/vue.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/superagent/3.8.3/superagent.min.js"></script>
+<script type="text/javascript">
+	var request = window.superagent;
+	new Vue({
+		el:'#tgt',
+		data: {
+			list:[
+				{
+					id:1,
+					rank:1,
+					name:'お名前',
+					score:3000
+				},
+				{
+					id:2,
+					rank:2,
+					name:'お名前2',
+					score:2000
+				}
+			]
+		},
+		template:'#tmpl-ranking',
+		computed: {
+		},
+		methods:{
+			readmore:function(obj){
+
+
+				return;
+			}
+		},
+		components:{
+			ranking_item:{
+				props:{
+					item:{
+						type:Object,
+						require:true
+					}
+				},
+				template:"#tmpl-ranking-item"
+			}
+		}
+	});
+</script>
+</body>
+</html>
