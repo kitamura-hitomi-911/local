@@ -27,10 +27,8 @@ var V_players = Backbone.View.extend({
 			return;
 		});
 
-		console.log(this.collection);
-
 		this.listenTo(this.collection, 'add', this.add);
-		this.listenTo(this.collection, 'change', this.change);
+		// this.listenTo(this.collection, 'change', this.change);
 	},
 	render:function(){
 		var html = this.template();
@@ -41,16 +39,27 @@ var V_players = Backbone.View.extend({
 		var item = new V_players_item ({ model: model });
 		item.render();
 		this.$el.find('ul').append(item.el);
+	},
+	change:function(model){
+		console.log('collection のほうのrender');
 	}
 });
 
 var V_players_item = Backbone.View.extend({
 	tagName:'li',
 	template:_.template($('#tmpl-players-item').text()),
+	initialize: function() {
+		this.listenTo(this.model, 'change', this.change);
+		// this.model.bind("change", this.render);
+	},
 	render:function(){
 		var html = this.template(this.model.attributes);
 		this.$el.empty().html(html);
 		return this;
+	},
+	change:function(){
+		console.log('modelのほうのrender');
+		this.render();
 	}
 });
 
