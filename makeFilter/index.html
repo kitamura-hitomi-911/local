@@ -1,0 +1,65 @@
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport"
+		content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Document</title>
+</head>
+<body>
+<script>
+	var base_fiter_items = ['tgt','tgt2'];
+
+	function getBaseFilterItemsName(data){
+		var ret_ary = [];
+		base_fiter_items.forEach(function(item){
+			ret_ary.push(data[item]);
+		});
+		return ret_ary.join('_');
+	}
+
+	var json = {"data":{"tgt":1,"tgt2":1,"list":[{"filter1":1,"filter2":1,"filter3":1,"status":3},{"filter1":1,"filter2":1,"filter3":2,"status":3},{"filter1":1,"filter2":1,"filter3":3,"status":3},{"filter1":1,"filter2":2,"filter3":1,"status":3},{"filter1":1,"filter2":2,"filter3":2,"status":3},{"filter1":1,"filter2":2,"filter3":3,"status":3},{"filter1":1,"filter2":3,"filter3":1,"status":3},{"filter1":1,"filter2":3,"filter3":2,"status":3},{"filter1":1,"filter2":3,"filter3":3,"status":3},{"filter1":1,"filter2":4,"filter3":1,"status":3},{"filter1":1,"filter2":4,"filter3":2,"status":3},{"filter1":1,"filter2":4,"filter3":3,"status":3},{"filter1":2,"filter2":1,"filter3":1,"status":3},{"filter1":2,"filter2":1,"filter3":2,"status":3},{"filter1":2,"filter2":1,"filter3":3,"status":3},{"filter1":2,"filter2":2,"filter3":1,"status":3},{"filter1":2,"filter2":2,"filter3":2,"status":3},{"filter1":2,"filter2":2,"filter3":3,"status":3},{"filter1":2,"filter2":3,"filter3":1,"status":3},{"filter1":2,"filter2":3,"filter3":2,"status":3},{"filter1":2,"filter2":3,"filter3":3,"status":3},{"filter1":2,"filter2":4,"filter3":1,"status":3},{"filter1":2,"filter2":4,"filter3":2,"status":3},{"filter1":2,"filter2":4,"filter3":3,"status":3},{"filter1":3,"filter2":1,"filter3":1,"status":3},{"filter1":3,"filter2":1,"filter3":2,"status":3},{"filter1":3,"filter2":1,"filter3":3,"status":3}]}};
+
+	
+	var list = json.data.list;
+	console.log(list);
+
+	var filter_items= [
+		{
+			name:'filter1'
+		},
+		{
+			name:'filter2'
+		},
+		{
+			name:'filter3'
+		}
+
+	];
+	console.log(filter_items);
+
+	var filter_data = {};
+	var base_filter_name = getBaseFilterItemsName(json.data);
+	if(!filter_data[base_filter_name]){
+		filter_data[base_filter_name] = {};
+	}
+
+	list.forEach(function(list_item,list_index){
+		var _current_level = filter_data[base_filter_name];
+		filter_items.forEach(function(filter_item,filter_item_index,filter_items){
+			if(!_current_level[list_item[filter_item.name]]){
+				if(filter_items.length -1 === filter_item_index){
+					_current_level[list_item[filter_item.name]] = list_item;
+				}else{
+					_current_level[list_item[filter_item.name]] = {};
+				}
+			}
+			_current_level = _current_level[list_item[filter_item.name]];
+		});
+	});
+
+	console.log(filter_data);
+</script>
+</body>
+</html>
+
