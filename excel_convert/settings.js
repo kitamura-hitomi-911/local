@@ -3,7 +3,8 @@ var settings = [
 		id:"test",
 		name:"テスト",
 		input:{
-			charset:"utf8",
+			charset:"Shift_JIS",//  Shift_JIS or UTF-8 、未指定なら TF-8
+			split_line:'999999', // 行の終わり。未指定なら "999999"
 			keys:[
 				{
 					"ID":'id',

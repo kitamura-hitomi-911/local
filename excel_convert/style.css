@@ -148,6 +148,25 @@ html{
 	border:1px solid #ccc;
 	background-color:#efefef;
 }
+.input_type_file_parts .input_type_file_parts-info{
+	padding:10px;
+	margin-top:10px;
+	border:1px solid #ccc;
+	background-color:#fff;
+}
+.input_type_file_parts .input_type_file_parts-info dl{
+	overflow:hidden;
+	font-size:0.75rem;
+	line-height:1.25em;
+}
+.input_type_file_parts .input_type_file_parts-info dt {
+	clear:both;
+	float:left;
+	width:9em;
+}
+.input_type_file_parts .input_type_file_parts-info dd{
+	margin-left:9em;
+}
 
 /* textarea パーツ */
 .textarea_parts textarea{

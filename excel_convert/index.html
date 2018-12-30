@@ -45,7 +45,19 @@
 			<div class="cmn_box-main">
 				<div class="l-input_file">
 					<div class="input_type_file_parts">
-						<input type="file" :disabled="selected_setting?false:true" />
+						<input type="file" :disabled="selected_setting?false:true" @change="onChangeInputFile" />
+						<div class="input_type_file_parts-info" v-if="input_file">
+							<dl>
+								<dt>ファイル名</dt>
+								<dd>{{input_file.name}}</dd>
+								<dt>最終更新日時</dt>
+								<dd>{{input_file.lastModifiedDate}}</dd>
+								<dt>ファイルサイズ</dt>
+								<dd>{{input_file.size}} byte</dd>
+								<dt>MIMEタイプ</dt>
+								<dd>{{input_file.type}}</dd>
+							</dl>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -82,7 +94,9 @@
 			template:'#tmpl-app',
 			data:{
 				selected_setting:'',
-				settings:'settings' in window ?settings:[]
+				settings:'settings' in window ?settings:[],
+				input_file:null,
+				reader:null,
 			},
 			computed:{
 				selected_setting_label:function(){
@@ -107,11 +121,30 @@
 				}
 			},
 			created:function(){
+				this.reader = new FileReader();
+				this.reader.addEventListener('load', this.fileLoad, false);
 				console.log(this.settings);
 			},
 			methods:{
 				onChangeSettingSelect:function(){
 					console.log(this.selected_setting);
+				},
+				onChangeInputFile:function(e){
+					var target = e.target;
+					var files = target.files;
+					if(files.length){
+						this.input_file = files[0];
+						var charset = this.current_setting.input.charset || 'UTF-8';
+						this.reader.readAsText(files[0],charset);
+					}else{
+						this.input_file = null;
+						this.reader.abort();
+					}
+
+					console.log(files);
+				},
+				fileLoad:function(){
+					console.log(this.reader.result);
 				}
 			}
 		});
