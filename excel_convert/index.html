@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="x-ua-compatible" content="ie=edge">
+	<title>Excel Data Converter</title>
+	<meta name="description" content="">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="format-detection" content="telephone=no">
+	<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="l-wrapper">
+	<header class="l-header">
+		<div class="header">
+			<h1>Excel Data Converter</h1>
+		</div>
+	</header>
+	<div class="l-content">
+		<div class="cmn_box">
+			<div class="cmn_box-ttl">
+				<h2>【１】設定選択</h2>
+			</div>
+			<div class="cmn_box-main">
+				<div class="l-select_setting">
+					<div class="select_parts">
+						<p class="select_parts-label" :style="label_style_obj">{{selected_label}}</p>
+						<select name="fuga" v-model="selected" @change="onChangeSelect">
+							<option value="">↓選択してください</option>
+							<option value="1">選択1</option>
+							<option value="2">選択2</option>
+							<option value="3">選択3</option>
+							<option value="4">選択4</option>
+							<option value="5">選択5</option>
+							<option value="6">選択6</option>
+						</select>
+					</div>
+				</div>
+
+			</div>
+		</div>
+
+		<div class="cmn_box">
+			<div class="cmn_box-ttl">
+				<h2>【２】TSVファイルインポート</h2>
+			</div>
+			<div class="cmn_box-main">
+				<div class="l-input_file">
+					<div class="input_type_file_parts">
+						<input type="file" />
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="cmn_box">
+			<div class="cmn_box-ttl">
+				<h2>【３】出力</h2>
+			</div>
+			<div class="cmn_box-main">
+				<div class="l-output_file">
+					<div class="textarea_parts">
+						<textarea placeholder="ここに出力されます"></textarea>
+					</div>
+				</div>
+				<div class="l-dl_btn">
+					<div class="dl_btn">
+						<a href="#">
+							ダウンロード
+							<span class="dl_btn-filename">hogehoge.json</span>
+						</a>
+					</div>
+				</div>
+			</div>
+		</div>
+
+	</div>
+</div>
+<script src="https://unpkg.com/vue/dist/vue.js"></script>
+<script src="./common.js"></script>
+<script type="text/javascript">
+	(function(){
+
+	})();
+</script>
+</body>
+</html>
