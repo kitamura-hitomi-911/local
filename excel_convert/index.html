@@ -16,6 +16,9 @@
 			<h1>Excel Data Converter</h1>
 		</div>
 	</header>
+	<div id="app"></div>
+</div>
+<script type="text/x-template" id="tmpl-app">
 	<div class="l-content">
 		<div class="cmn_box">
 			<div class="cmn_box-ttl">
@@ -24,15 +27,10 @@
 			<div class="cmn_box-main">
 				<div class="l-select_setting">
 					<div class="select_parts">
-						<p class="select_parts-label" :style="label_style_obj">{{selected_label}}</p>
-						<select name="fuga" v-model="selected" @change="onChangeSelect">
+						<p class="select_parts-label">{{selected_setting_label}}</p>
+						<select v-model="selected_setting" @change="onChangeSettingSelect">
 							<option value="">↓選択してください</option>
-							<option value="1">選択1</option>
-							<option value="2">選択2</option>
-							<option value="3">選択3</option>
-							<option value="4">選択4</option>
-							<option value="5">選択5</option>
-							<option value="6">選択6</option>
+							<option v-for="setting in settings" :key="setting.key" :value="setting.id">{{setting.name}}</option>
 						</select>
 					</div>
 				</div>
@@ -47,7 +45,7 @@
 			<div class="cmn_box-main">
 				<div class="l-input_file">
 					<div class="input_type_file_parts">
-						<input type="file" />
+						<input type="file" :disabled="selected_setting?false:true" />
 					</div>
 				</div>
 			</div>
@@ -63,24 +61,60 @@
 						<textarea placeholder="ここに出力されます"></textarea>
 					</div>
 				</div>
-				<div class="l-dl_btn">
+				<div class="l-dl_btn" v-if="current_setting.output && current_setting.output.type === 'json'">
 					<div class="dl_btn">
 						<a href="#">
 							ダウンロード
-							<span class="dl_btn-filename">hogehoge.json</span>
+							<span class="dl_btn-filename">{{current_setting.output.name}}.json</span>
 						</a>
 					</div>
 				</div>
 			</div>
 		</div>
-
 	</div>
-</div>
+</script>
 <script src="https://unpkg.com/vue/dist/vue.js"></script>
-<script src="./common.js"></script>
+<script src="./settings.js"></script>
 <script type="text/javascript">
 	(function(){
-
+		new Vue({
+			el:'#app',
+			template:'#tmpl-app',
+			data:{
+				selected_setting:'',
+				settings:'settings' in window ?settings:[]
+			},
+			computed:{
+				selected_setting_label:function(){
+					var that = this;
+					var ret = '↓選択してください';
+					this.settings.forEach(function(setting){
+						if(setting.id === that.selected_setting){
+							ret = setting.name;
+						}
+					});
+					return ret;
+				},
+				current_setting:function(){
+					var that = this;
+					var ret = {};
+					this.settings.forEach(function(setting){
+						if(setting.id === that.selected_setting){
+							ret = setting;
+						}
+					});
+					return ret;
+				}
+			},
+			created:function(){
+				console.log(this.settings);
+			},
+			methods:{
+				onChangeSettingSelect:function(){
+					console.log(this.selected_setting);
+				}
+			}
+		});
 	})();
 </script>
 </body>
