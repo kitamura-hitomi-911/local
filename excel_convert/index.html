@@ -138,7 +138,8 @@
 			},
 			methods:{
 				onChangeSettingSelect:function(){
-					console.log(this.setting.selected);
+					this._clearData('input_file');
+					console.log('setting.selected : '+this.setting.selected);
 				},
 				onChangeInputFile:function(e){
 					var target = e.target;
@@ -151,19 +152,9 @@
 				},
 				/**
 				 * 入力ファイルをクリア
-				 * input パーツを再生成
-				 * 関連データをクリア
 				 */
 				clearInputFile:function(){
-					var that= this;
-					this.input_file.info = null;
-					this.output.obj = null;
-					this.output.txt= '';
-					this.output.dl_link = '';
-					this.input_file.is_show_input_parts = false;
-					setTimeout(function(){
-						that.input_file.is_show_input_parts = true;
-					}, 500);
+					this._clearData('input_file');
 				},
 				onFileLoad:function(){
 					var that = this;
@@ -246,7 +237,42 @@
 					});
 					return ret;
 				},
-				_clearData:function(from){
+				/**
+				 * 指定の工程以降のデータを初期化
+				 * @param {String} step setting,input_file,output のいずれか、未指定の場合は setting
+				 */
+				_clearData:function(step){
+					var that = this;
+					if(!step){
+						step = 'setting';
+					}
+					var steps = ['setting','input_file','output'];
+					var tgt_steps = [];
+					['setting','input_file','output'].forEach(function(tgt){
+						if(tgt === step || tgt_steps.length){
+							tgt_steps.push(tgt);
+						}
+					});
+					if(!tgt_steps.length){
+						console.log('_clearData のパラメータ'+step+'が不適切です。');
+					}
+					tgt_steps.forEach(function(tgt){
+						if(tgt==='setting'){
+							that.setting.selected = '';
+						}else if(tgt==='input_file'){
+							if(that.input_file.info){
+								that.input_file.info = null;
+								that.input_file.is_show_input_parts = false;
+								setTimeout(function(){
+									that.input_file.is_show_input_parts = true;
+								}, 500);
+							}
+						}else if(tgt==='output'){
+							that.output.obj = null;
+							that.output.txt= '';
+							that.output.dl_link = '';
+						}
+					});
 
 				},
 				_setDlBtn:function(){
