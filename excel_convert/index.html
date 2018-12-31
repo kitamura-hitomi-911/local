@@ -97,6 +97,7 @@
 				settings:'settings' in window ?settings:[],
 				input_file:null,
 				reader:null,
+				output_txt:''
 			},
 			computed:{
 				selected_setting_label:function(){
@@ -144,7 +145,68 @@
 					console.log(files);
 				},
 				fileLoad:function(){
-					console.log(this.reader.result);
+					var input_file_text = this.reader.result;
+					var op={
+						delim:(this.current_setting.delim || '\t'),
+						quote:(this.current_setting.quote || '"'),
+						linedelim:(this.current_setting.linedelim || '999999'),
+					};
+					var tmp = makeArrayObjectFromTsv(input_file_text,op);
+					tmp = makeObjectFromArray(tmp,this.current_setting.input);
+					console.log(tmp);
+
+					/**
+					 * tsvテキストから二次元配列化
+					 * @param {String} tsv
+					 * @param {Object} op オプション
+					 * @param {String} op.delim 列のデリミタ
+					 * @param {String} op.quote 文字列を囲む
+					 * @param {String} op.linedelim 行のデリミタ
+					 * @returns {Array}
+					 */
+					function makeArrayObjectFromTsv(tsv,op){
+						var re_quote = new RegExp('^'+op.quote+'([\\s\\S]+)'+op.quote+'$','m');
+						var lines = (function(tsv){
+							return tsv.split(op.linedelim);
+						})(tsv,op);
+						lines.forEach(function(line,index){
+							var items = line.split(op.delim);
+							items.forEach(function(item,item_index){
+								if(item && item.match(re_quote)){
+									items[item_index] = item.replace(re_quote,function(whole,s1){
+										return s1;
+									});
+								}
+							});
+							lines[index] = items;
+						});
+						return lines;
+					}
+
+					function makeObjectFromArray(ary, current_setting){
+						var ret = [];
+						var keys = [];
+						var tmp_obj = {};
+						ary.forEach(function(line,line_index){
+							if(line_index >= current_setting.enable_line_from-1){
+								tmp_obj = {};
+							}
+							line.forEach(function(item,item_index){
+								if(line_index === 0){
+									keys.push((current_setting.keys[item]?current_setting.keys[item]:''));
+								}else if(line_index >= current_setting.enable_line_from-1){
+									if(keys[item_index]){
+										tmp_obj[keys[item_index]] = item;
+									}
+								}
+							});
+							if(line_index >= current_setting.enable_line_from-1 && Object.keys(tmp_obj).length){
+								ret.push(tmp_obj);
+							}
+						});
+						return ret;
+					}
+
 				}
 			}
 		});
