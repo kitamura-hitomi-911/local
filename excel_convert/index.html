@@ -187,7 +187,6 @@
 			created:function(){
 				this.input_file.reader = new FileReader();
 				this.input_file.reader.addEventListener('load', this.onFileLoad, false);
-				console.log(this.setting.data);
 				// 設定のIDが重複してないかチェック
 				this.setting.data.forEach(function(setting,setting_index,moto){
 					moto.some(function(moto_setting, moto_setting_index){
@@ -209,14 +208,12 @@
 				 * 入力ファイルのチェンジイベント
 				 */
 				onChangeInputFile:function(e){
-					console.log('onChangeInputFile');
 					var target = e.target;
 					var files = target.files;
 					if(files.length){
 						this.input_file.info = files[0];
 						var charset = this.current_setting.input.charset || 'UTF-8';
 						this.input_file.reader.readAsText(files[0],charset);
-						console.log('readAsText',files[0]);
 					}
 				},
 				/**
@@ -229,10 +226,8 @@
 				 * 入力ファイルロードイベント
 				 */
 				onFileLoad:function(){
-					console.log('onFileLoad');
 					var that = this;
 					var input_file_text = this.input_file.reader.result;
-					console.log(input_file_text);
 					// TODO: ここ、なんとかわかりやすく書けないか？関数に関数を渡せるが、それだと可読性が…
 					this.output.obj = (function(input_file_text,setting){
 						var tmp = that._makeTwoDimensionalArrayFromTsv(input_file_text, {
@@ -263,7 +258,7 @@
 				 */
 				_makeTwoDimensionalArrayFromTsv:function(txt,op){
 					if(!op || !op.quote|| !op.linedelim){
-						console.log('TSVを二次元配列にするための情報が不足しています。');
+						console.error('TSVを二次元配列にするための情報が不足しています。');
 						return;
 					}
 					var ret_ary = [];
@@ -376,7 +371,7 @@
 						}
 					});
 					if(!tgt_steps.length){
-						console.log('_clearData のパラメータ'+step+'が不適切です。');
+						console.error('_clearData のパラメータ'+step+'が不適切です。');
 					}
 					tgt_steps.forEach(function(tgt){
 						if(tgt==='setting'){
