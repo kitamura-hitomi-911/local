@@ -135,12 +135,26 @@
 				this.input_file.reader = new FileReader();
 				this.input_file.reader.addEventListener('load', this.onFileLoad, false);
 				console.log(this.setting.data);
+				// 設定のIDが重複してないかチェック
+				this.setting.data.forEach(function(setting,setting_index,moto){
+					moto.some(function(moto_setting, moto_setting_index){
+						if(setting.id === moto_setting.id && setting_index !== moto_setting_index){
+							console.error('settings.jsのid、'+setting.id +'('+setting.name+')が重複しています。');
+						}
+					});
+				});
 			},
 			methods:{
+				/**
+				 * 設定プルダウンのチェンジイベント
+				 */
 				onChangeSettingSelect:function(){
 					this._clearData('input_file');
 					console.log('setting.selected : '+this.setting.selected);
 				},
+				/**
+				 * 入力ファイルのチェンジイベント
+				 */
 				onChangeInputFile:function(e){
 					var target = e.target;
 					var files = target.files;
@@ -156,6 +170,9 @@
 				clearInputFile:function(){
 					this._clearData('input_file');
 				},
+				/**
+				 * 入力ファイルロードイベント
+				 */
 				onFileLoad:function(){
 					var that = this;
 					var input_file_text = this.input_file.reader.result;
@@ -167,12 +184,17 @@
 						});
 						return that._makeAssociativeArrayObjectFromArray(tmp,{
 							keys:(setting.input.keys || []),
+							custom_func:(setting.input.custom_func || null),
 							enable_line_from:(setting.input.enable_line_from || 3)
 						});
 					})(input_file_text,this.current_setting);
+					if(this.current_setting.output.type === 'json'){
+						this.output.txt = JSON.stringify({date:this.input_file.info.lastModifiedDate,list:this.output.obj});
+						this._setDlBtn();
+					}else if(this.current_setting.output.type === 'html'){
+						this.output.txt = this._makeHtmlSrc();
+					}
 
-					this.output.txt = JSON.stringify({date:this.input_file.info.lastModifiedDate,list:this.output.obj});
-					this._setDlBtn();
 				},
 				/**
 				 * tsvテキストから二次元配列化
@@ -210,10 +232,11 @@
 					return ret_ary;
 				},
 				/**
-				 * 二次元配列から連想配列化
+				 * 二次元配列から連想配列化、項目ごとの処理も適用する
 				 * @param {String} ary 加工元の二次元配列
 				 * @param {Object} op オプション
 				 * @param {Object.<String, Array>} op.keys エクセルの見出し文字列とkey名の組み合わせ、またそれぞれの追加処理等
+				 * @param {Object.<String, Function>} op.custom_func カスタム処理
 				 * @param {Object.<String, Number>} op.enable_line_from 処理開始行
 				 * @returns {Object}
 				 */
@@ -235,11 +258,12 @@
 							if(line_index === 0){
 								_keys.push((_key_name_form_excel_name[item]?_key_name_form_excel_name[item]:''));
 							}else if(line_index >= op.enable_line_from-1){
-								// item_index に key 名をもっていたら追加
-								if(_keys[item_index]){
+
+								// item_index に key 名をもっている ＆ 出力対象外になってなければ 追加
+								if(_keys[item_index] && !_key_settings_by_name[_keys[item_index]].is_not_output){
 									// 改行コードを<br>にする
 									if(_key_settings_by_name[_keys[item_index]].is_nl2br){
-										item = item.replace(/\n/gm,'<br>');
+										item = item.replace(/\r\n|\r|\n/gm,'<br>');
 									}
 									// 〇 を true / 〇以外を false に変換
 									if(_key_settings_by_name[_keys[item_index]].is_bool){
@@ -254,6 +278,15 @@
 							}
 						});
 						if(line_index >= op.enable_line_from-1 && Object.keys(_tmp_obj).length){
+							if(op.custom_func && typeof op.custom_func === 'function'){
+								var line_obj = {};
+								_keys.forEach(function(key,index){
+									if(key){
+										line_obj[key] = line[index];
+									}
+								});
+								Object.assign(_tmp_obj, op.custom_func(line_obj));
+							}
 							ret.push(_tmp_obj);
 						}
 					});
@@ -301,6 +334,18 @@
 					var blob = new Blob([ this.output.txt ], { "type" : "application/json" });
 					window.URL = window.URL || window.webkitURL;
 					this.output.dl_link = window.URL.createObjectURL(blob);
+				},
+				_makeHtmlSrc:function(){
+					var ret = '';
+					if(!this.current_setting.output.template){
+						console.error('outputにtemplateの指定がありません');
+						return;
+					}
+					var tmpl = this.current_setting.output.template.replace(/\{(.+?)\}/gm,'${$1}');
+					this.output.obj.forEach(function(line){
+						ret += eval('`'+tmpl+'`');
+					});
+					return ret;
 				}
 			}
 		});
