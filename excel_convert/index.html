@@ -159,15 +159,14 @@
 				onFileLoad:function(){
 					var that = this;
 					var input_file_text = this.input_file.reader.result;
-					// TODO: ここ、なんとかわかりやすく書けないか？
+					// TODO: ここ、なんとかわかりやすく書けないか？関数に関数を渡せるが、それだと可読性が…
 					this.output.obj = (function(input_file_text,setting){
 						var tmp = that._makeTwoDimensionalArrayFromTsv(input_file_text, {
 							quote: (setting.quote || '"'),
 							linedelim: (setting.linedelim || '999999'),
 						});
 						return that._makeAssociativeArrayObjectFromArray(tmp,{
-							keys:(setting.input.keys || {}),
-							func_of_:(setting.input.func_of_ || {}),
+							keys:(setting.input.keys || []),
 							enable_line_from:(setting.input.enable_line_from || 3)
 						});
 					})(input_file_text,this.current_setting);
@@ -188,11 +187,16 @@
 						console.log('TSVを二次元配列にするための情報が不足しています。');
 						return;
 					}
+					var ret_ary = [];
 					var re_quote = new RegExp('^'+op.quote+'([\\s\\S]+)'+op.quote+'$','m');
 					var lines = (function(tsv){
 						return tsv.split(op.linedelim);
 					})(txt,op);
 					lines.forEach(function(line,index){
+						if(!(line.replace(/[\n\r\t]/g,''))){
+							// 改行、タブをトルツメして空文字になる行は追加しない
+							return;
+						}
 						var items = line.split('\t');
 						items.forEach(function(item,item_index){
 							if(item && item.match(re_quote)){
@@ -201,38 +205,56 @@
 								});
 							}
 						});
-						lines[index] = items;
+						ret_ary.push(items);
 					});
-					return lines;
+					return ret_ary;
 				},
 				/**
 				 * 二次元配列から連想配列化
 				 * @param {String} ary 加工元の二次元配列
 				 * @param {Object} op オプション
-				 * @param {Object.<String, String>} op.keys エクセルの見出し文字列とkey名の組み合わせ
-				 * @param {Object.<String, Function>} op.func_of_ 各key毎の追加処理
+				 * @param {Object.<String, Array>} op.keys エクセルの見出し文字列とkey名の組み合わせ、またそれぞれの追加処理等
 				 * @param {Object.<String, Number>} op.enable_line_from 処理開始行
 				 * @returns {Object}
 				 */
 				_makeAssociativeArrayObjectFromArray:function(ary,op){
 					var ret = [];
-					var keys = [];
-					var tmp_obj = {};
+					var _keys = [];
+					var _tmp_obj = {};
+					var _key_name_form_excel_name = {};
+					var _key_settings_by_name = {};
+					op.keys.forEach(function(key_setting){
+						_key_name_form_excel_name[key_setting.excel_name] = key_setting.name;
+						_key_settings_by_name[key_setting.name] = key_setting;
+					});
 					ary.forEach(function(line,line_index){
 						if(line_index >= op.enable_line_from-1){
-							tmp_obj = {};
+							_tmp_obj = {};
 						}
 						line.forEach(function(item,item_index){
 							if(line_index === 0){
-								keys.push((op.keys[item]?op.keys[item]:''));
+								_keys.push((_key_name_form_excel_name[item]?_key_name_form_excel_name[item]:''));
 							}else if(line_index >= op.enable_line_from-1){
-								if(keys[item_index]){
-									tmp_obj[keys[item_index]] = item;
+								// item_index に key 名をもっていたら追加
+								if(_keys[item_index]){
+									// 改行コードを<br>にする
+									if(_key_settings_by_name[_keys[item_index]].is_nl2br){
+										item = item.replace(/\n/gm,'<br>');
+									}
+									// 〇 を true / 〇以外を false に変換
+									if(_key_settings_by_name[_keys[item_index]].is_bool){
+										item = (item === '〇');
+									}
+									// func 適用
+									if(_key_settings_by_name[_keys[item_index]].func && typeof _key_settings_by_name[_keys[item_index]].func === "function"){
+										item = _key_settings_by_name[_keys[item_index]].func(item);
+									}
+									_tmp_obj[_keys[item_index]] = item;
 								}
 							}
 						});
-						if(line_index >= op.enable_line_from-1 && Object.keys(tmp_obj).length){
-							ret.push(tmp_obj);
+						if(line_index >= op.enable_line_from-1 && Object.keys(_tmp_obj).length){
+							ret.push(_tmp_obj);
 						}
 					});
 					return ret;
