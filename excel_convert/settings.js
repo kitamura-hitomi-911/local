@@ -131,7 +131,6 @@ var settings = [
 			 */
 			custom_func:function(line){
 				var ret_obj = {};
-				console.log(line);
 				ret_obj.item = {
 					alt:line.item1 || '',
 					src:line.item2 || '',
@@ -180,7 +179,7 @@ var settings = [
 		},
 		output:{
 			type:"html",
-			/* 行単位のテンプレート、{ } 内が評価されます。line.【key名】で各行の変数を指定。文は書けませんが式は書けます。 */
+			/* 行単位のテンプレート、{ } 内が評価されます。line.<key名> で各行の変数を指定。文は書けませんが式は書けます。 */
 			template:`<tr id="{line.id}"><td class="title">{line.title}</td><td class="title">{line.is_live?'〇':''}</td></tr>`
 		}
 	}
