@@ -55,7 +55,7 @@ html{
 }
 /* レイアウト --------------------------------- */
 .l-select_setting{
-	width:300px;
+	max-width:800px;
 	padding:20px 10px 10px;
 }
 .l-input_file{
@@ -103,6 +103,7 @@ html{
 /* select パーツ */
 .select_parts {
 	position: relative;
+	width:300px;
 }
 
 .select_parts .select_parts-label {
@@ -140,6 +141,14 @@ html{
 	box-sizing: border-box;
 	-webkit-appearance: menulist-button;
 	font-size: 100%;
+}
+
+/* select パーツ下 エラーメッセージ */
+.setting_err_msg{
+	padding-top:10px;
+	color:#f00;
+	font-size:0.75rem;
+	line-height:1.25em;
 }
 
 /* input type file パーツ */

@@ -8,6 +8,9 @@ var settings = [
 		/* @type {String} name 設定選択時に表示される文字列。わかりやすいものを
 		name:"jsonサンプル1",
 		/**
+		/* @type {Boolean} [is_delete=false] 設定として無効か否か
+		is_delete:true,
+		/**
 		/* 読み込みファイルに関連する設定
 		/* @type {Object} input
 		/* @type {Object.<String>} [charset="UTF-8"] 読み込むファイルの文字コード。Shift_JIS or UTF-8 のいずれかを指定可能。
@@ -69,8 +72,6 @@ var settings = [
 		name:"jsonサンプル1",
 		input:{
 			charset:"Shift_JIS",
-			linedelim:'999999',
-			enable_line_from:3,
 			keys:[
 				{
 					excel_name:'ID',
@@ -104,8 +105,6 @@ var settings = [
 		id:"sample2",
 		name:"jsonサンプル2",
 		input:{
-			linedelim:'999999',
-			enable_line_from:3,
 			keys:[
 				{
 					excel_name:'ID',
@@ -137,8 +136,6 @@ var settings = [
 		name:"jsonサンプル3 高度",
 		input:{
 			charset:"Shift_JIS",
-			linedelim:'999999',
-			enable_line_from:3,
 			keys:[
 				{
 					excel_name:'ID',
@@ -197,9 +194,6 @@ var settings = [
 		name:"HTMLソースサンプル",
 		input:{
 			charset:"Shift_JIS",
-			linedelim:'999999',
-			enable_line_from:3,
-			is_nl2br:true,
 			keys:[
 				{
 					excel_name:'ID',

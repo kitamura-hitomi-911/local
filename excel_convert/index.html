@@ -33,6 +33,7 @@
 							<option v-for="setting in setting.data" :key="setting.key" :value="setting.id">{{setting.name}}</option>
 						</select>
 					</div>
+					<p class="setting_err_msg" v-if="setting.err_msg" v-html="setting.err_msg"></p>
 				</div>
 
 			</div>
@@ -149,7 +150,8 @@
 			data:{
 				setting:{
 					selected:'',
-					data:'settings' in window ?settings:[],
+					data:[],
+					err_msg:''
 				},
 				input_file:{
 					is_show_input_parts:true,
@@ -185,16 +187,30 @@
 				}
 			},
 			created:function(){
-				this.input_file.reader = new FileReader();
-				this.input_file.reader.addEventListener('load', this.onFileLoad, false);
+				var that = this;
+
+				// 設定情報を適用
+				var tmp_settings = 'settings' in window ? settings:[];
+
 				// 設定のIDが重複してないかチェック
-				this.setting.data.forEach(function(setting,setting_index,moto){
+				tmp_settings.forEach(function(setting,setting_index,moto){
 					moto.some(function(moto_setting, moto_setting_index){
 						if(setting.id === moto_setting.id && setting_index !== moto_setting_index){
-							console.error('settings.jsのid、'+setting.id +'('+setting.name+')が重複しています。');
+							that.setting.err_msg += that.setting.err_msg?'<br>':'';
+							that.setting.err_msg += 'settings.jsのid、'+setting.id +'('+setting.name+')が重複しています。';
 						}
 					});
 				});
+				if(!this.setting.err_msg){
+					tmp_settings.forEach(function(setting){
+						if(!setting.is_delete){
+							that.setting.data.push(setting);
+						}
+					});
+				}
+
+				this.input_file.reader = new FileReader();
+				this.input_file.reader.addEventListener('load', this.onFileLoad, false);
 			},
 			methods:{
 				/**
