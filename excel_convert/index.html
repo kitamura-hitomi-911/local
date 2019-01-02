@@ -236,7 +236,7 @@
 						});
 						return that._makeAssociativeArrayObjectFromArray(tmp,{
 							keys:(setting.input.keys || []),
-							custom_func:(setting.input.custom_func || null),
+							addItem:(setting.input.addItem || null),
 							enable_line_from:(setting.input.enable_line_from || 3)
 						});
 					})(input_file_text,this.current_setting);
@@ -288,7 +288,7 @@
 				 * @param {String} ary 加工元の二次元配列
 				 * @param {Object} op オプション
 				 * @param {Object.<String, Array>} op.keys エクセルの見出し文字列とkey名の組み合わせ、またそれぞれの追加処理等
-				 * @param {Object.<String, Function>} op.custom_func 行ごとのカスタム処理
+				 * @param {Object.<String, Function>} op.addItem 行ごとのカスタム処理
 				 * @param {Object.<String, Number>} op.enable_line_from 処理開始行
 				 * @returns {Object}
 				 */
@@ -328,9 +328,9 @@
 									if(_key_settings_by_name[_keys[item_index]].is_bool){
 										item = (item === '〇');
 									}
-									// func 適用
-									if(_key_settings_by_name[_keys[item_index]].func && typeof _key_settings_by_name[_keys[item_index]].func === "function"){
-										item = _key_settings_by_name[_keys[item_index]].func(item);
+									// customValue 適用
+									if(_key_settings_by_name[_keys[item_index]].customValue && typeof _key_settings_by_name[_keys[item_index]].customValue === "function"){
+										item = _key_settings_by_name[_keys[item_index]].customValue(item);
 									}
 									_tmp_obj[_keys[item_index]] = item;
 								}
@@ -339,14 +339,14 @@
 							// オブジェクトに key value のセットが1つ以上ぶらさがってたら return するオブジェクトに追加
 							if(Object.keys(_tmp_obj).length){
 								// カスタム処理があれば追加
-								if(op.custom_func && typeof op.custom_func === 'function'){
+								if(op.addItem && typeof op.addItem === 'function'){
 									var line_obj = {};
 									_keys.forEach(function(key,index){
 										if(key){
 											line_obj[key] = line[index];
 										}
 									});
-									Object.assign(_tmp_obj, op.custom_func(line_obj));
+									Object.assign(_tmp_obj, op.addItem(line_obj));
 								}
 								ret.push(_tmp_obj);
 							}

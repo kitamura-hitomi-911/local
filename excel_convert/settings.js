@@ -18,11 +18,11 @@ var settings = [
 		/* @type {Object.<Array>.<String>} name 出力時の key 名 ※出力可否の項目のみ必ず "is_be_output" を指定してください。
 		/* @type {Object.<Array>.<Boolean>} [is_bool=false] 出力をブーリアン型にするか否か。 true の場合は、〇 が ture、それ以外が false となる。
 		/* @type {Object.<Array>.<Boolean>} [is_nl2br=false] 改行コードを <br> にするか否か。
-		/* @type {Object.<Array>.<Boolean>} [is_not_output=false] 出力不要か否か。後述の custom_func で処理するが個別の key で出力不要の場合に使用する想定。
-		/* @type {Object.<Array>.<Function>} [func] 出力する値に対しての追加処理
+		/* @type {Object.<Array>.<Boolean>} [is_not_output=false] 出力不要か否か。後述の addItem で処理するが個別の key で出力不要の場合に使用する想定。
+		/* @type {Object.<Array>.<Function>} [customValue] 出力する値に対しての追加処理
 		/*         @param {String} val 元の値
 		/*         @return {String} 処理後の値
-		/* @type {Object.<Function>} [custom_func] 読み込むファイルにない項目の追加処理
+		/* @type {Object.<Function>} [addItem] 読み込むファイルにない項目の追加処理
 		/*         @param {Object} line その行が持つ key value のオブジェクト
 		/*         @return {Object} 追加する key value を持つオブジェクト
 		input:{
@@ -36,13 +36,13 @@ var settings = [
 					is_bool:true,
 					is_nl2br:true,
 					is_not_output:true,
-					func:function(val){
+					customValue:function(val){
 						return '★'+val;
 					}
 				},
 				// ... 以下、必要な項目の指定を記載。
 			]
-			custom_func:function(line){
+			addItem:function(line){
 				var ret_obj = {};
 				ret_obj.item = {
 					alt:line.item1 || '',
@@ -80,7 +80,7 @@ var settings = [
 					excel_name:'タイトル',
 					name:'title',
 					is_nl2br:true,
-					func:function(val){
+					customValue:function(val){
 						return '★'+val;
 					}
 				},
@@ -148,7 +148,7 @@ var settings = [
 					excel_name:'タイトル',
 					name:'title',
 					is_nl2br:true,
-					func:function(val){
+					customValue:function(val){
 						return '★'+val;
 					}
 				},
@@ -177,7 +177,7 @@ var settings = [
 					name:'is_be_output'
 				}
 			],
-			custom_func:function(line){
+			addItem:function(line){
 				var ret_obj = {};
 				ret_obj.item = {
 					alt:line.item1 || '',
@@ -209,7 +209,7 @@ var settings = [
 					excel_name:'タイトル',
 					name:'title',
 					is_nl2br:true,
-					func:function(val){
+					customValue:function(val){
 						return '★'+val;
 					}
 				},
