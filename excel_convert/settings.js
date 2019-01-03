@@ -25,9 +25,9 @@
  *                       @param {Object} line 該当行の key value のオブジェクト
  *                       @return {Object} 該当行に追加する key value を持つオブジェクト
  *
- * @property {Object} output 出力に関連する設定
- * @property {string} type 出力タイプ "json" もしくは "html"
- * @property {string} name type が json の場合は指定必須。ダウンロードファイル名。拡張子は含めない
+ * @property {Object} [output = {type:'json','name':id}] 出力に関連する設定
+ * @property {string} [type='json'] 出力タイプ "json" もしくは "html"
+ * @property {string} [name=id] type が json の場合のダウンロードファイル名。拡張子は含めない。
  * @property {string} template type が html の場合は指定必須。行単位のHTMLテンプレート、{ } がテンプレートリテラルの @{ } として処理される。line.<key名> で各行の変数を使用可。
  */
 var settings = [
@@ -62,10 +62,6 @@ var settings = [
 					name:'is_be_output'
 				}
 			]
-		},
-		output:{
-			type:"json",
-			name:'sample1'
 		}
 	},
 	{
@@ -92,10 +88,6 @@ var settings = [
 					name:'is_be_output'
 				}
 			]
-		},
-		output:{
-			type:"json",
-			name:'sample2'
 		}
 	},
 	{
@@ -150,10 +142,6 @@ var settings = [
 				};
 				return ret_obj;
 			}
-		},
-		output:{
-			type:"json",
-			name:'sample3'
 		}
 	},
 	{

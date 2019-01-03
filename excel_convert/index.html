@@ -197,13 +197,26 @@
 					moto.some(function(moto_setting, moto_setting_index){
 						if(setting.id === moto_setting.id && setting_index !== moto_setting_index){
 							that.setting.err_msg += that.setting.err_msg?'<br>':'';
-							that.setting.err_msg += 'settings.jsのid、'+setting.id +'('+setting.name+')が重複しています。';
+							that.setting.err_msg += '「'+setting.name+'」のid:'+setting.id + 'はユニークではありません';
 						}
 					});
 				});
 				if(!this.setting.err_msg){
 					tmp_settings.forEach(function(setting){
 						if(!setting.is_delete){
+							if(!setting.output){
+								setting.output = {};
+							}
+							if(!setting.output.type){
+								setting.output.type = 'json';
+							}
+							if(setting.output.type === 'json' && !setting.output.name){
+								setting.output.name = setting.id;
+							}
+							if(setting.output.type === 'html' && !setting.output.template){
+								setting.output.template = '';
+								that.setting.err_msg = setting.id + '('+ setting.name +')は出力がHTMLなので、 template の指定が必須です';
+							}
 							that.setting.data.push(setting);
 						}
 					});
