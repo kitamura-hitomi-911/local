@@ -16,15 +16,18 @@ var settings = [
 		/* @type {Object.<String>} [charset="UTF-8"] 読み込むファイルの文字コード。Shift_JIS or UTF-8 のいずれかを指定可能。
 		/* @type {Object.<String|Number>} [linedelim=999999] 読み込むファイルの行の終わりを意味する文字列。
 		/* @type {Object.<Number>} [enable_line_from=3] 読み込むファイルの2行め以降の有効な開始行の指定。未指定の場合は 3 （1行めを見出し行、2行めを入力例行を想定）
-		/* @type {Object.<Array>} items 読み込むファイルの項目（key）ごとの設定の配列
+		/* @type {Object.<Array>} items 読み込むファイルの項目ごとの設定の配列
 		/* @type {Object.<Array>.<String>} excel_name エクセルの見出しの文字列
 		/* @type {Object.<Array>.<String>} name 出力時の key 名 ※出力可否の項目のみ必ず "is_be_output" を指定してください。
 		/* @type {Object.<Array>.<Boolean>} [is_bool=false] 出力をブーリアン型にするか否か。 true の場合は、〇 が ture、それ以外が false となる。
 		/* @type {Object.<Array>.<Boolean>} [is_nl2br=false] 改行コードを <br> にするか否か。
-		/* @type {Object.<Array>.<Boolean>} [is_not_output=false] 出力不要か否か。後述の addItem で処理するが個別の key で出力不要の場合に使用する想定。
+		/* @type {Object.<Array>.<Boolean>} [is_not_output=false] 該当の項目が出力不要か否か。後述の addItem で処理するが個別の key で出力不要の場合に使用する想定。
 		/* @type {Object.<Array>.<Function>} [customValue] 出力する値に対しての追加処理
 		/*         @param {String} val 元の値
 		/*         @return {String} 処理後の値
+		/* @type {Object.<Array>.<Function>} [removeLine] 条件を満たした場合は出力対象外にする
+		/*         @param {String} val 元の値
+		/*         @return {Boolean} true の場合は該当行は出力されない
 		/* @type {Object.<Function>} [addItem] 読み込むファイルにない項目の追加処理
 		/*         @param {Object} line その行が持つ key value のオブジェクト
 		/*         @return {Object} 追加する key value を持つオブジェクト
@@ -88,7 +91,10 @@ var settings = [
 				{
 					excel_name:'配信有無',
 					name:'is_live',
-					is_bool:true
+					is_bool:true,
+					removeLine:function(val){
+						return (val !== '〇');
+					}
 				},
 				{
 					excel_name:'出力可否',

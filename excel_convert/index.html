@@ -314,6 +314,7 @@
 					var _tmp_obj = {};
 					var _key_name_form_excel_name = {};
 					var _item_settings_by_name = {};
+					var is_remove = false;
 					var is_be_output = 'is_be_output';
 					op.items.forEach(function(item_setting){
 						_key_name_form_excel_name[item_setting.excel_name] = item_setting.name;
@@ -328,32 +329,43 @@
 						}
 						if(line_index >= op.enable_line_from-1){
 							_tmp_obj = {};
+							is_remove = false;
 							// 出力可否の項目が〇でなければ処理しない
 							if(line[_keys.indexOf(is_be_output)] !== '〇'){
 								return;
 							}
 							// 項目ごとに key value のセットで追加する
 							line.forEach(function(item,item_index){
-								// item_index に key 名をもっていて、出力可否の項目ではない ＆ 出力対象外になってなければ 追加
+								// item_index に key 名をもっていて、出力可否の項目ではない ＆ 出力対象外になってなければ処理
 								if(_keys[item_index] && _keys[item_index] !== is_be_output && !_item_settings_by_name[_keys[item_index]].is_not_output){
+
+									// 対象外にする条件があれば確認、対象外であれば is_remove を true にする。
+									if(_item_settings_by_name[_keys[item_index]].removeLine && typeof _item_settings_by_name[_keys[item_index]].removeLine === 'function'){
+										is_remove = _item_settings_by_name[_keys[item_index]].removeLine(item);
+										console.log('is_remove',is_remove);
+									}
+
 									// 改行コードを<br>にする
 									if(_item_settings_by_name[_keys[item_index]].is_nl2br){
 										item = item.replace(/\r\n|\r|\n/gm,'<br>');
 									}
+
 									// 〇 を true / 〇以外を false に変換
 									if(_item_settings_by_name[_keys[item_index]].is_bool){
 										item = (item === '〇');
 									}
+
 									// customValue 適用
 									if(_item_settings_by_name[_keys[item_index]].customValue && typeof _item_settings_by_name[_keys[item_index]].customValue === "function"){
 										item = _item_settings_by_name[_keys[item_index]].customValue(item);
 									}
+
 									_tmp_obj[_keys[item_index]] = item;
 								}
 							});
 
-							// オブジェクトに key value のセットが1つ以上ぶらさがってたら return するオブジェクトに追加
-							if(Object.keys(_tmp_obj).length){
+							// is_remove となっていない && オブジェクトに key value のセットが1つ以上ぶらさがってたら return するオブジェクトに追加
+							if(!is_remove && Object.keys(_tmp_obj).length){
 								// addItem が設定してあれば追加
 								if(op.addItem && typeof op.addItem === 'function'){
 									// addItem に渡すために、現在行のkey value オブジェクトを生成する
