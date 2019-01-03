@@ -93,9 +93,9 @@
 
 	/**
 	 * 日時を整形する
-	 * @param {Date | string} date フォーマットしたい日時情報、デフォルトフォーマットのみ設定したい場合のみ null 可
+	 * @param {Date|string} date フォーマットしたい日時情報、デフォルトフォーマットのみ設定したい場合のみ null 可
 	 * @param format フォーマット。未指定の場合はデフォルトフォーマットが適用される。date が null の場合はデフォルトフォーマットとして適用される
-	 * @returns {String}
+	 * @returns {string}
 	 */
 	var formatDate = (function(date, format){
 		// デフォルトフォーマット
@@ -233,7 +233,7 @@
 					}
 				},
 				/**
-				 * 入力ファイルをクリア
+				 * 入力ファイルをクリアする
 				 */
 				clearInputFile:function(){
 					this._clearData('input_file');
@@ -266,11 +266,11 @@
 				},
 				/**
 				 * tsvテキストから二次元配列化
-				 * @param {String} txt
+				 * @param {string} txt
 				 * @param {Object} op オプション
-				 * @param {String} op.quote 文字列を囲み
-				 * @param {String} op.linedelim 行のデリミタ
-				 * @returns {Array}
+				 * @param {string} op.quote 文字列を囲み
+				 * @param {string|number} op.linedelim 行のデリミタ
+				 * @returns {Array.<Array>}
 				 */
 				_makeTwoDimensionalArrayFromTsv:function(txt,op){
 					if(!op || !op.quote|| !op.linedelim){
@@ -301,11 +301,11 @@
 				},
 				/**
 				 * 二次元配列から連想配列化、項目ごとの処理も適用する
-				 * @param {String} ary 加工元の二次元配列
+				 * @param {Array} ary 加工元の二次元配列
 				 * @param {Object} op オプション
-				 * @param {Object.<String, Array>} op.items エクセルの見出し文字列とkey名の組み合わせ、またそれぞれの追加処理等
-				 * @param {Object.<String, Function>} op.addItem 行ごとのカスタム処理
-				 * @param {Object.<String, Number>} op.enable_line_from 処理開始行
+				 * @param {Array} op.items[] エクセルの見出し文字列とkey名の組み合わせ、またそれぞれの追加処理等
+				 * @param {Function} op.addItem 行ごとのカスタム処理
+				 * @param {number} op.enable_line_from 処理開始行
 				 * @returns {Object}
 				 */
 				_makeAssociativeArrayObjectFromArray:function(ary,op){
@@ -385,7 +385,7 @@
 				},
 				/**
 				 * 指定の工程以降のデータを初期化
-				 * @param {String} step setting,input_file,output のいずれか、未指定の場合は setting
+				 * @param {string='setting'} step setting,input_file,output のいずれか
 				 */
 				_clearData:function(step){
 					var that = this;
