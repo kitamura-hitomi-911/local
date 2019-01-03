@@ -16,7 +16,7 @@ var settings = [
 		/* @type {Object.<String>} [charset="UTF-8"] 読み込むファイルの文字コード。Shift_JIS or UTF-8 のいずれかを指定可能。
 		/* @type {Object.<String|Number>} [linedelim=999999] 読み込むファイルの行の終わりを意味する文字列。
 		/* @type {Object.<Number>} [enable_line_from=3] 読み込むファイルの2行め以降の有効な開始行の指定。未指定の場合は 3 （1行めを見出し行、2行めを入力例行を想定）
-		/* @type {Object.<Array>} keys 読み込むファイルの項目（key）ごとの設定の配列
+		/* @type {Object.<Array>} items 読み込むファイルの項目（key）ごとの設定の配列
 		/* @type {Object.<Array>.<String>} excel_name エクセルの見出しの文字列
 		/* @type {Object.<Array>.<String>} name 出力時の key 名 ※出力可否の項目のみ必ず "is_be_output" を指定してください。
 		/* @type {Object.<Array>.<Boolean>} [is_bool=false] 出力をブーリアン型にするか否か。 true の場合は、〇 が ture、それ以外が false となる。
@@ -32,7 +32,7 @@ var settings = [
 			charset:"Shift_JIS",
 			linedelim:'999999',
 			enable_line_from:3,
-			keys:[
+			items:[
 				{
 					excel_name:'ID',
 					name:'id',
@@ -72,7 +72,7 @@ var settings = [
 		name:"jsonサンプル1",
 		input:{
 			charset:"Shift_JIS",
-			keys:[
+			items:[
 				{
 					excel_name:'ID',
 					name:'id'
@@ -105,7 +105,7 @@ var settings = [
 		id:"sample2",
 		name:"jsonサンプル2",
 		input:{
-			keys:[
+			items:[
 				{
 					excel_name:'ID',
 					name:'id'
@@ -136,7 +136,7 @@ var settings = [
 		name:"jsonサンプル3 高度",
 		input:{
 			charset:"Shift_JIS",
-			keys:[
+			items:[
 				{
 					excel_name:'ID',
 					name:'id'
@@ -194,7 +194,7 @@ var settings = [
 		name:"HTMLソースサンプル",
 		input:{
 			charset:"Shift_JIS",
-			keys:[
+			items:[
 				{
 					excel_name:'ID',
 					name:'id'

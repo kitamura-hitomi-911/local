@@ -251,7 +251,7 @@
 							linedelim: (setting.linedelim || '999999'),
 						});
 						return that._makeAssociativeArrayObjectFromArray(tmp,{
-							keys:(setting.input.keys || []),
+							items:(setting.input.items || []),
 							addItem:(setting.input.addItem || null),
 							enable_line_from:(setting.input.enable_line_from || 3)
 						});
@@ -303,7 +303,7 @@
 				 * 二次元配列から連想配列化、項目ごとの処理も適用する
 				 * @param {String} ary 加工元の二次元配列
 				 * @param {Object} op オプション
-				 * @param {Object.<String, Array>} op.keys エクセルの見出し文字列とkey名の組み合わせ、またそれぞれの追加処理等
+				 * @param {Object.<String, Array>} op.items エクセルの見出し文字列とkey名の組み合わせ、またそれぞれの追加処理等
 				 * @param {Object.<String, Function>} op.addItem 行ごとのカスタム処理
 				 * @param {Object.<String, Number>} op.enable_line_from 処理開始行
 				 * @returns {Object}
@@ -313,11 +313,11 @@
 					var _keys = [];
 					var _tmp_obj = {};
 					var _key_name_form_excel_name = {};
-					var _key_settings_by_name = {};
+					var _item_settings_by_name = {};
 					var is_be_output = 'is_be_output';
-					op.keys.forEach(function(key_setting){
-						_key_name_form_excel_name[key_setting.excel_name] = key_setting.name;
-						_key_settings_by_name[key_setting.name] = key_setting;
+					op.items.forEach(function(item_setting){
+						_key_name_form_excel_name[item_setting.excel_name] = item_setting.name;
+						_item_settings_by_name[item_setting.name] = item_setting;
 					});
 					ary.forEach(function(line,line_index){
 						if(line_index === 0){
@@ -335,18 +335,18 @@
 							// 項目ごとに key value のセットで追加する
 							line.forEach(function(item,item_index){
 								// item_index に key 名をもっていて、出力可否の項目ではない ＆ 出力対象外になってなければ 追加
-								if(_keys[item_index] && _keys[item_index] !== is_be_output && !_key_settings_by_name[_keys[item_index]].is_not_output){
+								if(_keys[item_index] && _keys[item_index] !== is_be_output && !_item_settings_by_name[_keys[item_index]].is_not_output){
 									// 改行コードを<br>にする
-									if(_key_settings_by_name[_keys[item_index]].is_nl2br){
+									if(_item_settings_by_name[_keys[item_index]].is_nl2br){
 										item = item.replace(/\r\n|\r|\n/gm,'<br>');
 									}
 									// 〇 を true / 〇以外を false に変換
-									if(_key_settings_by_name[_keys[item_index]].is_bool){
+									if(_item_settings_by_name[_keys[item_index]].is_bool){
 										item = (item === '〇');
 									}
 									// customValue 適用
-									if(_key_settings_by_name[_keys[item_index]].customValue && typeof _key_settings_by_name[_keys[item_index]].customValue === "function"){
-										item = _key_settings_by_name[_keys[item_index]].customValue(item);
+									if(_item_settings_by_name[_keys[item_index]].customValue && typeof _item_settings_by_name[_keys[item_index]].customValue === "function"){
+										item = _item_settings_by_name[_keys[item_index]].customValue(item);
 									}
 									_tmp_obj[_keys[item_index]] = item;
 								}
@@ -354,8 +354,9 @@
 
 							// オブジェクトに key value のセットが1つ以上ぶらさがってたら return するオブジェクトに追加
 							if(Object.keys(_tmp_obj).length){
-								// カスタム処理があれば追加
+								// addItem が設定してあれば追加
 								if(op.addItem && typeof op.addItem === 'function'){
+									// addItem に渡すために、現在行のkey value オブジェクトを生成する
 									var line_obj = {};
 									_keys.forEach(function(key,index){
 										if(key){
