@@ -1,0 +1,129 @@
+@charset "UTF-8";
+
+/* reset */
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed,
+figure, figcaption, footer, header,
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	font: inherit;
+	font-size: 100%;
+	vertical-align: baseline;
+	box-sizing: border-box;
+}
+ol, ul {
+	list-style: none;
+}
+table {
+	border-collapse: collapse;
+	border-spacing: 0;
+}
+caption, th, td {
+	text-align: left;
+	font-weight: normal;
+	vertical-align: middle;
+}
+q, blockquote {
+	quotes: none;
+}
+q:before, q:after, blockquote:before, blockquote:after {
+	content: "";
+	content: none;
+}
+a img {
+	border: none;
+}
+a {
+	text-decoration: none;
+}
+article, aside, details, figcaption, figure, footer, header, menu, nav, section, summary {
+	display: block;
+}
+html{
+	color:#666;
+}
+/* レイアウト --------------------------------- */
+.l-assign_points{
+	max-width:800px;
+	padding:20px 10px 10px;
+}
+.l-result_points{
+	max-width:800px;
+	padding:20px 10px 10px;
+}
+
+
+/* モジュール --------------------------------- */
+
+/* ヘッダー */
+.header{
+	background: #666;
+	color:#fff;
+}
+.header h1{
+	padding:10px 20px;
+	font-size:2rem;
+	line-height:1.25;
+}
+
+/* 共通枠 */
+.cmn_box{
+	margin-top:20px;
+	padding:0 20px;
+}
+.cmn_box .cmn_box-ttl{
+	border-bottom:5px solid #666;
+}
+.cmn_box .cmn_box-ttl h1,
+.cmn_box .cmn_box-ttl h2,
+.cmn_box .cmn_box-ttl h3,
+.cmn_box .cmn_box-ttl h4{
+	font-size:1.5rem;
+	line-height:1.5;
+}
+
+/* ポイント割振表 */
+.assign_points th,
+.assign_points td{
+	padding:5px 10px;
+	border:1px solid #666;
+}
+.assign_points .assign_points-sum td{
+	text-align:right;
+	border:none;
+}
+
+.assign_points th{
+	background-color:#999;
+	color:#fff;
+}
+.assign_points .assign_points-point{
+	min-width:8em;
+}
+
+.assign_points .assign_points-project{
+	min-width:360px;
+}
+.assign_points .assign_points-sum-current{
+	display:inline-block;
+	font-size:2rem;
+	line-height:1.5;
+}
+
+.assign_points td input{
+	padding:3px 5px;
+	border:1px solid #666;
+	font-size:1rem;
+	line-height:1.5;
+}

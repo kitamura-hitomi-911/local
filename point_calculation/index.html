@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="x-ua-compatible" content="ie=edge">
+	<title>Point Culcuration</title>
+	<meta name="description" content="">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="format-detection" content="telephone=no">
+	<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="l-wrapper">
+	<header class="l-header">
+		<div class="header">
+			<h1>Point Culcuration</h1>
+		</div>
+	</header>
+	<div id="app"></div>
+</div>
+<script type="text/x-template" id="tmpl-app">
+	<div class="l-content">
+		<div class="cmn_box">
+			<div class="cmn_box-ttl">
+				<h2>【１】ポイント割振</h2>
+			</div>
+			<div class="cmn_box-main">
+				<div class="l-assign_points">
+					<div class="assign_points">
+						<table>
+							<tr><th class="assign_points-project">プロジェクト</th><th class="assign_points-point">ポイント</th></tr>
+							<tr v-for="project in project_list" :key="project.id"><td>{{project.label}}</td><td><input type="number" min="0" max="100" v-model="project.point"></td></tr>
+							<tr class="assign_points-sum"><td>合計</td><td><span class="assign_points-sum-current">{{total_points}}</span>&nbsp;/&nbsp;<span class="assign_points-sum-max">{{max_points}}</span></td></tr>
+						</table>
+					</div>
+				</div>
+
+			</div>
+		</div>
+
+		<div class="cmn_box">
+			<div class="cmn_box-ttl">
+				<h2>【２】結果</h2>
+			</div>
+			<div class="cmn_box-main">
+				<div class="l-result_points">
+					<div class="result_points">
+
+
+					</div>
+				</div>
+			</div>
+		</div>
+
+	</div>
+</script>
+<script src="https://unpkg.com/vue/dist/vue.js"></script>
+<script src="./setting.js"></script>
+<script type="text/javascript">
+	(function(){
+
+		new Vue({
+			el:'#app',
+			template:'#tmpl-app',
+			data:{
+				max_point:0,
+				project_list:[],
+				code_list:[]
+			},
+			computed:{
+				total_points:function(){
+					var ret = 0;
+					this.project_list.forEach(function(project){
+						ret += project.point * 1;
+					});
+					return ret;
+				}
+
+			},
+			created:function(){
+				var that = this;
+				var _tmp_setting = 'setting' in window ? setting:[];
+				this.max_points = _tmp_setting.max_points;
+				console.log(_tmp_setting);
+				_tmp_setting.projects.forEach(function(project){
+					project.point = 0;
+					that.project_list.push(project);
+				});
+
+
+			},
+			methods:{
+
+			}
+		});
+	})();
+</script>
+</body>
+</html>
