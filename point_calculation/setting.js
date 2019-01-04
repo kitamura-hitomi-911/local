@@ -8,12 +8,12 @@ var setting = {
 				{
 					id:'111',
 					name:'ほげ１',
-					percentage:0.5
+					percentage:(1/2)
 				},
 				{
 					id:'112',
 					name:'ほげ２',
-					percentage:0.5
+					percentage:(1/2)
 				}
 			]
 		},
@@ -24,17 +24,17 @@ var setting = {
 				{
 					id:'111',
 					name:'ほげ１',
-					percentage:0.333
+					percentage:(1/3)
 				},
 				{
 					id:'112',
 					name:'ほげ２',
-					percentage:0.333
+					percentage:(1/3)
 				},
 				{
 					id:'113',
 					name:'ほげ３',
-					percentage:0.333
+					percentage:(1/3)
 				}
 			]
 		},

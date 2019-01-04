@@ -127,3 +127,31 @@ html{
 	font-size:1rem;
 	line-height:1.5;
 }
+
+/* 結果表 */
+.result_points th,
+.result_points td{
+	padding:5px 10px;
+	border:1px solid #666;
+}
+.result_points .assign_points-sum td{
+	text-align:right;
+	border:none;
+}
+
+.result_points th{
+	background-color:#999;
+	color:#fff;
+}
+.result_points .result_points-point{
+	min-width:8em;
+}
+
+.result_points .result_points-code{
+	min-width:360px;
+}
+.result_points .assign_points-sum-current{
+	display:inline-block;
+	font-size:2rem;
+	line-height:1.5;
+}
