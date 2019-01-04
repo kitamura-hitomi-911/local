@@ -25,17 +25,17 @@
 				<h2>【１】ポイント割振</h2>
 			</div>
 			<div class="cmn_box-main">
-				<div class="l-assign_points">
-					<div class="assign_points">
+				<div class="l-assign_point">
+					<div class="assign_point">
 						<table>
-							<tr><th class="assign_points-project">プロジェクト</th><th class="assign_points-point">ポイント</th></tr>
+							<tr><th class="assign_point-project">プロジェクト</th><th class="assign_point-point">ポイント</th></tr>
 							<tr v-for="project in project_list" :key="project.id">
 								<td>
 									{{project.label}}<br>
 									⇒ <span v-for="code in project.composed_of" :key="code.id">{{code.name}}({{Math.round(code.percentage * 1000) / 10}}%)</span>
 								</td><td><input type="number" min="0" max="100" v-model="project.point" @input="calculateCodePoint"></td>
 							</tr>
-							<tr class="assign_points-sum"><td>合計</td><td><span class="assign_points-sum-current" :style="total_points_style_obj">{{total_points}}</span>&nbsp;/&nbsp;<span class="assign_points-sum-max">{{max_points}}</span></td></tr>
+							<tr class="assign_point-sum"><td>合計</td><td><span class="assign_point-sum-current" :style="total_point_style_obj">{{total_point}}</span>&nbsp;/&nbsp;<span class="assign_point-sum-max">{{max_point}}</span></td></tr>
 						</table>
 					</div>
 				</div>
@@ -48,10 +48,10 @@
 				<h2>【２】結果</h2>
 			</div>
 			<div class="cmn_box-main">
-				<div class="l-result_points">
-					<div class="result_points">
+				<div class="l-result_point">
+					<div class="result_point">
 						<table>
-							<tr><th class="result_points-code">コード名</th><th class="result_points-point">ポイント</th></tr>
+							<tr><th class="result_point-code">コード名</th><th class="result_point-point">ポイント</th></tr>
 							<tr v-for="code in code_data" :key="code.id"><td>{{code.name}}({{code.id}})</td><td>{{code.point}}</td></tr>
 						</table>
 					</div>
@@ -82,23 +82,23 @@
 					}
 					return ret;
 				},
-				total_points:function(){
+				total_point:function(){
 					var ret = 0;
 					this.project_list.forEach(function(project){
 						ret += project.point * 1;
 					});
 					return ret;
 				},
-				total_points_style_obj:function(){
-					return this.total_points > 100 ? {color:"#f00"}:{};
+				total_point_style_obj:function(){
+					return this.total_point > 100 ? {color:"#f00"}:{};
 				}
 
 			},
 			created:function(){
 				var that = this;
 				var _tmp_setting = 'setting' in window ? setting:[];
-				this.max_points = _tmp_setting.max_points;
-				
+				this.max_point = _tmp_setting.max_point;
+
 				_tmp_setting.projects.forEach(function(project){
 					project.point = 0;
 					that.project_list.push(project);
@@ -128,20 +128,20 @@
 						}
 						/**
 						 * 適用済みポイント
-						 * @type {number} assigned_points
+						 * @type {number} assigned_point
 						 */
-						var assigned_points = 0;
+						var assigned_point = 0;
 						project.composed_of.forEach(function(code){
 							that.code_data[code.id].point += Math.floor(project.point * code.percentage);
-							assigned_points += Math.floor(project.point * code.percentage);
+							assigned_point += Math.floor(project.point * code.percentage);
 						});
 						// 割り切れず残ったポイントを適用
-						var rest_points = project.point - assigned_points;
-						if(rest_points){
+						var rest_point = project.point - assigned_point;
+						if(rest_point){
 							project.composed_of.forEach(function(code){
-								that.code_data[code.id].point += (rest_points?1:0)*1;
-								if(rest_points){
-									rest_points--;
+								that.code_data[code.id].point += (rest_point?1:0)*1;
+								if(rest_point){
+									rest_point--;
 								}
 							});
 						}

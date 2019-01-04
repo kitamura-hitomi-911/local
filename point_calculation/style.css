@@ -54,11 +54,11 @@ html{
 	color:#666;
 }
 /* レイアウト --------------------------------- */
-.l-assign_points{
+.l-assign_point{
 	max-width:800px;
 	padding:20px 10px 10px;
 }
-.l-result_points{
+.l-result_point{
 	max-width:800px;
 	padding:20px 10px 10px;
 }
@@ -94,34 +94,34 @@ html{
 }
 
 /* ポイント割振表 */
-.assign_points th,
-.assign_points td{
+.assign_point th,
+.assign_point td{
 	padding:5px 10px;
 	border:1px solid #666;
 }
-.assign_points .assign_points-sum td{
+.assign_point .assign_point-sum td{
 	text-align:right;
 	border:none;
 }
 
-.assign_points th{
+.assign_point th{
 	background-color:#999;
 	color:#fff;
 }
-.assign_points .assign_points-point{
+.assign_point .assign_point-point{
 	min-width:8em;
 }
 
-.assign_points .assign_points-project{
+.assign_point .assign_point-project{
 	min-width:360px;
 }
-.assign_points .assign_points-sum-current{
+.assign_point .assign_point-sum-current{
 	display:inline-block;
 	font-size:2rem;
 	line-height:1.5;
 }
 
-.assign_points td input{
+.assign_point td input{
 	padding:3px 5px;
 	border:1px solid #666;
 	font-size:1rem;
@@ -129,28 +129,28 @@ html{
 }
 
 /* 結果表 */
-.result_points th,
-.result_points td{
+.result_point th,
+.result_point td{
 	padding:5px 10px;
 	border:1px solid #666;
 }
-.result_points .assign_points-sum td{
+.result_point .assign_point-sum td{
 	text-align:right;
 	border:none;
 }
 
-.result_points th{
+.result_point th{
 	background-color:#999;
 	color:#fff;
 }
-.result_points .result_points-point{
+.result_point .result_point-point{
 	min-width:8em;
 }
 
-.result_points .result_points-code{
+.result_point .result_point-code{
 	min-width:360px;
 }
-.result_points .assign_points-sum-current{
+.result_point .assign_point-sum-current{
 	display:inline-block;
 	font-size:2rem;
 	line-height:1.5;

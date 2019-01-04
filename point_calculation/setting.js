@@ -1,5 +1,5 @@
 var setting = {
-	max_points:100,
+	max_point:100,
 	projects:[
 		{
 			id:'pro_a',
