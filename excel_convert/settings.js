@@ -16,14 +16,14 @@
  * @property {boolean} [input.items[].is_nl2br=false] 改行コードを <br> にするか否か。
  * @property {boolean} [input.items[].is_not_output=false] 該当の項目が出力不要か否か。後述の addItem で処理するが個別の key で出力不要の場合に使用する想定。
  * @property {Function} [input.items[].customValue] 出力する値に対しての追加処理
- *                       @param {string} val 元の値
- *                       @return {String} 処理後の値
+ *                      @param {string} val 元の値
+ *                      @return {String} 処理後の値
  * @property {Function} [input.items[].removeLine] 条件を満たした場合は該当行は出力対象外にする
- *                       @param {string} val 元の値
- *                       @return {boolean} true の場合は該当行は出力されない
+ *                      @param {string} val 元の値
+ *                      @return {boolean} true の場合は該当行は出力されない
  * @property {Function} [input.items[].addItem] 読み込むファイルにない項目の追加処理
- *                       @param {Object} line 該当行の key value のオブジェクト
- *                       @return {Object} 該当行に追加する key value を持つオブジェクト
+ *                      @param {Object} line 該当行の key value のオブジェクト
+ *                      @return {Object} 該当行に追加する key value を持つオブジェクト
  *
  * @property {Object} [output = {type:'json','name':id}] 出力に関連する設定
  * @property {string} [type='json'] 出力タイプ "json" もしくは "html"
