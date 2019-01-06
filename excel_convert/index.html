@@ -35,6 +35,22 @@
 					</div>
 					<p class="setting_err_msg" v-if="setting.err_msg" v-html="setting.err_msg"></p>
 				</div>
+				<div class="l-select_setting_info" v-if="setting.selected">
+					<div class="select_setting_info">
+						<dl>
+							<dt>入力ファイル</dt>
+							<dd>{{current_setting.input.is_excel?'Excel':'TSV('+current_setting.input.charset+')'}}</dd>
+						</dl>
+						<dl>
+							<dt>項目名(key名)</dt>
+							<dd><span v-for="item in current_setting.input.items" :key="item.name" class="select_setting_info-item">{{item.excel_name}}({{item.name}})</span></dd>
+						</dl>
+						<dl>
+							<dt>出力フォーマット</dt>
+							<dd>{{current_setting.output.type}}{{current_setting.output.type==='json'?'('+current_setting.output.name+'.json)':''}}</dd>
+						</dl>
+					</div>
+				</div>
 
 			</div>
 		</div>
@@ -58,7 +74,7 @@
 								<dt>MIMEタイプ</dt>
 								<dd>{{input_file.info.type}}</dd>
 							</dl>
-							<a href="#" @click.prevent="clearInputFile" class="input_type_file_parts-clear">TSVファイルをクリアする</a>
+							<a href="#" @click.prevent="clearInputFile" class="input_type_file_parts-clear">ファイルをクリアする</a>
 						</div>
 					</div>
 				</div>
@@ -270,13 +286,13 @@
 						var tmp;
 						if(setting.input.is_excel){
 							// Excelファイルの場合
-							tmp = that._makeTwoDimensionalArrayFromExcel(input_file_text,{
+							tmp = that._make2dArrayFromExcel(input_file_text,{
 								sheet_name:(setting.input.sheet_name || '')
 							});
 							console.log(tmp);
 						}else{
 							// テキストファイルの場合
-							tmp = that._makeTwoDimensionalArrayFromTsv(input_file_text, {
+							tmp = that._make2dArrayFromTsv(input_file_text, {
 								quote: (setting.quote || '"'),
 								linedelim: (setting.linedelim || '999999'),
 							});
@@ -307,7 +323,7 @@
 				 * @param {number} op.enable_line_from 処理開始行
 				 * @returns {Array}
 				 */
-				_makeTwoDimensionalArrayFromExcel:function(array_buffer, op){
+				_make2dArrayFromExcel:function(array_buffer, op){
 					var _tmp_json = (function(array_buffer){
 						var _tmp_wb = XLSX.read(btoa(fixdata(array_buffer)), {
 							type: 'base64',
@@ -362,7 +378,7 @@
 				 * @param {string|number} op.linedelim 行のデリミタ
 				 * @returns {Array.<Array>}
 				 */
-				_makeTwoDimensionalArrayFromTsv:function(txt,op){
+				_make2dArrayFromTsv:function(txt,op){
 					if(!op || !op.quote|| !op.linedelim){
 						console.error('TSVを二次元配列にするための情報が不足しています。');
 						return;
@@ -449,6 +465,11 @@
 										item = (item === '〇');
 									}
 
+									// 日付の整形処理
+									if(_item_settings_by_name[_keys[item_index]].as_date){
+										item = formatDate(item,_item_settings_by_name[_keys[item_index]].as_date);
+									}
+
 									// customValue 適用
 									if(_item_settings_by_name[_keys[item_index]].customValue && typeof _item_settings_by_name[_keys[item_index]].customValue === "function"){
 										item = _item_settings_by_name[_keys[item_index]].customValue(item);
@@ -458,7 +479,7 @@
 								}
 							});
 
-							// _is_remove となっていない && オブジェクトに key value のセットが1つ以上ぶらさがってたら return するオブジェクトに追加
+							// _is_remove が false && オブジェクトに key value のセットが1つ以上ぶらさがってたら return するオブジェクトに追加
 							if(!_is_remove && Object.keys(_tmp_obj).length){
 								// addItem が設定してあれば追加
 								if(op.addItem && typeof op.addItem === 'function'){
@@ -518,7 +539,7 @@
 				 * jsonソースを生成する
 				 */
 				_makeJsonSrc:function(){
-					return JSON.stringify({date:formatDate(this.input_file.info.lastModifiedDate),list:this.output.obj});;
+					return JSON.stringify({created_date:formatDate(this.input_file.info.lastModifiedDate),list:this.output.obj});;
 				},
 				/**
 				 * ダウンロードボタンにjsonファイルを付ける

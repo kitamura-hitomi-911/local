@@ -16,6 +16,7 @@
  * @property {string} input.items[].name 出力時の key 名 ※出力可否の項目のみ必ず "is_be_output" を指定してください。
  * @property {boolean} [input.items[].is_bool=false] 出力をブーリアン型にするか否か。 true の場合は、〇 が ture、それ以外が false となる。
  * @property {boolean} [input.items[].is_nl2br=false] 改行コードを <br> にするか否か。
+ * @property {string} [input.items[].as_date] 指定されていたら、この日時フォーマットで formatDate する。
  * @property {boolean} [input.items[].is_not_output=false] 該当の項目が出力不要か否か。後述の addItem で処理するが個別の key で出力不要の場合に使用する想定。
  * @property {Function} [input.items[].customValue] 出力する値に対しての追加処理
  *                      @param {string} val 元の値
@@ -58,6 +59,11 @@ var settings = [
 					excel_name:'配信有無',
 					name:'is_live',
 					is_bool:true
+				},
+				{
+					excel_name:'日時',
+					name:'date',
+					as_date:'YYYY/MM/DD hh:mm:ss'
 				},
 				{
 					excel_name:'出力可否',

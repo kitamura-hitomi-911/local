@@ -58,6 +58,11 @@ html{
 	max-width:800px;
 	padding:20px 10px 10px;
 }
+
+.l-select_setting_info{
+	max-width:800px;
+	padding:10px;
+}
 .l-input_file{
 	max-width:800px;
 	padding:20px 10px 10px;
@@ -149,6 +154,38 @@ html{
 	color:#f00;
 	font-size:0.75rem;
 	line-height:1.25em;
+}
+
+/* select パーツ下 選択した設定の情報 */
+.select_setting_info{
+	padding:10px;
+	border:1px solid #ccc;
+	background-color:#efefef;
+}
+.select_setting_info dl{
+	overflow:hidden;
+	font-size:0.75rem;
+	line-height:1.25;
+}
+.select_setting_info dt{
+	float:left;
+	width:10em;
+	padding:5px 0;
+}
+.select_setting_info dd{
+	margin-left:11em;
+	padding:5px 0 5px 10px;
+	border-left:1px solid #ccc;
+}
+.select_setting_info .select_setting_info-item{
+	display:inline-block;
+}
+.select_setting_info .select_setting_info-item + .select_setting_info-item{
+	margin-left:2px;
+}
+.select_setting_info .select_setting_info-item + .select_setting_info-item:before{
+	content:",";
+	margin-right:5px;
 }
 
 /* input type file パーツ */
