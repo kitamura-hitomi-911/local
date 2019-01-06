@@ -5,11 +5,13 @@
  * @property {boolean} [is_delete=false] 設定として無効か否か
  *
  * @property {Object} input 読み込みファイルに関連する設定
- * @property {string} [input.charset="UTF-8"] 読み込むファイルの文字コード。Shift_JIS or UTF-8 のいずれかを指定可能。
- * @property {string|number} [input.linedelim=999999] 読み込むファイルの行の終わりを意味する文字列。
+ * @property {string} [input.charset] 読み込むファイルがテキストの場合のみ。読み込むファイルの文字コード。Shift_JIS or UTF-8 のいずれかを指定可能。未指定の場合は Excel ファイル扱いになる。
+ * @property {string|number} [input.linedelim=999999] 読み込むファイルがテキストの場合のみ。読み込むファイルの行の終わりを意味する文字列。
+ * @property {string} [input.quote='"'] 読み込むファイルがテキストの場合のみ。 " or ' のいずれかを指定可能
  * @property {number} [input.enable_line_from=3] 読み込むファイルの2行め以降の有効な開始行の指定。未指定の場合は 3 （1行めを見出し行、2行めを入力例行を想定）
- * @property {Array.<Object>} input.items 読み込むファイルの項目ごとの設定の配列
+ * @property {string} [input.sheet_name] 読み込むファイルがExcelの場合のみ。対象のシート名を指定。未指定の場合は1つめのシートが選択される
  *
+ * @property {Array.<Object>} input.items 読み込むファイルの項目ごとの設定の配列
  * @property {string} input.items[].excel_name エクセルの見出しの文字列
  * @property {string} input.items[].name 出力時の key 名 ※出力可否の項目のみ必ず "is_be_output" を指定してください。
  * @property {boolean} [input.items[].is_bool=false] 出力をブーリアン型にするか否か。 true の場合は、〇 が ture、それ以外が false となる。
@@ -35,7 +37,7 @@ var settings = [
 		id:"sample1",
 		name:"jsonサンプル1",
 		input:{
-			charset:"Shift_JIS",
+			charset:"UTF-8",
 			items:[
 				{
 					excel_name:'ID',
@@ -68,6 +70,7 @@ var settings = [
 		id:"sample2",
 		name:"jsonサンプル2",
 		input:{
+			charset:"Shift_JIS",
 			items:[
 				{
 					excel_name:'ID',
@@ -176,6 +179,39 @@ var settings = [
 		output:{
 			type:"html",
 			template:`<tr id="{line.id}"><td class="title">{line.title}</td><td class="title">{line.is_live?'〇':''}</td></tr>`
+		}
+	},
+	{
+		id:"sample5",
+		name:"excel → jsonサンプル",
+		input:{
+			items:[
+				{
+					excel_name:'ID',
+					name:'id'
+				},
+				{
+					excel_name:'タイトル',
+					name:'title',
+					is_nl2br:true
+				},
+				{
+					excel_name:'カテゴリ',
+					name:'cat',
+					customValue:function(val){
+						return 'カテゴリ'+val;
+					}
+				},
+				{
+					excel_name:'配信有無',
+					name:'is_live',
+					is_bool:true
+				},
+				{
+					excel_name:'出力可否',
+					name:'is_be_output'
+				}
+			]
 		}
 	}
 ];

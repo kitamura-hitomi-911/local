@@ -87,6 +87,7 @@
 		</div>
 	</div>
 </script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.14.1/xlsx.full.min.js"></script>
 <script src="https://unpkg.com/vue/dist/vue.js"></script>
 <script src="./settings.js"></script>
 <script type="text/javascript">
@@ -204,6 +205,9 @@
 				if(!this.setting.err_msg){
 					tmp_settings.forEach(function(setting){
 						if(!setting.is_delete){
+							// 文字コードの指定がなければExcelファイル
+							setting.input.is_excel = setting.input.charset ? false:true;
+
 							if(!setting.output){
 								setting.output = {};
 							}
@@ -239,10 +243,13 @@
 				onChangeInputFile:function(e){
 					var target = e.target;
 					var files = target.files;
-					if(files.length){
+					if(files.length) {
 						this.input_file.info = files[0];
-						var charset = this.current_setting.input.charset || 'UTF-8';
-						this.input_file.reader.readAsText(files[0],charset);
+						if (this.current_setting.input.is_excel) {
+							this.input_file.reader.readAsArrayBuffer(files[0]);
+						} else{
+							this.input_file.reader.readAsText(files[0],this.current_setting.input.charset);
+						}
 					}
 				},
 				/**
@@ -257,18 +264,30 @@
 				onFileLoad:function(){
 					var that = this;
 					var input_file_text = this.input_file.reader.result;
+
 					// TODO: ここ、なんとかわかりやすく書けないか？関数に関数を渡せるが、それだと可読性が…
 					this.output.obj = (function(input_file_text,setting){
-						var tmp = that._makeTwoDimensionalArrayFromTsv(input_file_text, {
-							quote: (setting.quote || '"'),
-							linedelim: (setting.linedelim || '999999'),
-						});
+						var tmp;
+						if(setting.input.is_excel){
+							// Excelファイルの場合
+							tmp = that._makeTwoDimensionalArrayFromExcel(input_file_text,{
+								sheet_name:(setting.input.sheet_name || '')
+							});
+							console.log(tmp);
+						}else{
+							// テキストファイルの場合
+							tmp = that._makeTwoDimensionalArrayFromTsv(input_file_text, {
+								quote: (setting.quote || '"'),
+								linedelim: (setting.linedelim || '999999'),
+							});
+						}
 						return that._makeAssociativeArrayObjectFromArray(tmp,{
 							items:(setting.input.items || []),
 							addItem:(setting.input.addItem || null),
 							enable_line_from:(setting.input.enable_line_from || 3)
 						});
 					})(input_file_text,this.current_setting);
+
 					if(this.current_setting.output.type === 'json'){
 						this.output.txt = this._makeJsonSrc();
 						this._setDlBtn();
@@ -276,6 +295,64 @@
 						this.output.txt = this._makeHtmlSrc();
 					}
 
+				},
+				/**
+				 * Excel から 二次元配列化
+				 * (XLSX は Sheet.js ライブラリ)
+				 * @param {Array} array_buffer ExcelファイルをArrayBufferとして読み込んだデータ
+				 * @param {Object} op オプション
+				 * @param {Array} op.sheet_name シート名。未指定の場合は空文字となるので、1つめのシートが選択される
+				 * @param {Array} op.items[] エクセルの見出し文字列とkey名の組み合わせ、またそれぞれの追加処理等
+				 * @param {Function} op.addItem 行ごとのカスタム処理
+				 * @param {number} op.enable_line_from 処理開始行
+				 * @returns {Array}
+				 */
+				_makeTwoDimensionalArrayFromExcel:function(array_buffer, op){
+					var _tmp_json = (function(array_buffer){
+						var _tmp_wb = XLSX.read(btoa(fixdata(array_buffer)), {
+							type: 'base64',
+							cellDates: true,
+						});
+						return to_json(_tmp_wb);
+					})(array_buffer);
+
+					var sheet_name = op.sheet_name;
+					for(var i in _tmp_json){
+						if(!sheet_name){
+							sheet_name = i;
+						}
+					}
+
+					return _tmp_json[sheet_name];
+
+					// ファイルの読み込み
+					function fixdata(data) {
+						var o = "",
+								l = 0,
+								w = 10240;
+						for (; l < data.byteLength / w; ++l) o += String.fromCharCode.apply(null, new Uint8Array(data.slice(l * w,
+								l * w + w)));
+						o += String.fromCharCode.apply(null, new Uint8Array(data.slice(l * w)));
+						return o;
+					}
+
+					// ワークブックのデータをjsonに変換
+					function to_json(workbook) {
+						var result = {};
+						workbook.SheetNames.forEach(function (sheetName) {
+							var roa = XLSX.utils.sheet_to_json(
+									workbook.Sheets[sheetName],
+									{
+										raw: true,
+										header:1, // "2D Array"
+										defval:'' // 空欄のデフォルト値
+							});
+							if (roa.length > 0) {
+								result[sheetName] = roa;
+							}
+						});
+						return result;
+					}
 				},
 				/**
 				 * tsvテキストから二次元配列化
@@ -319,16 +396,17 @@
 				 * @param {Array} op.items[] エクセルの見出し文字列とkey名の組み合わせ、またそれぞれの追加処理等
 				 * @param {Function} op.addItem 行ごとのカスタム処理
 				 * @param {number} op.enable_line_from 処理開始行
-				 * @returns {Object}
+				 * @returns {Array}
 				 */
 				_makeAssociativeArrayObjectFromArray:function(ary,op){
+					console.log(ary);
 					var ret = [];
 					var _keys = [];
 					var _tmp_obj = {};
 					var _key_name_form_excel_name = {};
 					var _item_settings_by_name = {};
-					var is_remove = false;
-					var is_be_output = 'is_be_output';
+					var _is_remove = false;
+					var _is_be_output = 'is_be_output';
 					op.items.forEach(function(item_setting){
 						_key_name_form_excel_name[item_setting.excel_name] = item_setting.name;
 						_item_settings_by_name[item_setting.name] = item_setting;
@@ -336,26 +414,29 @@
 					ary.forEach(function(line,line_index){
 						if(line_index === 0){
 							// key 名の配列を作成
+							console.log(line.length);
 							line.forEach(function(item,item_index){
+								console.log(item,item_index);
 								_keys.push((_key_name_form_excel_name[item]?_key_name_form_excel_name[item]:''));
 							});
+							console.log(_keys);
 						}
 						if(line_index >= op.enable_line_from-1){
 							_tmp_obj = {};
-							is_remove = false;
+							_is_remove = false;
 							// 出力可否の項目が〇でなければ処理しない
-							if(line[_keys.indexOf(is_be_output)] !== '〇'){
+							if(line[_keys.indexOf(_is_be_output)] !== '〇'){
 								return;
 							}
 							// 項目ごとに key value のセットで追加する
 							line.forEach(function(item,item_index){
 								// item_index に key 名をもっていて、出力可否の項目ではない ＆ 出力対象外になってなければ処理
-								if(_keys[item_index] && _keys[item_index] !== is_be_output && !_item_settings_by_name[_keys[item_index]].is_not_output){
+								if(_keys[item_index] && _keys[item_index] !== _is_be_output && !_item_settings_by_name[_keys[item_index]].is_not_output){
 
 									// 対象外にする条件があれば確認、対象外であれば is_remove を true にする。
 									if(_item_settings_by_name[_keys[item_index]].removeLine && typeof _item_settings_by_name[_keys[item_index]].removeLine === 'function'){
-										is_remove = _item_settings_by_name[_keys[item_index]].removeLine(item);
-										console.log('is_remove',is_remove);
+										_is_remove = _item_settings_by_name[_keys[item_index]].removeLine(item);
+										console.log('is_remove',_is_remove);
 									}
 
 									// 改行コードを<br>にする
@@ -377,8 +458,8 @@
 								}
 							});
 
-							// is_remove となっていない && オブジェクトに key value のセットが1つ以上ぶらさがってたら return するオブジェクトに追加
-							if(!is_remove && Object.keys(_tmp_obj).length){
+							// _is_remove となっていない && オブジェクトに key value のセットが1つ以上ぶらさがってたら return するオブジェクトに追加
+							if(!_is_remove && Object.keys(_tmp_obj).length){
 								// addItem が設定してあれば追加
 								if(op.addItem && typeof op.addItem === 'function'){
 									// addItem に渡すために、現在行のkey value オブジェクトを生成する
