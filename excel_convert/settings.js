@@ -34,8 +34,41 @@
  */
 var settings = [
 	{
+		id:"excel_sample",
+		name:"excel → jsonサンプル",
+		input:{
+			items:[
+				{
+					excel_name:'ID',
+					name:'id'
+				},
+				{
+					excel_name:'タイトル',
+					name:'title',
+					is_nl2br:true
+				},
+				{
+					excel_name:'カテゴリ',
+					name:'cat',
+					customValue:function(val){
+						return 'カテゴリ'+val;
+					}
+				},
+				{
+					excel_name:'配信有無',
+					name:'is_live',
+					is_bool:true
+				},
+				{
+					excel_name:'出力可否',
+					name:'is_be_output'
+				}
+			]
+		}
+	},
+	{
 		id:"sample1",
-		name:"jsonサンプル1",
+		name:"tsv(UTF-8) → jsonサンプル1",
 		input:{
 			charset:"UTF-8",
 			items:[
@@ -68,7 +101,7 @@ var settings = [
 	},
 	{
 		id:"sample2",
-		name:"jsonサンプル2",
+		name:"tsv(Shift_JIS) → jsonサンプル2",
 		input:{
 			charset:"Shift_JIS",
 			items:[
@@ -95,7 +128,7 @@ var settings = [
 	},
 	{
 		id:"sample3",
-		name:"jsonサンプル3 高度",
+		name:"tsv(Shift_JIS) → jsonサンプル3 高度",
 		input:{
 			charset:"Shift_JIS",
 			items:[
@@ -149,7 +182,7 @@ var settings = [
 	},
 	{
 		id:"sample4",
-		name:"HTMLソースサンプル",
+		name:"tsv(Shift_JIS) → HTMLソースサンプル",
 		input:{
 			charset:"Shift_JIS",
 			items:[
@@ -179,39 +212,6 @@ var settings = [
 		output:{
 			type:"html",
 			template:`<tr id="{line.id}"><td class="title">{line.title}</td><td class="title">{line.is_live?'〇':''}</td></tr>`
-		}
-	},
-	{
-		id:"sample5",
-		name:"excel → jsonサンプル",
-		input:{
-			items:[
-				{
-					excel_name:'ID',
-					name:'id'
-				},
-				{
-					excel_name:'タイトル',
-					name:'title',
-					is_nl2br:true
-				},
-				{
-					excel_name:'カテゴリ',
-					name:'cat',
-					customValue:function(val){
-						return 'カテゴリ'+val;
-					}
-				},
-				{
-					excel_name:'配信有無',
-					name:'is_live',
-					is_bool:true
-				},
-				{
-					excel_name:'出力可否',
-					name:'is_be_output'
-				}
-			]
 		}
 	}
 ];

@@ -103,7 +103,7 @@ html{
 /* select パーツ */
 .select_parts {
 	position: relative;
-	width:300px;
+	width:500px;
 }
 
 .select_parts .select_parts-label {

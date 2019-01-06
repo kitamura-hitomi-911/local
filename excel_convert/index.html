@@ -41,7 +41,7 @@
 
 		<div class="cmn_box">
 			<div class="cmn_box-ttl">
-				<h2>【２】TSVファイルインポート</h2>
+				<h2>【２】{{setting.selected?(current_setting.input.is_excel?'Excel':'TSV('+current_setting.input.charset+')'):''}}ファイルインポート</h2>
 			</div>
 			<div class="cmn_box-main">
 				<div class="l-input_file">
@@ -67,7 +67,7 @@
 
 		<div class="cmn_box">
 			<div class="cmn_box-ttl">
-				<h2>【３】出力</h2>
+				<h2>【３】出力{{setting.selected?'('+current_setting.output.type+')':''}}</h2>
 			</div>
 			<div class="cmn_box-main">
 				<div class="l-output_file">
