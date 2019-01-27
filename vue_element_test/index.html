@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+	<meta charset="UTF-8">
+	<title>vue element test</title>
+	<link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+</head>
+<body>
+<div id="app">
+	<el-date-picker
+			v-model="date.value"
+			type="date"
+			placeholder="日程を選択"
+			:picker-options="date.options">
+	</el-date-picker>
+
+	<el-date-picker
+			v-model="datetime.value"
+			type="datetime"
+			:format="datetime.format"
+			:value-format="datetime.format"
+			placeholder="日時を選択"
+			:picker-options="datetime.options">
+	</el-date-picker>
+
+	<el-time-picker
+			v-model="time.value"
+			:format="time.format"
+			:value-format="time.format"
+			placeholder="時間を選択">
+</div>
+</body>
+<!-- import Vue before Element -->
+<script src="https://unpkg.com/vue/dist/vue.js"></script>
+<!-- import JavaScript -->
+<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+<script>
+	new Vue({
+		el: '#app',
+		data: function() {
+			return {
+				date:{
+					value: '2019-01-30',
+					options:{
+						disabledDate:function(time) {
+							return time.getTime() < Date.now();
+						}
+					}
+				},
+				datetime:{
+					value:'2019-01-30 11:00',
+					format:'yyyy-MM-dd HH:mm',
+					options:{
+						disabledDate:function(time) {
+							return time.getTime() < Date.now();
+						}
+					}
+				},
+				time:{
+					value:new Date(2016, 9, 10, 11, 0),
+					format:"HH:mm"
+				}
+			};
+		}
+	});
+</script>
+</html>
