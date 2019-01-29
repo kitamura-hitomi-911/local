@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+	<meta charset="UTF-8">
+	<title>History APIテスト</title>
+</head>
+<body>
+<p><a href="#" onclick="movePage('#push_test');return false;">pushState</a></p>
+<p><a href="#" onclick="replacePage('#replace_test');return false;">replacePage</a></p>
+<p><a href="#" onclick="replacePage(window.location.pathname+window.location.search);return false;">ハッシュ外し</a></p>
+<p><a href="#hoge">単純なページ遷移</a></p>
+</body>
+<script type="text/javascript">
+	(function(){
+		'use strict';
+		window.addEventListener('popstate', function (e) {
+			console.log(e);
+			if(state){
+				document.title = e.state.title;
+			}
+		});
+
+		window.movePage = function(path){
+			var stateObj = { path: path, title:'pushState' };
+			history.pushState(stateObj, null, path);
+			document.title = history.state.title;
+		};
+		window.replacePage = function(path){
+			var stateObj = { path: path, title:'replacePage' };
+			history.replaceState(stateObj, null, path);
+			document.title = history.state.title;
+		};
+
+	})();
+</script>
+</html>
