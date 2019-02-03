@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Vue Test</title>
+</head>
+<body>
+<div id="app"></div>
+<script src="https://unpkg.com/vue/dist/vue.js"></script>
+<script type="text/x-template" id="tmpl-list">
+	<li>
+		<dl>
+			<dt>{{item.name}}({{item.id}})</dt>
+			<dd>{{item.desc}}</dd>
+			<dd v-if="item.err_msg">{{item.err_msg}}</dd>
+		</dl>
+	</li>
+</script>
+<script type="text/javascript">
+	(function(){
+		'use strict';
+
+		var Item = function(params){
+			if(!params || !params.id || !params.name){
+					return;
+			}
+			this.id = params.id;
+			this.name = params.name;
+			this.desc = params.desc || '';
+			this.isValid = params.isValid || function(vm){return true;};
+			this.err_msg = '';
+		};
+
+
+		new Vue({
+			el:'#app',
+			data:{
+				list:[]
+			},
+			created:function(){
+				var that = this;
+				var _list = [
+					{
+						id:'hoge',
+						name:'ほげ',
+						desc:'説明',
+						isValid:function(vm){
+							var _err_flg = false;
+							this.err_msg = '';
+							if(!this.desc){
+								this.err_msg = '説明がない';
+								_err_flg = true;
+							}
+							return !_err_flg;
+						}
+					},
+					{id:'fuga',name:'ふが',desc:'説明'}
+				];
+
+				_list.forEach(function(item,item_index,origin_list){
+					that.list.push(new Item(item));
+				});
+
+			},
+			template:'<ul><list v-for="item in list" :item="item" :key="item.id"></list><li><a href="#" @click="checkItems">チェックフォーム</a></li></ul>',
+			methods:{
+				checkItems:function(){
+					var err_flg = false;
+					var that = this;
+					this.list.forEach(function(item,item_index,origin_list){
+						err_flg = !item.isValid(that) || err_flg;
+					});
+					console.log('err_flg',err_flg);
+				}
+			},
+			components:{
+				list:{
+					props:{
+						item:{
+							type:Item,
+							required:true
+						}
+					},
+					template:'#tmpl-list'
+				}
+			}
+		})
+
+	})();
+</script>
+</body>
+</html>
